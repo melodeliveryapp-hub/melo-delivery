@@ -9,7 +9,6 @@
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .glass-effect { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans selection:bg-orange-100">
@@ -31,12 +30,12 @@
     <div class="max-w-6xl mx-auto mt-12 px-4">
         <div class="flex gap-3 overflow-x-auto no-scrollbar pb-6 pl-1" id="container-filtros">
             <button onclick="filtrarCategoriaGeral('')" 
-                    class="flex flex-col items-center justify-center min-w-[100px] h-[105px] bg-white rounded-2xl shadow-sm border border-orange-500 relative shrink-0 gap-2 group transition-all active:scale-95">
+                    class="flex flex-col items-center justify-center min-w-[100px] h-[105px] bg-white rounded-2xl shadow-sm border border-orange-500 relative shrink-0 gap-2 group transition-all active:scale-95 cursor-pointer">
                 <span class="text-3xl filter drop-shadow-sm group-hover:scale-110 transition-transform">🏪</span>
                 <span class="text-xs font-bold text-orange-600">Ver Tudo</span>
                 <div class="absolute bottom-0 w-full h-1 bg-orange-500 rounded-b-2xl opacity-50"></div>
             </button>
-            </div>
+        </div>
     </div>
 
     <main class="max-w-6xl mx-auto py-4 px-4 mb-20">
@@ -84,7 +83,6 @@
     </div>
 
     <script>
-        // CHAVE CORRIGIDA (Versão Longa Original)
         const SUPABASE_URL = 'https://xhfwrbjxitcrktccdrpn.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZndyYmp4aXRjcmt0Y2NkcnBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MjQ5NTksImV4cCI6MjA4NjIwMDk1OX0.nyGJxdNT-qiH-oqJL4KDKA-7bRtlj5UxmXy32RswPUc';
         
@@ -99,28 +97,23 @@
             'mercado': '🛒', 'comércio': '🛍️', 'pet': '🐶', 'padaria': '🥐', 
             'sorvete': '🍦', 'gelado': '🍦', 'celular': '📱', 'técnica': '📱', 
             'assistência': '📱', 'eletrônico': '🔌', 'informática': '💻',
-            'roupa': '👕', 'moda': '👗'
+            'roupa': '👕', 'moda': '👗', 'açaí': '🟣'
         };
 
         async function carregarLojas() {
             try {
-                // 1. Busca Segura
                 const { data: profiles, error: errP } = await sbClient.from('profiles').select('*');
                 const { data: info, error: errI } = await sbClient.from('store_info').select('*');
 
                 if (errP || errI) {
-                    console.error("Erro Supabase:", errP, errI);
-                    alert("Erro ao conectar com o servidor. Verifique a internet.");
+                    console.error("Erro Supabase:", errP || errI);
                     return;
                 }
 
-                if (!profiles) return; // Se não tiver nada, para aqui.
+                if (!profiles) return;
 
                 todasLojas = profiles.map(p => {
-                    // Match inteligente de nomes (remove espaços e ignora maiúsculas)
                     const extra = info?.find(i => i.name?.trim().toLowerCase() === p.store_name?.trim().toLowerCase());
-                    
-                    // Tratamento de Categorias (Separa por ; e remove espaços)
                     const rawCats = p.categoria_loja || 'Outros';
                     const cats = rawCats.split(';').map(c => c.trim()).filter(c => c !== "");
 
@@ -143,13 +136,10 @@
             const container = document.getElementById('container-filtros');
             let listaCats = [];
             todasLojas.forEach(l => listaCats = [...listaCats, ...l.categorias]);
-            
-            // Remove duplicatas e ordena
             const catsUnicas = [...new Set(listaCats)].sort();
 
             catsUnicas.forEach(cat => {
                 const catLower = cat.toLowerCase();
-                // Tenta achar um ícone pelo nome parcial
                 const chaveEncontrada = Object.keys(mapaIcones).find(chave => catLower.includes(chave));
                 const icon = chaveEncontrada ? mapaIcones[chaveEncontrada] : '🍽️';
                 
@@ -211,21 +201,12 @@
             const loja = document.getElementById('p-loja').value;
             const doc = document.getElementById('p-doc').value;
             const zap = document.getElementById('p-zap').value;
-            
-            const msg = `Olá! Quero cadastrar minha loja no Melo Delivery:%0A%0A🏪 *Loja:* ${loja}%0A📄 *Doc:* ${doc}%0A📞 *Contato:* ${zap}`;
-            
-            // Redireciona para o email (simples e funcional)
-            window.location.href = `mailto:melodigital@gmail.com?subject=Novo Parceiro - ${loja}&body=${msg}`;
+            const msg = `Olá! Quero cadastrar minha loja:%0A🏪 ${loja}%0A📄 ${doc}%0A📞 ${zap}`;
+            window.location.href = `mailto:cadastro@melodelivery.com?subject=Parceiro&body=${msg}`;
             fecharModalParceiro();
         }
 
         carregarLojas();
-
-        Copyright (c) 2026 Melo Delivery - Mateus [SEU SOBRENOME]
-        Todos os direitos reservados.
-
-        O código fonte deste projeto é propriedade exclusiva de Mateus [SEU SOBRENOME].
-        A cópia, redistribuição ou uso comercial sem autorização expressa é proibida.
     </script>
 </body>
 </html>

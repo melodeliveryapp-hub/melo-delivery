@@ -68,13 +68,11 @@
         <div class="bg-white w-full max-w-lg rounded-[2.5rem] p-8 space-y-4 shadow-2xl animate-[fadeIn_0.3s_ease-out]">
             <h2 class="text-2xl font-black text-orange-600 text-center">Cadastro Rápido</h2>
             <p class="text-center text-gray-400 text-sm mb-4">Preencha para nossa equipe entrar em contato.</p>
-            
             <div class="space-y-3">
                 <input type="text" id="p-loja" placeholder="Nome do Estabelecimento" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-200 focus:bg-white transition-all">
                 <input type="text" id="p-doc" placeholder="CNPJ ou CPF" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-200 focus:bg-white transition-all">
                 <input type="tel" id="p-zap" placeholder="WhatsApp (DDD + Número)" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-200 focus:bg-white transition-all">
             </div>
-
             <div class="flex gap-3 pt-4">
                 <button onclick="fecharModalParceiro()" class="flex-1 font-bold text-gray-400 py-4 hover:bg-gray-50 rounded-xl transition-colors">Cancelar</button>
                 <button onclick="enviarCadastroParceiro()" class="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 rounded-xl font-black shadow-lg hover:shadow-orange-200 hover:-translate-y-1 transition-all">ENVIAR</button>
@@ -89,7 +87,6 @@
         const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let todasLojas = [];
 
-        // Ícones Inteligentes para Categorias
         const mapaIcones = {
             'lanche': '🍔', 'burguer': '🍔', 'pizza': '🍕', 'doce': '🍩', 
             'sobremesa': '🍰', 'bolo': '🍰', 'bebida': '🥤', 'açaí': '🥣',
@@ -105,11 +102,7 @@
                 const { data: profiles, error: errP } = await sbClient.from('profiles').select('*');
                 const { data: info, error: errI } = await sbClient.from('store_info').select('*');
 
-                if (errP || errI) {
-                    console.error("Erro Supabase:", errP || errI);
-                    return;
-                }
-
+                if (errP || errI) { console.error("Erro Supabase:", errP || errI); return; }
                 if (!profiles) return;
 
                 todasLojas = profiles.map(p => {
@@ -123,13 +116,9 @@
                         categorias: cats 
                     };
                 });
-
                 criarFiltrosCategorias();
                 exibirLojas(todasLojas);
-
-            } catch (e) {
-                console.error("Erro crítico no JS:", e);
-            }
+            } catch (e) { console.error("Erro crítico no JS:", e); }
         }
 
         function criarFiltrosCategorias() {
@@ -162,19 +151,18 @@
             } else {
                 feedback.classList.add('hidden');
                 lojas.forEach(loja => {
+                    // LÓGICA DO LINK AMIGÁVEL: Se tiver SLUG usa ele, senão usa o ID
+                    const linkLoja = loja.slug ? `cardapio.html?loja=${loja.slug}` : `cardapio.html?loja=${loja.id}`;
+                    
                     container.innerHTML += `
                         <div class="bg-white p-6 rounded-[2.5rem] shadow-lg border border-gray-50 flex flex-col items-center text-center transition-all hover:-translate-y-1 hover:shadow-xl cursor-pointer group" 
-                             onclick="window.location.href='cardapio.html?loja=${loja.id}'">
+                             onclick="window.location.href='${linkLoja}'">
                             <div class="w-24 h-24 bg-gray-50 rounded-full mb-4 overflow-hidden border-4 border-white shadow-md group-hover:border-orange-100 transition-colors">
-                                <img src="${loja.logoFinal}" 
-                                     onerror="this.src='https://via.placeholder.com/200?text=Loja'" 
-                                     class="w-full h-full object-cover">
+                                <img src="${loja.logoFinal}" onerror="this.src='https://via.placeholder.com/200?text=Loja'" class="w-full h-full object-cover">
                             </div>
                             <h3 class="text-lg font-black text-gray-800 leading-tight group-hover:text-orange-600 transition-colors">${loja.store_name}</h3>
                             <div class="flex flex-wrap justify-center gap-1 mt-3">
-                                ${loja.categorias.slice(0, 2).map(c => `
-                                    <span class="bg-orange-50 text-orange-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide border border-orange-100">${c}</span>
-                                `).join('')}
+                                ${loja.categorias.slice(0, 2).map(c => `<span class="bg-orange-50 text-orange-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide border border-orange-100">${c}</span>`).join('')}
                             </div>
                         </div>`;
                 });
@@ -183,10 +171,7 @@
 
         function filtrarLojas() {
             const termo = document.getElementById('searchInput').value.toLowerCase();
-            exibirLojas(todasLojas.filter(l => 
-                l.store_name.toLowerCase().includes(termo) || 
-                l.categorias.some(c => c.toLowerCase().includes(termo))
-            ));
+            exibirLojas(todasLojas.filter(l => l.store_name.toLowerCase().includes(termo) || l.categorias.some(c => c.toLowerCase().includes(termo))));
         }
 
         function filtrarCategoriaGeral(cat) {
@@ -196,7 +181,6 @@
 
         function abrirModalParceiro() { document.getElementById('modal-parceiro').classList.remove('hidden'); }
         function fecharModalParceiro() { document.getElementById('modal-parceiro').classList.add('hidden'); }
-        
         function enviarCadastroParceiro() {
             const loja = document.getElementById('p-loja').value;
             const doc = document.getElementById('p-doc').value;

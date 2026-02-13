@@ -3,123 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Melo Delivery - Home</title>
+    <title>Melo Delivery - O Shopping da Cidade</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass-effect { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans">
+<body class="bg-gray-50 text-gray-900 font-sans selection:bg-orange-100">
 
-    <header class="bg-orange-500 pt-12 pb-24 px-6 rounded-b-[3rem] shadow-xl text-center relative z-10">
-        <h1 class="text-white text-4xl font-black italic tracking-tighter uppercase">Melo Delivery</h1>
-        <p class="text-orange-100 text-sm font-bold mt-2 uppercase tracking-widest italic">O sabor bate à sua porta</p>
+    <header class="bg-gradient-to-b from-orange-500 to-orange-600 pt-12 pb-24 px-6 rounded-b-[3rem] shadow-xl text-center relative z-10">
+        <h1 class="text-white text-4xl font-black italic tracking-tighter uppercase drop-shadow-md">Melo Delivery</h1>
+        <p class="text-orange-100 text-sm font-bold mt-2 uppercase tracking-widest italic opacity-90">O sabor bate à sua porta</p>
     </header>
 
     <div class="max-w-4xl mx-auto -mt-8 px-4 relative z-20">
-        <div class="relative group">
+        <div class="relative group transition-all hover:-translate-y-1">
             <input type="text" id="searchInput" onkeyup="filtrarLojas()" 
-                   placeholder="Pesquisar loja..." 
-                   class="w-full p-6 pl-14 rounded-2xl shadow-xl border-none outline-none bg-white text-lg text-gray-600 focus:ring-4 focus:ring-orange-100 transition-all">
-            <span class="absolute left-5 top-6 text-gray-400 text-xl">🔍</span>
+                   placeholder="O que você procura hoje?" 
+                   class="w-full p-6 pl-14 rounded-2xl shadow-xl border-none outline-none bg-white text-lg text-gray-600 focus:ring-4 focus:ring-orange-100 placeholder-gray-400 transition-all">
+            <span class="absolute left-5 top-6 text-gray-400 text-xl group-focus-within:text-orange-500 transition-colors">🔍</span>
         </div>
     </div>
 
-    <div class="max-w-6xl mx-auto mt-10 px-4">
-        <div class="flex gap-4 overflow-x-auto no-scrollbar pb-4" id="container-filtros">
+    <div class="max-w-6xl mx-auto mt-12 px-4">
+        <div class="flex gap-3 overflow-x-auto no-scrollbar pb-6 pl-1" id="container-filtros">
             <button onclick="filtrarCategoriaGeral('')" 
-                    class="flex flex-col items-center justify-center min-w-[100px] h-[100px] bg-white rounded-2xl shadow-sm border border-orange-500 hover:bg-orange-50 transition-all shrink-0 gap-2 group">
-                <span class="text-2xl group-hover:scale-110 transition-transform">🏪</span>
-                <span class="text-xs font-bold text-orange-600">Todos</span>
+                    class="flex flex-col items-center justify-center min-w-[100px] h-[105px] bg-white rounded-2xl shadow-sm border border-orange-500 relative shrink-0 gap-2 group transition-all active:scale-95">
+                <span class="text-3xl filter drop-shadow-sm group-hover:scale-110 transition-transform">🏪</span>
+                <span class="text-xs font-bold text-orange-600">Ver Tudo</span>
+                <div class="absolute bottom-0 w-full h-1 bg-orange-500 rounded-b-2xl opacity-50"></div>
             </button>
             </div>
     </div>
 
-    <main class="max-w-6xl mx-auto py-6 px-4 mb-20">
-        <h2 class="text-xl font-black text-gray-800 mb-6 flex items-center gap-2">
-            <span class="w-1.5 h-6 bg-orange-500 rounded-full"></span> Lojas Parceiras
+    <main class="max-w-6xl mx-auto py-4 px-4 mb-20">
+        <h2 class="text-xl font-black text-gray-800 mb-6 flex items-center gap-2 px-2">
+            <span class="w-1.5 h-6 bg-orange-500 rounded-full shadow-sm"></span> Lojas Parceiras
         </h2>
 
         <div id="lista-lojas" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
         
-        <div id="feedback-busca" class="hidden text-center py-16 px-6 bg-orange-50 rounded-[3rem] border-4 border-dashed border-orange-200 mt-6">
-            <p class="text-orange-800 font-black text-xl italic">"Que pena, essa loja ainda não é nossa parceira..."</p>
-            <p class="text-orange-600 mt-3 font-bold">Aproveite e nos indique à ela! 🚀</p>
+        <div id="feedback-busca" class="hidden text-center py-16 px-6 bg-orange-50 rounded-[3rem] border-4 border-dashed border-orange-200 mt-6 mx-auto max-w-lg">
+            <div class="text-6xl mb-4">😕</div>
+            <p class="text-orange-800 font-black text-xl italic">"Poxa, não encontramos essa loja..."</p>
+            <p class="text-orange-600 mt-2 font-bold text-sm">Mas você pode indicá-la para o Melo Delivery! 🚀</p>
         </div>
 
-        <div class="mt-16 bg-gray-900 rounded-[3rem] p-8 text-center text-white shadow-2xl relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-orange-500 rounded-full blur-3xl opacity-20"></div>
-            <h2 class="text-2xl font-black mb-2 relative z-10">Sua loja aqui?</h2>
-            <p class="text-gray-400 mb-6 text-sm relative z-10">Venda mais com o Melo Delivery!</p>
-            <button onclick="abrirModalParceiro()" class="bg-orange-500 text-white px-8 py-3 rounded-xl font-black shadow-lg hover:scale-105 transition-transform relative z-10 text-sm">QUERO SER PARCEIRO</button>
+        <div class="mt-16 bg-gray-900 rounded-[2.5rem] p-8 text-center text-white shadow-2xl relative overflow-hidden group cursor-pointer" onclick="abrirModalParceiro()">
+            <div class="absolute top-0 right-0 w-40 h-40 bg-orange-500 rounded-full blur-[60px] opacity-20 group-hover:opacity-30 transition-opacity"></div>
+            <h2 class="text-2xl font-black mb-1 relative z-10">Tem um comércio?</h2>
+            <p class="text-gray-400 mb-6 text-sm relative z-10">Venda muito mais com a gente!</p>
+            <button class="bg-orange-500 text-white px-8 py-3 rounded-xl font-black shadow-lg group-hover:scale-105 transition-transform relative z-10 text-sm w-full sm:w-auto">QUERO SER PARCEIRO</button>
         </div>
     </main>
 
-    <div id="modal-parceiro" class="fixed inset-0 bg-black/80 z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-lg rounded-[2.5rem] p-8 space-y-4">
-            <h2 class="text-2xl font-black text-orange-500 text-center">Cadastro Rápido</h2>
-            <input type="text" id="p-loja" placeholder="Nome do Estabelecimento" class="w-full p-4 bg-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-200">
-            <input type="text" id="p-doc" placeholder="CNPJ ou CPF" class="w-full p-4 bg-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-200">
-            <input type="tel" id="p-zap" placeholder="WhatsApp para Contato" class="w-full p-4 bg-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-200">
-            <div class="flex gap-4 pt-4">
-                <button onclick="fecharModalParceiro()" class="flex-1 font-bold text-gray-400 py-4">Cancelar</button>
-                <button onclick="enviarCadastroParceiro()" class="flex-1 bg-orange-500 text-white py-4 rounded-xl font-black shadow-lg">ENVIAR</button>
+    <footer class="text-center py-8 text-gray-400 text-xs mb-4">
+        <p>&copy; 2026 Melo Delivery. Todos os direitos reservados.</p>
+        <p class="opacity-50 mt-1">Desenvolvido com ❤️</p>
+    </footer>
+
+    <div id="modal-parceiro" class="fixed inset-0 bg-black/80 z-[100] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-lg rounded-[2.5rem] p-8 space-y-4 shadow-2xl animate-[fadeIn_0.3s_ease-out]">
+            <h2 class="text-2xl font-black text-orange-600 text-center">Cadastro Rápido</h2>
+            <p class="text-center text-gray-400 text-sm mb-4">Preencha para nossa equipe entrar em contato.</p>
+            
+            <div class="space-y-3">
+                <input type="text" id="p-loja" placeholder="Nome do Estabelecimento" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-200 focus:bg-white transition-all">
+                <input type="text" id="p-doc" placeholder="CNPJ ou CPF" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-200 focus:bg-white transition-all">
+                <input type="tel" id="p-zap" placeholder="WhatsApp (DDD + Número)" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-200 focus:bg-white transition-all">
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <button onclick="fecharModalParceiro()" class="flex-1 font-bold text-gray-400 py-4 hover:bg-gray-50 rounded-xl transition-colors">Cancelar</button>
+                <button onclick="enviarCadastroParceiro()" class="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 rounded-xl font-black shadow-lg hover:shadow-orange-200 hover:-translate-y-1 transition-all">ENVIAR</button>
             </div>
         </div>
     </div>
 
     <script>
+        // CHAVE CORRIGIDA (Versão Longa Original)
         const SUPABASE_URL = 'https://xhfwrbjxitcrktccdrpn.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZndyYmp4aXRjcmt0Y2NkcnBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MjQ5NTksImV4cCI6MjA4NjIwMDk1OX0.nyGJxdNT-qiH-oqJL4KDKA-7bRtlj5UxmXy32RswPUc';
+        
         const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let todasLojas = [];
 
-        // Dicionário de Palavras-Chave -> Emojis
+        // Ícones Inteligentes para Categorias
         const mapaIcones = {
             'lanche': '🍔', 'burguer': '🍔', 'pizza': '🍕', 'doce': '🍩', 
             'sobremesa': '🍰', 'bolo': '🍰', 'bebida': '🥤', 'açaí': '🥣',
             'sushi': '🍣', 'japonesa': '🍣', 'farmácia': '💊', 'drogaria': '💊',
             'mercado': '🛒', 'comércio': '🛍️', 'pet': '🐶', 'padaria': '🥐', 
             'sorvete': '🍦', 'gelado': '🍦', 'celular': '📱', 'técnica': '📱', 
-            'assistência': '📱', 'eletrônico': '🔌', 'informática': '💻'
+            'assistência': '📱', 'eletrônico': '🔌', 'informática': '💻',
+            'roupa': '👕', 'moda': '👗'
         };
 
         async function carregarLojas() {
-            const { data: profiles } = await sbClient.from('profiles').select('*');
-            const { data: info } = await sbClient.from('store_info').select('*');
-            
-            todasLojas = profiles.map(p => {
-                const extra = info?.find(i => i.name?.trim().toLowerCase() === p.store_name?.trim().toLowerCase());
-                const cats = p.categoria_loja ? p.categoria_loja.split(';').map(c => c.trim()) : ['Outros'];
-                return { 
-                    ...p, 
-                    logoFinal: extra?.logo_url || 'https://via.placeholder.com/200', 
-                    categorias: cats 
-                };
-            });
-            criarFiltrosCategorias();
-            exibirLojas(todasLojas);
+            try {
+                // 1. Busca Segura
+                const { data: profiles, error: errP } = await sbClient.from('profiles').select('*');
+                const { data: info, error: errI } = await sbClient.from('store_info').select('*');
+
+                if (errP || errI) {
+                    console.error("Erro Supabase:", errP, errI);
+                    alert("Erro ao conectar com o servidor. Verifique a internet.");
+                    return;
+                }
+
+                if (!profiles) return; // Se não tiver nada, para aqui.
+
+                todasLojas = profiles.map(p => {
+                    // Match inteligente de nomes (remove espaços e ignora maiúsculas)
+                    const extra = info?.find(i => i.name?.trim().toLowerCase() === p.store_name?.trim().toLowerCase());
+                    
+                    // Tratamento de Categorias (Separa por ; e remove espaços)
+                    const rawCats = p.categoria_loja || 'Outros';
+                    const cats = rawCats.split(';').map(c => c.trim()).filter(c => c !== "");
+
+                    return { 
+                        ...p, 
+                        logoFinal: extra?.logo_url || 'https://via.placeholder.com/200?text=Loja', 
+                        categorias: cats 
+                    };
+                });
+
+                criarFiltrosCategorias();
+                exibirLojas(todasLojas);
+
+            } catch (e) {
+                console.error("Erro crítico no JS:", e);
+            }
         }
 
         function criarFiltrosCategorias() {
             const container = document.getElementById('container-filtros');
             let listaCats = [];
             todasLojas.forEach(l => listaCats = [...listaCats, ...l.categorias]);
+            
+            // Remove duplicatas e ordena
             const catsUnicas = [...new Set(listaCats)].sort();
 
             catsUnicas.forEach(cat => {
                 const catLower = cat.toLowerCase();
-                // Busca Inteligente: Procura se alguma palavra-chave existe dentro do nome da categoria
+                // Tenta achar um ícone pelo nome parcial
                 const chaveEncontrada = Object.keys(mapaIcones).find(chave => catLower.includes(chave));
                 const icon = chaveEncontrada ? mapaIcones[chaveEncontrada] : '🍽️';
                 
                 container.innerHTML += `
                     <button onclick="filtrarCategoriaGeral('${cat}')" 
-                            class="flex flex-col items-center justify-center min-w-[100px] h-[100px] bg-white rounded-2xl shadow-sm border border-gray-100 hover:border-orange-500 hover:shadow-md transition-all shrink-0 gap-2 group">
+                            class="flex flex-col items-center justify-center min-w-[100px] h-[100px] bg-white rounded-2xl shadow-sm border border-gray-100 hover:border-orange-500 hover:shadow-md transition-all shrink-0 gap-2 group cursor-pointer">
                         <span class="text-3xl group-hover:scale-110 transition-transform">${icon}</span>
-                        <span class="text-xs font-bold text-gray-600 group-hover:text-orange-600 text-center px-1 leading-tight">${cat}</span>
+                        <span class="text-xs font-bold text-gray-600 group-hover:text-orange-600 text-center px-1 leading-tight overflow-hidden text-ellipsis w-full">${cat}</span>
                     </button>`;
             });
         }
@@ -138,11 +176,15 @@
                         <div class="bg-white p-6 rounded-[2.5rem] shadow-lg border border-gray-50 flex flex-col items-center text-center transition-all hover:-translate-y-1 hover:shadow-xl cursor-pointer group" 
                              onclick="window.location.href='cardapio.html?loja=${loja.id}'">
                             <div class="w-24 h-24 bg-gray-50 rounded-full mb-4 overflow-hidden border-4 border-white shadow-md group-hover:border-orange-100 transition-colors">
-                                <img src="${loja.logoFinal}" class="w-full h-full object-cover">
+                                <img src="${loja.logoFinal}" 
+                                     onerror="this.src='https://via.placeholder.com/200?text=Loja'" 
+                                     class="w-full h-full object-cover">
                             </div>
                             <h3 class="text-lg font-black text-gray-800 leading-tight group-hover:text-orange-600 transition-colors">${loja.store_name}</h3>
                             <div class="flex flex-wrap justify-center gap-1 mt-3">
-                                ${loja.categorias.slice(0,2).map(c => `<span class="bg-orange-50 text-orange-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide">${c}</span>`).join('')}
+                                ${loja.categorias.slice(0, 2).map(c => `
+                                    <span class="bg-orange-50 text-orange-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide border border-orange-100">${c}</span>
+                                `).join('')}
                             </div>
                         </div>`;
                 });
@@ -164,18 +206,26 @@
 
         function abrirModalParceiro() { document.getElementById('modal-parceiro').classList.remove('hidden'); }
         function fecharModalParceiro() { document.getElementById('modal-parceiro').classList.add('hidden'); }
+        
         function enviarCadastroParceiro() {
-            const msg = `Novo Parceiro Interessado: ${document.getElementById('p-loja').value} (Doc: ${document.getElementById('p-doc').value})`;
-            window.location.href = `mailto:cadastro@melodelivery.com?body=${msg}`;
+            const loja = document.getElementById('p-loja').value;
+            const doc = document.getElementById('p-doc').value;
+            const zap = document.getElementById('p-zap').value;
+            
+            const msg = `Olá! Quero cadastrar minha loja no Melo Delivery:%0A%0A🏪 *Loja:* ${loja}%0A📄 *Doc:* ${doc}%0A📞 *Contato:* ${zap}`;
+            
+            // Redireciona para o email (simples e funcional)
+            window.location.href = `mailto:melodigital@gmail.com?subject=Novo Parceiro - ${loja}&body=${msg}`;
+            fecharModalParceiro();
         }
 
         carregarLojas();
 
-        <footer class="text-center py-8 text-gray-400 text-xs mb-10">
-        <p>&copy; 2026 Melo Delivery. Todos os direitos reservados.</p>
-        <p>Desenvolvido por Mateus Melo</p>
-    </footer>
+        Copyright (c) 2026 Melo Delivery - Mateus [SEU SOBRENOME]
+        Todos os direitos reservados.
+
+        O código fonte deste projeto é propriedade exclusiva de Mateus [SEU SOBRENOME].
+        A cópia, redistribuição ou uso comercial sem autorização expressa é proibida.
     </script>
 </body>
-
 </html>

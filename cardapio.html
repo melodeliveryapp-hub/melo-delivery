@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardápio - Melo Delivery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 pb-44">
+
+    <header class="bg-orange-500 p-6 shadow-md flex items-center gap-4 text-white sticky top-0 z-50">
+        <button onclick="window.location.href='index.html'" class="text-3xl font-bold">←</button>
+        <h1 id="nome-loja" class="text-xl font-black uppercase italic">CARDÁPIO</h1>
+    </header>
+
+    <div class="w-full h-48 bg-gray-200 relative overflow-hidden shadow-inner">
+        <img id="banner-topo" src="" onerror="this.src='https://via.placeholder.com/1200x400'" class="w-full h-full object-cover opacity-90">
+    </div>
+
+    <main class="max-w-2xl mx-auto p-4 space-y-10 mt-10 relative z-10" id="cardapio-container"></main>
+
+    <div id="modal-entrega" class="fixed inset-0 bg-black/60 z-[70] hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white w-full max-w-md rounded-[3rem] p-8 space-y-3 shadow-2xl my-auto">
+            <h3 class="text-2xl font-black">Entrega</h3>
+            <input type="text" id="cli-nome" placeholder="Seu Nome" class="w-full p-4 bg-gray-100 rounded-2xl outline-none">
+            <div class="flex gap-2">
+                <input type="text" id="cli-rua" placeholder="Rua" class="flex-[3] p-4 bg-gray-100 rounded-2xl outline-none">
+                <input type="text" id="cli-num" placeholder="Nº" class="flex-1 p-4 bg-gray-100 rounded-2xl outline-none">
+            </div>
+            <input type="text" id="cli-bairro" placeholder="Bairro" class="w-full p-4 bg-gray-100 rounded-2xl outline-none">
+            <select id="cli-taxa" class="w-full p-4 bg-gray-100 rounded-2xl font-bold border-orange-200">
+                <option value="0">Selecione a Taxa</option>
+                <option value="5">Centro (R$ 5,00)</option>
+                <option value="10">Outros (R$ 10,00)</option>
+            </select>
+            <input type="tel" id="cli-contato" placeholder="WhatsApp" class="w-full p-4 bg-gray-100 rounded-2xl outline-none">
+            <div class="flex gap-4 pt-4">
+                <button onclick="document.getElementById('modal-entrega').classList.add('hidden')" class="flex-1 font-bold text-gray-400">Voltar</button>
+                <button onclick="finalizarPedido()" class="flex-1 py-4 bg-green-500 text-white font-black rounded-2xl">ENVIAR</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="barra-carrinho" class="fixed bottom-0 left-0 right-0 bg-white border-t p-6 shadow-2xl z-40 hidden">
+        <div class="max-w-2xl mx-auto flex justify-between items-center">
+            <p id="carrinho-total" class="text-3xl font-black text-orange-600">R$ 0,00</p>
+            <button onclick="document.getElementById('modal-entrega').classList.remove('hidden')" class="bg-orange-500 text-white px-10 py-4 rounded-2xl font-black shadow-lg">PEDIR</button>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://xhfwrbjxitcrktccdrpn.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZndyYmp4aXRjcmt0Y2NkcnBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MjQ5NTksImV4cCI6MjA4NjIwMDk1OX0.nyGJxdNT-qiH-oqJL4KDKA-7bRtlj5UxmXy32RswPUc';
+        const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const urlParams = new URLSearchParams(window.location.search);
+        const lojaId = urlParams.get('loja');
+        let zapLoja = ""; let carrinho = []; let pizzasDisp = [];
+
+        async function init() {
+            const { data: profile } = await sbClient.from('profiles').select('*').eq('id', lojaId).single();
+            if (profile) {
+                document.getElementById('nome-loja').innerText = profile.store_name;
+                zapLoja = profile.whatsapp_number;
+                const { data: info } = await sbClient.from('store_info').select('banner_url').eq('name', profile.store_name).single();
+                if (info?.banner_url) document.getElementById('banner-topo').src = info.banner_url;
+            }
+
+            const { data: produtos } = await sbClient.from('products').select('*').eq('tenant_id', lojaId);
+            pizzasDisp = produtos.filter(p => (p.categoria_produtos || '').toLowerCase().includes('pizza'));
+            
+            const container = document.getElementById('cardapio-container');
+            const categorias = [...new Set(produtos.map(p => p.categoria_produtos || 'Outros'))];
+
+            categorias.forEach(cat => {
+                const section = document.createElement('section');
+                section.innerHTML = `<h2 class="text-xl font-black mb-4 flex items-center gap-2"><span class="w-1.5 h-6 bg-orange-500 rounded-full"></span>${cat}</h2>`;
+                const grid = document.createElement('div'); grid.className = "space-y-4";
+                
+                if (cat.toLowerCase().includes('pizza')) {
+                    grid.innerHTML += `<button onclick="abrirMeio()" class="w-full bg-orange-50 text-orange-600 p-4 rounded-2xl font-black border-2 border-dashed border-orange-300">🍕 MONTAR PIZZA 2 SABORES</button>`;
+                }
+
+                produtos.filter(p => (p.categoria_produtos || 'Outros') === cat).forEach(p => {
+                    grid.innerHTML += `<div class="bg-white p-5 rounded-[2.5rem] shadow-sm flex items-center border border-gray-100 gap-4">
+                        <img src="${p.image_url}" class="w-20 h-20 object-cover rounded-3xl bg-gray-50">
+                        <div class="flex-1"><h3 class="font-black">${p.name}</h3><p class="text-orange-500 font-black">R$ ${p.price.toFixed(2)}</p></div>
+                        <div class="flex flex-col items-center gap-1">
+                            <button onclick="add('${p.name}', ${p.price})" class="w-10 h-10 rounded-2xl bg-orange-500 text-white font-black">+</button>
+                            <span id="qtd-${p.name}" class="font-bold text-gray-300 text-xs">0</span>
+                            <button onclick="rem('${p.name}')" class="w-10 h-10 rounded-2xl border-2 border-gray-100 font-black text-gray-300">-</button>
+                        </div></div>`;
+                });
+                section.appendChild(grid); container.appendChild(section);
+            });
+        }
+
+        function add(n, p) { carrinho.push({ n, p }); updateUI(n); }
+        function rem(n) { const idx = carrinho.map(i => i.n).lastIndexOf(n); if (idx > -1) carrinho.splice(idx, 1); updateUI(n); }
+        function updateUI(n) {
+            const el = document.getElementById(`qtd-${n}`);
+            if(el) el.innerText = carrinho.filter(i => i.n === n).length;
+            const total = carrinho.reduce((s, i) => s + i.p, 0);
+            if (carrinho.length > 0) { document.getElementById('barra-carrinho').classList.remove('hidden'); document.getElementById('carrinho-total').innerText = `R$ ${total.toFixed(2)}`; }
+            else document.getElementById('barra-carrinho').classList.add('hidden');
+        }
+
+        function abrirMeio() {
+            let s1 = prompt("1º Sabor (número):\n" + pizzasDisp.map((p,i) => `${i+1}. ${p.name}`).join("\n"));
+            let s2 = prompt("2º Sabor (número):\n" + pizzasDisp.map((p,i) => `${i+1}. ${p.name}`).join("\n"));
+            if (s1 && s2) {
+                let p1 = pizzasDisp[parseInt(s1)-1]; let p2 = pizzasDisp[parseInt(s2)-1];
+                add(`Pizza ½ ${p1.name} / ½ ${p2.name}`, (p1.price + p2.price) / 2);
+            }
+        }
+
+        function finalizarPedido() {
+            const nome = document.getElementById('cli-nome').value;
+            const rua = document.getElementById('cli-rua').value;
+            const num = document.getElementById('cli-num').value;
+            const taxa = parseFloat(document.getElementById('cli-taxa').value);
+            if (!nome || !rua || taxa === 0) return alert("Preencha todos os campos!");
+
+            const contagem = {};
+            carrinho.forEach(item => { contagem[item.n] = (contagem[item.n] || 0) + 1; });
+            let resumo = "";
+            for (const [nomeProd, qtd] of Object.entries(contagem)) { resumo += `✅ *${qtd}x* ${nomeProd}\n`; }
+
+            const totalGeral = carrinho.reduce((s, i) => s + i.p, 0) + taxa;
+            const msg = encodeURIComponent(`🍱 *PEDIDO: ${document.getElementById('nome-loja').innerText}*\n\n👤 *Cliente:* ${nome}\n📍 *End:* ${rua}, ${num} - ${document.getElementById('cli-bairro').value}\n\n🛒 *ITENS:*\n${resumo}\n🛵 *Entrega:* R$ ${taxa.toFixed(2)}\n💰 *TOTAL: R$ ${totalGeral.toFixed(2)}*`);
+            window.open(`https://wa.me/55${zapLoja.replace(/\D/g, '')}?text=${msg}`, '_blank');
+            carrinho = []; location.reload();
+        }
+        init();
+    </script>
+</body>
+</html>

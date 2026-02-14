@@ -211,7 +211,7 @@
                 
                 const { data: dataImg, error: erroImg } = await sbClient.storage
                     .from('product-images')
-                    .upload(`${user.id}/${nomeArq}`, file); // Cria pasta com ID do user para organizar
+                    .upload(`${user.id}/${nomeArq}`, file); 
 
                 if (erroImg) throw erroImg;
 
@@ -223,13 +223,13 @@
                 btn.innerHTML = "Salvando Dados...";
                 
                 const { error: erroBanco } = await sbClient.from('products').insert({
-                    tenant_id: user.id, // VITAL: Liga o produto ao dono
+                    tenant_id: user.id, 
                     name: document.getElementById('prod-nome').value,
                     price: parseFloat(document.getElementById('prod-preco').value),
                     description: document.getElementById('prod-desc').value,
                     categoria_produtos: document.getElementById('prod-cat').value,
                     image_url: publicUrl,
-                    available: true
+                    is_available: true // AQUI ESTÁ A CORREÇÃO!
                 });
 
                 if (erroBanco) throw erroBanco;

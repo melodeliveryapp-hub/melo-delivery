@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Parceiro - Melo Delivery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link rel="icon" type="image/png" href="favicon.png">
+</head>
+<body class="bg-gray-50 min-h-screen pb-20">
+
+    <nav class="bg-white shadow-sm border-b border-gray-200 px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <div class="bg-orange-100 p-2 rounded-lg text-xl">⚙️</div>
+            <div>
+                <h1 class="font-black text-gray-800 leading-none">Painel Lojista</h1>
+                <p class="text-xs text-gray-400 font-bold" id="nome-loja-nav">Carregando...</p>
+            </div>
+        </div>
+        <button onclick="logout()" class="text-red-500 font-bold text-sm hover:bg-red-50 px-3 py-2 rounded-lg transition-colors">Sair</button>
+    </nav>
+
+    <main class="max-w-4xl mx-auto p-6 space-y-8">
+
+        <section class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100">
+            <h2 class="text-xl font-black text-gray-800 mb-4 flex items-center gap-2">
+                <span class="w-1.5 h-6 bg-orange-500 rounded-full"></span> Horário de Funcionamento
+            </h2>
+            
+            <div class="flex flex-col md:flex-row gap-4 items-end">
+                <div class="w-full">
+                    <label class="text-xs font-bold text-gray-400 ml-2 uppercase">Abre às</label>
+                    <input type="time" id="inp-abre" class="w-full p-4 bg-gray-50 rounded-2xl font-bold text-gray-700 outline-none focus:ring-2 focus:ring-orange-200">
+                </div>
+                <div class="w-full">
+                    <label class="text-xs font-bold text-gray-400 ml-2 uppercase">Fecha às</label>
+                    <input type="time" id="inp-fecha" class="w-full p-4 bg-gray-50 rounded-2xl font-bold text-gray-700 outline-none focus:ring-2 focus:ring-orange-200">
+                </div>
+                <button onclick="salvarHorario()" id="btn-salvar-hora" class="w-full md:w-auto px-8 py-4 bg-gray-900 text-white font-black rounded-2xl hover:bg-gray-800 active:scale-95 transition-all shadow-lg">
+                    SALVAR HORÁRIO
+                </button>
+            </div>
+            <p class="text-xs text-gray-400 mt-3 ml-2">💡 Isso controla automaticamente se sua loja aparece como "Aberta" ou "Fechada" no site.</p>
+        </section>
+
+        <section>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-black text-gray-800 flex items-center gap-2">
+                    <span class="w-1.5 h-6 bg-orange-500 rounded-full"></span> Produtos Cadastrados
+                </h2>
+                <button onclick="alert('Função Adicionar em breve!')" class="bg-orange-500 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-lg hover:bg-orange-600 transition-all">+ Novo Produto</button>
+            </div>
+
+            <div id="lista-produtos" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="text-center py-10 text-gray-400 col-span-full">Carregando produtos...</div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const SUPABASE_URL = 'https://xhfwrbjxitcrktccdrpn.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZndyYmp4aXRjcmt0Y2NkcnBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MjQ5NTksImV4cCI6MjA4NjIwMDk1OX0.nyGJxdNT-qiH-oqJL4KDKA-7bRtlj5UxmXy32RswPUc';
+        const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let user = null;
+        let storeInfoId = null; // ID da tabela store_info para update
+
+        // 1. Verifica Login
+        async function checkAuth() {
+            const { data: { session } } = await sbClient.auth.getSession();
+            if (!session) {
+                window.location.href = 'login.html';
+                return;
+            }
+            user = session.user;
+            carregarDadosLoja();
+        }
+
+        // 2. Carrega Dados da Loja
+        async function carregarDadosLoja() {
+            // Busca o Profile ligado ao ID do usuário logado
+            const { data: profile, error } = await sbClient.from('profiles').select('*').eq('id', user.id).single();
+
+            if (error || !profile) {
+                alert("Erro: Seu usuário não está vinculado a uma loja. Contate o suporte.");
+                return;
+            }
+
+            document.getElementById('nome-loja-nav').innerText = profile.store_name;
+
+            // Busca Infos Adicionais (Horários) na store_info
+            const { data: info } = await sbClient.from('store_info').select('*').eq('name', profile.store_name).single();
+            
+            if (info) {
+                storeInfoId = info.id;
+                document.getElementById('inp-abre').value = info.opening_time || "18:00";
+                document.getElementById('inp-fecha').value = info.closing_time || "23:59";
+            }
+
+            // Busca Produtos
+            carregarProdutos(user.id);
+        }
+
+        // 3. Carrega Produtos
+        async function carregarProdutos(userId) {
+            const { data: produtos } = await sbClient.from('products').select('*').eq('tenant_id', userId).order('name');
+            const lista = document.getElementById('lista-produtos');
+            lista.innerHTML = '';
+
+            if(produtos.length === 0) {
+                lista.innerHTML = '<p class="text-gray-400 col-span-full text-center">Nenhum produto encontrado.</p>';
+                return;
+            }
+
+            produtos.forEach(p => {
+                lista.innerHTML += `
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+                        <img src="${p.image_url}" class="w-16 h-16 rounded-xl object-cover bg-gray-50">
+                        <div class="flex-1">
+                            <h3 class="font-bold text-gray-800">${p.name}</h3>
+                            <p class="text-green-600 font-black">R$ ${p.price.toFixed(2)}</p>
+                        </div>
+                        <button onclick="deletarProduto('${p.id}')" class="bg-red-50 text-red-500 p-2 rounded-lg hover:bg-red-100 transition-colors" title="Excluir">
+                            🗑️
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        // 4. Salvar Horário
+        async function salvarHorario() {
+            const btn = document.getElementById('btn-salvar-hora');
+            const abre = document.getElementById('inp-abre').value;
+            const fecha = document.getElementById('inp-fecha').value;
+
+            btn.innerText = "Salvando...";
+            btn.disabled = true;
+
+            // Atualiza na store_info
+            if (storeInfoId) {
+                const { error } = await sbClient.from('store_info').update({ 
+                    opening_time: abre, 
+                    closing_time: fecha 
+                }).eq('id', storeInfoId);
+
+                if (error) alert("Erro ao salvar horário!");
+                else alert("Horário atualizado com sucesso! ✅");
+            } else {
+                 // Fallback: Tenta atualizar no profile se não tiver store_info linkada
+                 const { error } = await sbClient.from('profiles').update({ 
+                    opening_time: abre, 
+                    closing_time: fecha 
+                }).eq('id', user.id);
+                if (!error) alert("Horário atualizado (Profile) ✅");
+            }
+
+            btn.innerText = "SALVAR HORÁRIO";
+            btn.disabled = false;
+        }
+
+        // 5. Deletar Produto
+        async function deletarProduto(id) {
+            if(confirm("Tem certeza que deseja excluir este produto?")) {
+                const { error } = await sbClient.from('products').delete().eq('id', id);
+                if (error) {
+                    alert("Erro ao excluir. Verifique se você tem permissão.");
+                } else {
+                    carregarProdutos(user.id); // Recarrega a lista
+                }
+            }
+        }
+
+        async function logout() {
+            await sbClient.auth.signOut();
+            window.location.href = 'login.html';
+        }
+
+        checkAuth();
+    </script>
+</body>
+</html>

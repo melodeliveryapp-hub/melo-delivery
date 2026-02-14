@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cardápio - Melo Delivery</title>
-    <link rel="icon" type="image/png" href="favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link rel="icon" type="image/png" href="favicon.png">
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         html { scroll-behavior: smooth; }
         .status-dot { animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body class="bg-orange-50 text-gray-800 pb-32 font-sans">
@@ -22,9 +23,7 @@
             <img id="banner-topo" src="" onerror="this.src='https://via.placeholder.com/800x300'" class="w-full h-full object-cover opacity-80">
             <div class="absolute top-4 left-4 z-20">
                 <button onclick="window.location.href='index.html'" class="bg-black/30 backdrop-blur-md p-2 rounded-full border border-white/20 text-white shadow-lg active:scale-90 transition-all hover:bg-black/50">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
                 </button>
             </div>
         </div>
@@ -33,12 +32,11 @@
             <div class="bg-white p-1 rounded-2xl shadow-xl w-24 h-24 self-start rotate-1 border-2 border-orange-500">
                 <img id="logo-loja" src="" onerror="this.src='https://via.placeholder.com/100'" class="w-full h-full object-cover rounded-xl">
             </div>
-            
             <div class="mt-4 flex justify-between items-end">
                 <div class="text-white">
                     <h1 id="nome-loja" class="text-2xl font-black leading-none drop-shadow-md">Carregando...</h1>
                     <p class="text-xs text-orange-100 mt-2 font-medium flex items-center gap-1 opacity-90">
-                        ⏱️ <span id="horario-txt">--:-- às --:--</span> • 🛵 30-45min
+                        ⏱️ <span id="horario-txt">--:-- às --:--</span> • 🛵 Entrega rápida
                     </p>
                 </div>
                 <div id="status-loja" class="bg-white text-gray-800 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wide shadow-lg flex items-center gap-2">...</div>
@@ -46,11 +44,9 @@
         </div>
     </header>
 
-    <nav class="sticky top-0 bg-white/95 backdrop-blur-sm z-30 py-3 px-4 overflow-x-auto no-scrollbar whitespace-nowrap shadow-sm border-b border-gray-100" id="nav-categorias">
-        </nav>
+    <nav class="sticky top-0 bg-white/95 backdrop-blur-sm z-30 py-3 px-4 overflow-x-auto no-scrollbar whitespace-nowrap shadow-sm border-b border-gray-100" id="nav-categorias"></nav>
 
-    <main class="max-w-2xl mx-auto p-4 space-y-6" id="cardapio-container">
-        </main>
+    <main class="max-w-2xl mx-auto p-4 space-y-6" id="cardapio-container"></main>
 
     <div id="modal-fechado" class="fixed inset-0 bg-black/80 z-[80] hidden flex items-center justify-center p-6 backdrop-blur-sm animate-fade-in">
         <div class="bg-white rounded-[2.5rem] p-8 text-center shadow-2xl max-w-sm relative overflow-hidden">
@@ -59,6 +55,19 @@
             <h3 class="text-2xl font-black text-gray-800">Loja Fechada!</h3>
             <p class="text-gray-500 mt-2 font-medium">Funcionamos das <br><b class="text-red-500 text-lg" id="modal-horario">--:-- às --:--</b></p>
             <button onclick="document.getElementById('modal-fechado').classList.add('hidden')" class="mt-6 w-full py-3.5 bg-gray-100 text-gray-600 font-bold rounded-2xl active:scale-95 transition-transform">Só estou olhando</button>
+        </div>
+    </div>
+
+    <div id="modal-sucesso" class="fixed inset-0 bg-green-500/90 z-[90] hidden flex items-center justify-center p-6 backdrop-blur-md">
+        <div class="bg-white rounded-[2.5rem] p-8 text-center shadow-2xl max-w-sm relative animate-[popIn_0.4s_ease-out]">
+            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl shadow-inner">
+                ✅
+            </div>
+            <h3 class="text-2xl font-black text-gray-800">Pedido Enviado!</h3>
+            <p class="text-gray-500 mt-2 text-sm">Seu pedido foi encaminhado para o WhatsApp da loja. Aguarde a confirmação.</p>
+            <button onclick="resetarSite()" class="mt-6 w-full py-4 bg-green-500 text-white font-black rounded-2xl shadow-lg shadow-green-200 active:scale-95 transition-all">
+                FAZER NOVO PEDIDO
+            </button>
         </div>
     </div>
 
@@ -76,29 +85,22 @@
     <div id="modal-entrega" class="fixed inset-0 bg-black/60 z-[70] hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white w-full max-w-md rounded-[2.5rem] p-6 space-y-4 shadow-2xl my-auto relative">
             <button onclick="document.getElementById('modal-entrega').classList.add('hidden')" class="absolute top-4 right-6 text-gray-300 hover:text-gray-600 font-bold text-2xl z-10">&times;</button>
-            
             <h3 class="text-xl font-black text-gray-800 pt-2">Resumo do Pedido</h3>
-            
-            <div id="lista-resumo" class="bg-orange-50 rounded-2xl p-4 max-h-40 overflow-y-auto text-sm space-y-2 border border-orange-100">
-                </div>
+            <div id="lista-resumo" class="bg-orange-50 rounded-2xl p-4 max-h-40 overflow-y-auto text-sm space-y-2 border border-orange-100"></div>
 
             <h3 class="text-xl font-black text-gray-800 pt-2 border-t border-gray-100">Dados de Entrega</h3>
-            
             <input type="text" id="cli-nome" placeholder="Seu Nome Completo" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-100 font-bold text-gray-700">
-            
             <div class="flex flex-row gap-3 w-full">
                 <input type="text" id="cli-rua" placeholder="Rua / Avenida" class="w-2/3 p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold text-gray-600">
                 <input type="text" id="cli-num" placeholder="Nº" class="w-1/3 p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold text-gray-600 text-center">
             </div>
-
             <input type="text" id="cli-bairro" placeholder="Bairro" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold text-gray-600">
-            <select id="cli-taxa" class="w-full p-4 bg-orange-50 border border-orange-100 rounded-2xl font-bold text-orange-600 outline-none cursor-pointer">
-                <option value="0">Selecione a Taxa de Entrega</option>
-                <option value="5">Centro (R$ 5,00)</option>
-                <option value="10">Bairros (R$ 10,00)</option>
-            </select>
-            <input type="tel" id="cli-contato" placeholder="WhatsApp (DDD + Número)" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold text-gray-700">
             
+            <select id="cli-taxa" class="w-full p-4 bg-orange-50 border border-orange-100 rounded-2xl font-bold text-orange-600 outline-none cursor-pointer">
+                <option value="0">Carregando taxas...</option>
+            </select>
+            
+            <input type="tel" id="cli-contato" placeholder="WhatsApp (DDD + Número)" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold text-gray-700">
             <button onclick="finalizarPedido()" class="w-full py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-black rounded-2xl shadow-lg shadow-green-200 active:scale-95 transition-all mt-2">ENVIAR PEDIDO 🚀</button>
         </div>
     </div>
@@ -125,7 +127,7 @@
                 document.getElementById('nome-loja').innerText = profile.store_name;
                 zapLoja = profile.whatsapp_number;
                 
-                // Busca INFO (Horários e Banner na tabela store_info)
+                // Busca INFO Completa (Horários + Taxas + Imagens)
                 const { data: info } = await sbClient.from('store_info').select('*').eq('name', profile.store_name).single();
                 
                 let abre = "18:00", fecha = "23:59";
@@ -133,9 +135,11 @@
                 if (info) {
                     if (info.banner_url) document.getElementById('banner-topo').src = info.banner_url;
                     if (info.logo_url) document.getElementById('logo-loja').src = info.logo_url;
-                    // Correção: Pega horário do store_info
                     if (info.opening_time) abre = info.opening_time;
                     if (info.closing_time) fecha = info.closing_time;
+
+                    // --- ATUALIZAÇÃO: Taxas Dinâmicas ---
+                    configurarTaxas(info.delivery_fee_main, info.delivery_fee_far);
                 }
                 
                 verificarStatusLoja(abre, fecha);
@@ -146,25 +150,35 @@
             }
         }
 
+        // --- FUNÇÃO NOVA: Configurar Taxas ---
+        function configurarTaxas(taxaMain, taxaFar) {
+            const select = document.getElementById('cli-taxa');
+            // Valores padrão se o lojista não tiver configurado ainda
+            const valMain = taxaMain || 5.00;
+            const valFar = taxaFar || 10.00;
+
+            select.innerHTML = `
+                <option value="0">Selecione a Taxa de Entrega</option>
+                <option value="${valMain}">Bairros Próximos (R$ ${valMain.toFixed(2)})</option>
+                <option value="${valFar}">Bairros Distantes/Outros (R$ ${valFar.toFixed(2)})</option>
+            `;
+        }
+
         function verificarStatusLoja(abreStr, fechaStr) {
             document.getElementById('horario-txt').innerText = `${abreStr.slice(0,5)} às ${fechaStr.slice(0,5)}`;
             document.getElementById('modal-horario').innerText = `${abreStr.slice(0,5)} às ${fechaStr.slice(0,5)}`;
 
             const agora = new Date();
             const horaAtual = agora.getHours() * 60 + agora.getMinutes();
-
             const [hA, mA] = abreStr.split(':').map(Number);
             const minAbre = hA * 60 + mA;
-
             const [hF, mF] = fechaStr.split(':').map(Number);
             let minFecha = hF * 60 + mF;
-
             if (minFecha < minAbre) minFecha += 24 * 60; 
             let horaAtualComp = horaAtual;
             if (horaAtual < minAbre && minFecha > 24*60) horaAtualComp += 24*60;
 
             lojaAberta = horaAtualComp >= minAbre && horaAtualComp < minFecha;
-
             const badge = document.getElementById('status-loja');
             if (lojaAberta) {
                 badge.className = "bg-white text-green-600 border border-green-100 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide shadow-sm flex items-center gap-2";
@@ -177,7 +191,7 @@
         }
 
         async function carregarProdutos(id) {
-            const { data: produtos } = await sbClient.from('products').select('*').eq('tenant_id', id);
+            const { data: produtos } = await sbClient.from('products').select('*').eq('tenant_id', id).eq('is_available', true); // Só carrega produtos DISPONÍVEIS
             
             const container = document.getElementById('cardapio-container');
             const nav = document.getElementById('nav-categorias');
@@ -192,19 +206,15 @@
                 
                 let htmlProdutos = `<h2 class="text-xl font-black text-gray-800 mb-4 ml-2 flex items-center gap-2"><span class="w-1.5 h-6 bg-orange-500 rounded-full"></span>${cat}</h2><div class="space-y-3">`;
 
-                // MEIO A MEIO REMOVIDO POR ENQUANTO (Aguardando Admin do Lojista)
-                
                 produtos.filter(p => (p.categoria_produtos || 'Outros') === cat).forEach(p => {
                     htmlProdutos += `
                         <div class="bg-white p-4 rounded-[2rem] shadow-sm border border-gray-100 flex gap-4 items-center hover:border-orange-200 transition-colors">
                             <img src="${p.image_url}" onerror="this.src='https://via.placeholder.com/150'" class="w-24 h-24 object-cover rounded-2xl bg-gray-50 shrink-0 shadow-inner">
-                            
                             <div class="flex-1 min-w-0">
                                 <h3 class="font-black text-gray-800 leading-tight text-sm mb-1">${p.name}</h3>
                                 <p class="text-xs text-gray-400 line-clamp-2 leading-relaxed mb-2">${p.description || ''}</p>
                                 <p class="text-green-600 font-black text-base">R$ ${p.price.toFixed(2)}</p>
                             </div>
-
                             <div class="flex flex-col items-center gap-2">
                                 <button onclick="add('${p.name}', ${p.price})" ${!lojaAberta ? 'disabled' : ''} class="w-9 h-9 rounded-xl bg-orange-500 text-white font-black shadow-lg shadow-orange-200 active:scale-90 flex items-center justify-center ${!lojaAberta ? 'grayscale opacity-50' : ''}">+</button>
                                 <span id="qtd-${p.name}" class="text-xs font-bold text-gray-400 hidden">0</span>
@@ -225,11 +235,7 @@
             const qtd = carrinho.filter(i => i.n === n).length;
             const elQtd = document.getElementById(`qtd-${n}`);
             const elRem = document.getElementById(`btn-rem-${n}`);
-            if(elQtd) {
-                elQtd.innerText = qtd;
-                if(qtd > 0) { elQtd.classList.remove('hidden'); elRem.classList.remove('hidden'); } 
-                else { elQtd.classList.add('hidden'); elRem.classList.add('hidden'); }
-            }
+            if(elQtd) { elQtd.innerText = qtd; if(qtd > 0) { elQtd.classList.remove('hidden'); elRem.classList.remove('hidden'); } else { elQtd.classList.add('hidden'); elRem.classList.add('hidden'); } }
             atualizarBarraFlutuante();
         }
 
@@ -240,32 +246,17 @@
                 barra.classList.remove('hidden'); barra.classList.add('flex');
                 document.getElementById('carrinho-qtd').innerText = carrinho.length;
                 document.getElementById('carrinho-total').innerText = `R$ ${total.toFixed(2)}`;
-            } else {
-                barra.classList.add('hidden'); barra.classList.remove('flex');
-            }
+            } else { barra.classList.add('hidden'); barra.classList.remove('flex'); }
         }
 
         function abrirModalEntrega() {
-            // Atualiza o resumo visual dentro do modal
             const lista = document.getElementById('lista-resumo');
             lista.innerHTML = '';
-            
-            // Agrupa itens
-            const contagem = {};
-            const precos = {};
-            carrinho.forEach(item => { 
-                contagem[item.n] = (contagem[item.n] || 0) + 1; 
-                precos[item.n] = item.p;
-            });
-
+            const contagem = {}; const precos = {};
+            carrinho.forEach(item => { contagem[item.n] = (contagem[item.n] || 0) + 1; precos[item.n] = item.p; });
             for (const [nome, qtd] of Object.entries(contagem)) {
-                lista.innerHTML += `
-                    <div class="flex justify-between items-center border-b border-orange-100 pb-1 last:border-0">
-                        <span class="text-gray-600"><b class="text-orange-600">${qtd}x</b> ${nome}</span>
-                        <span class="font-bold text-gray-800">R$ ${(precos[nome] * qtd).toFixed(2)}</span>
-                    </div>`;
+                lista.innerHTML += `<div class="flex justify-between items-center border-b border-orange-100 pb-1 last:border-0"><span class="text-gray-600"><b class="text-orange-600">${qtd}x</b> ${nome}</span><span class="font-bold text-gray-800">R$ ${(precos[nome] * qtd).toFixed(2)}</span></div>`;
             }
-            
             document.getElementById('modal-entrega').classList.remove('hidden');
         }
 
@@ -274,9 +265,10 @@
             const nome = document.getElementById('cli-nome').value;
             const rua = document.getElementById('cli-rua').value;
             const num = document.getElementById('cli-num').value;
+            const bairro = document.getElementById('cli-bairro').value;
             const taxa = parseFloat(document.getElementById('cli-taxa').value);
             
-            if (!nome || !rua || !num || taxa === 0) return alert("Preencha todos os dados!");
+            if (!nome || !rua || !num || !bairro || taxa === 0) return alert("Por favor, preencha todos os dados!");
 
             const contagem = {};
             carrinho.forEach(item => { contagem[item.n] = (contagem[item.n] || 0) + 1; });
@@ -284,12 +276,25 @@
             for (const [nomeProd, qtd] of Object.entries(contagem)) { resumo += `✅ *${qtd}x* ${nomeProd}\n`; }
             
             const total = carrinho.reduce((s, i) => s + i.p, 0) + taxa;
-            const msg = encodeURIComponent(`🍱 *PEDIDO: ${document.getElementById('nome-loja').innerText}*\n👤 *${nome}*\n📍 *${rua}, ${num} - ${document.getElementById('cli-bairro').value}*\n\n🛒 *ITENS:*\n${resumo}\n🛵 *Entrega:* R$ ${taxa.toFixed(2)}\n💰 *TOTAL: R$ ${total.toFixed(2)}*`);
+            const msg = encodeURIComponent(`🍱 *PEDIDO: ${document.getElementById('nome-loja').innerText}*\n👤 *${nome}*\n📍 *${rua}, ${num} - ${bairro}*\n\n🛒 *ITENS:*\n${resumo}\n🛵 *Entrega:* R$ ${taxa.toFixed(2)}\n💰 *TOTAL: R$ ${total.toFixed(2)}*`);
+            
+            // Abre o WhatsApp
             window.open(`https://wa.me/55${zapLoja.replace(/\D/g, '')}?text=${msg}`, '_blank');
+            
+            // Mostra tela de sucesso e reseta
+            document.getElementById('modal-entrega').classList.add('hidden');
+            document.getElementById('modal-sucesso').classList.remove('hidden');
+            
+            // Limpa o carrinho
+            carrinho = [];
+            atualizarBarraFlutuante();
+        }
+
+        function resetarSite() {
+            location.reload(); // Recarrega para "zerar" tudo
         }
 
         init();
     </script>
 </body>
 </html>
-

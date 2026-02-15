@@ -10,6 +10,11 @@
         .gradient-text { background-clip: text; -webkit-background-clip: text; color: transparent; background-image: linear-gradient(to right, #ea580c, #c2410c); }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-pop { animation: slideUp 0.5s ease-out; }
+        
+        /* Estilos do Slider */
+        .advantage-slide { display: none; }
+        .advantage-slide.active { display: flex; animation: fadeIn 0.8s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body class="bg-gray-900 text-white font-sans antialiased selection:bg-orange-500 selection:text-white">
@@ -40,24 +45,48 @@
                    <svg class="w-6 h-6 fill-current group-hover:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.438 9.889-9.887.002-5.462-4.415-9.89-9.881-9.891-5.446 0-9.884 4.438-9.887 9.887-.001 2.221.634 3.8 1.703 5.491l-.957 3.498 3.741-.981z"/></svg>
                    QUERO ME CADASTRAR
                 </a>
-                
                 <a href="login.html" class="bg-gray-800 text-white px-8 py-5 rounded-2xl font-bold text-center border border-gray-700 hover:bg-gray-700 transition-all">
                     Já tenho conta
                 </a>
             </div>
-
-            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">🔒 Sistema seguro e otimizado para celular.</p>
+            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">🔒 SISTEMA SEGURO E OTIMIZADO PARA CELULAR.</p>
         </div>
         
-        <div class="relative hidden md:block opacity-80">
+        <div class="relative hidden md:block">
             <div class="absolute inset-0 bg-orange-500 blur-[100px] opacity-20"></div>
-            <div class="relative bg-gray-800 border border-gray-700 p-2 rounded-[2.5rem] shadow-2xl rotate-3">
-                <div class="bg-gray-900 rounded-[2rem] overflow-hidden aspect-[4/3] flex items-center justify-center p-8">
-                   <div class="text-center">
-                       <span class="text-6xl block mb-4">📈</span>
-                       <p class="font-black text-orange-500 text-xl italic uppercase">Painel de Controle</p>
-                       <p class="text-gray-500 text-sm mt-1">Gestão de produtos e preços</p>
-                   </div>
+            <div class="relative bg-gray-800 border border-gray-700 p-2 rounded-[2.5rem] shadow-2xl rotate-3 h-[320px] flex items-center justify-center">
+                <div class="bg-gray-900 rounded-[2rem] w-full h-full relative overflow-hidden flex flex-col items-center justify-center p-8">
+                   
+                    <div class="advantage-slide active flex flex-col items-center text-center">
+                        <span class="text-6xl mb-4">📈</span>
+                        <p class="font-black text-orange-500 text-xl italic uppercase">Gestão Dinâmica</p>
+                        <p class="text-gray-500 text-sm mt-1">Altere preços e estoque em tempo real pelo painel.</p>
+                    </div>
+
+                    <div class="advantage-slide flex flex-col items-center text-center">
+                        <span class="text-6xl mb-4">💬</span>
+                        <p class="font-black text-orange-500 text-xl italic uppercase">Pedidos no Zap</p>
+                        <p class="text-gray-500 text-sm mt-1">Sua equipe recebe tudo organizado e pronto para preparo.</p>
+                    </div>
+
+                    <div class="advantage-slide flex flex-col items-center text-center">
+                        <span class="text-6xl mb-4">🚀</span>
+                        <p class="font-black text-orange-500 text-xl italic uppercase">Velocidade Total</p>
+                        <p class="text-gray-500 text-sm mt-1">Site leve que carrega instantaneamente no celular do cliente.</p>
+                    </div>
+
+                    <div class="advantage-slide flex flex-col items-center text-center">
+                        <span class="text-6xl mb-4">💎</span>
+                        <p class="font-black text-orange-500 text-xl italic uppercase">Taxa Zero</p>
+                        <p class="text-gray-500 text-sm mt-1">Sem comissões por cada venda. O lucro é todo seu!</p>
+                    </div>
+
+                    <div class="absolute bottom-6 flex gap-2">
+                        <div class="dot w-2 h-2 rounded-full bg-orange-500"></div>
+                        <div class="dot w-2 h-2 rounded-full bg-gray-700"></div>
+                        <div class="dot w-2 h-2 rounded-full bg-gray-700"></div>
+                        <div class="dot w-2 h-2 rounded-full bg-gray-700"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -74,17 +103,17 @@
                 <div class="p-10 rounded-[2.5rem] bg-gray-50 hover:bg-orange-50 transition-all border border-gray-100 group">
                     <div class="text-4xl mb-6 group-hover:scale-110 transition-transform">🚀</div>
                     <h3 class="text-xl font-black mb-3 italic">Cardápio Instantâneo</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed font-medium">Seus clientes não precisam baixar app. Um link rápido, fotos bonitas e o pedido direto no seu WhatsApp.</p>
+                    <p class="text-gray-500 text-sm leading-relaxed font-medium">Seus clientes não precisam baixar app. Um link rápido e fotos bonitas.</p>
                 </div>
                 <div class="p-10 rounded-[2.5rem] bg-gray-50 hover:bg-orange-50 transition-all border border-gray-100 group">
                     <div class="text-4xl mb-6 group-hover:scale-110 transition-transform">⚙️</div>
                     <h3 class="text-xl font-black mb-3 italic">Controle Total</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed font-medium">Altere preços, cadastre novos pratos ou pause produtos esgotados no seu próprio painel administrativo.</p>
+                    <p class="text-gray-500 text-sm leading-relaxed font-medium">Pause produtos esgotados no seu próprio painel administrativo.</p>
                 </div>
                 <div class="p-10 rounded-[2.5rem] bg-gray-50 hover:bg-orange-50 transition-all border border-gray-100 group">
                     <div class="text-4xl mb-6 group-hover:scale-110 transition-transform">💸</div>
-                    <h3 class="text-xl font-black mb-3 italic">Taxa Zero</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed font-medium">Diga adeus às comissões por cada lanche vendido. Trabalhamos com planos fixos para você lucrar mais.</p>
+                    <h3 class="text-xl font-black mb-3 italic">Sem Comissões</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed font-medium">Trabalhamos com planos fixos para você lucrar mais.</p>
                 </div>
             </div>
         </div>
@@ -95,5 +124,26 @@
         <p class="text-gray-600 text-[10px] mt-2 font-black uppercase tracking-widest italic">O sabor bate à sua porta</p>
     </footer>
 
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.advantage-slide');
+        const dots = document.querySelectorAll('.dot');
+
+        function showSlide(index) {
+            slides.forEach(s => s.classList.remove('active'));
+            dots.forEach(d => d.classList.replace('bg-orange-500', 'bg-gray-700'));
+            
+            slides[index].classList.add('active');
+            dots[index].classList.replace('bg-gray-700', 'bg-orange-500');
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }
+
+        // Troca o slide a cada 3 segundos
+        setInterval(nextSlide, 3000);
+    </script>
 </body>
 </html>

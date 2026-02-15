@@ -10,10 +10,11 @@
         .gradient-text { background-clip: text; -webkit-background-clip: text; color: transparent; background-image: linear-gradient(to right, #ea580c, #c2410c); }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-pop { animation: slideUp 0.5s ease-out; }
-        .dot-active { width: 1.5rem; background-color: #f97316 !important; }
+        /* Ajuste fino do Slider para não quebrar o layout */
+        #slider-wrapper { width: 100%; overflow: hidden; border-radius: 2rem; }
     </style>
 </head>
-<body class="bg-gray-900 text-white font-sans antialiased selection:bg-orange-500">
+<body class="bg-gray-900 text-white font-sans antialiased selection:bg-orange-500 selection:text-white">
 
     <nav class="w-full py-6 px-6 flex justify-between items-center max-w-6xl mx-auto border-b border-white/5">
         <div class="font-black text-2xl tracking-tighter italic">MELO<span class="text-orange-500">.PARCEIROS</span></div>
@@ -31,7 +32,7 @@
                 <span class="gradient-text">Máquina de Vendas</span>
             </h1>
             <p class="text-gray-400 text-lg md:text-xl leading-relaxed max-w-lg font-medium">
-                Tenha seu cardápio digital, receba pedidos organizados no WhatsApp e gerencie tudo em tempo real. Sem taxas abusivas por pedido.
+                Tenha seu cardápio digital, receba pedidos organizados no WhatsApp e gerencie tudo em tempo real.
             </p>
             
             <div class="flex flex-col sm:flex-row gap-4">
@@ -45,38 +46,38 @@
                     Já tenho conta
                 </a>
             </div>
-            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest italic opacity-60">🔒 Sistema seguro e otimizado para celular.</p>
         </div>
         
         <div class="relative hidden md:block animate-pop" style="animation-delay: 0.2s">
-            <div class="absolute inset-0 bg-orange-500 blur-[120px] opacity-20"></div>
-            
-            <div class="relative bg-gray-800 border border-gray-700 p-2 rounded-[2.5rem] shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-700 overflow-hidden">
-                <div id="slider-container" class="bg-gray-900 rounded-[2.2rem] aspect-[4/3] relative flex transition-transform duration-500 ease-out" style="width: 300%;">
-                    
-                    <div class="w-full flex flex-col items-center justify-center p-8 text-center shrink-0">
-                        <div class="w-20 h-20 bg-orange-500/10 rounded-3xl flex items-center justify-center text-5xl mb-6 border border-orange-500/20 shadow-inner">📈</div>
-                        <h3 class="text-2xl font-black italic uppercase tracking-tighter text-orange-500">Painel de Controle</h3>
-                        <p class="text-gray-400 mt-2 font-medium max-w-xs">Gestão total de produtos, preços e estoque em tempo real.</p>
-                    </div>
+            <div class="absolute inset-0 bg-orange-500 blur-[100px] opacity-10"></div>
+            <div class="relative bg-gray-800 border border-gray-700 p-2 rounded-[2.5rem] shadow-2xl">
+                <div id="slider-wrapper">
+                    <div id="slider-container" class="flex transition-transform duration-700 ease-in-out" style="width: 300%;">
+                        
+                        <div class="w-1/3 flex flex-col items-center justify-center p-10 text-center bg-gray-900 rounded-[2rem]">
+                            <span class="text-5xl mb-4">📈</span>
+                            <h3 class="text-xl font-black italic uppercase tracking-tighter text-orange-500">Painel VIP</h3>
+                            <p class="text-gray-500 text-sm mt-2">Gestão total de produtos e preços em tempo real.</p>
+                        </div>
 
-                    <div class="w-full flex flex-col items-center justify-center p-8 text-center shrink-0">
-                        <div class="w-20 h-20 bg-blue-500/10 rounded-3xl flex items-center justify-center text-5xl mb-6 border border-blue-500/20">⚡</div>
-                        <h3 class="text-2xl font-black italic uppercase tracking-tighter text-blue-400">Pedidos Instantâneos</h3>
-                        <p class="text-gray-400 mt-2 font-medium max-w-xs">Receba pedidos organizados no WhatsApp sem burocracia.</p>
-                    </div>
+                        <div class="w-1/3 flex flex-col items-center justify-center p-10 text-center bg-gray-900 rounded-[2rem]">
+                            <span class="text-5xl mb-4">⚡</span>
+                            <h3 class="text-xl font-black italic uppercase tracking-tighter text-blue-400">Agilidade</h3>
+                            <p class="text-gray-500 text-sm mt-2">Receba pedidos organizados direto no seu WhatsApp.</p>
+                        </div>
 
-                    <div class="w-full flex flex-col items-center justify-center p-8 text-center shrink-0">
-                        <div class="w-20 h-20 bg-green-500/10 rounded-3xl flex items-center justify-center text-5xl mb-6 border border-green-500/20">💰</div>
-                        <h3 class="text-2xl font-black italic uppercase tracking-tighter text-green-500">Lucro Máximo</h3>
-                        <p class="text-gray-400 mt-2 font-medium max-w-xs">Taxa zero por pedido. O faturamento da sua loja é 100% seu.</p>
+                        <div class="w-1/3 flex flex-col items-center justify-center p-10 text-center bg-gray-900 rounded-[2rem]">
+                            <span class="text-5xl mb-4">💰</span>
+                            <h3 class="text-xl font-black italic uppercase tracking-tighter text-green-500">Lucro Real</h3>
+                            <p class="text-gray-500 text-sm mt-2">Sem comissões por venda. O faturamento é 100% seu.</p>
+                        </div>
+
                     </div>
                 </div>
-
-                <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
-                    <div class="dot w-2 h-2 rounded-full bg-orange-500 transition-all duration-300 dot-active"></div>
-                    <div class="dot w-2 h-2 rounded-full bg-gray-600 transition-all duration-300"></div>
-                    <div class="dot w-2 h-2 rounded-full bg-gray-600 transition-all duration-300"></div>
+                <div class="absolute bottom-6 left-0 right-0 flex justify-center gap-2">
+                    <div class="dot w-2 h-2 rounded-full bg-orange-500 transition-all w-6"></div>
+                    <div class="dot w-2 h-2 rounded-full bg-gray-600 transition-all"></div>
+                    <div class="dot w-2 h-2 rounded-full bg-gray-600 transition-all"></div>
                 </div>
             </div>
         </div>
@@ -84,63 +85,50 @@
 
     <section class="bg-white text-gray-900 py-24 rounded-t-[3rem] md:rounded-t-[5rem]">
         <div class="max-w-6xl mx-auto px-6">
-            <div class="text-center mb-16 space-y-4">
-                <h2 class="text-4xl font-black italic uppercase tracking-tighter">Por que o Melo Delivery?</h2>
-                <p class="text-gray-500 font-medium">A parceria que o seu negócio precisava para crescer.</p>
-            </div>
-            
             <div class="grid md:grid-cols-3 gap-10">
-                <div class="p-10 rounded-[2.5rem] bg-gray-50 hover:bg-orange-50 transition-all border border-gray-100 group">
-                    <div class="text-4xl mb-6 group-hover:scale-110 transition-transform">🚀</div>
-                    <h3 class="text-xl font-black mb-3 italic uppercase">Cardápio Digital</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed font-medium">Seus clientes não precisam baixar app. Um link rápido, fotos bonitas e o pedido direto no WhatsApp.</p>
+                <div class="p-10 rounded-[2.5rem] bg-gray-50 border border-gray-100">
+                    <div class="text-3xl mb-4">🚀</div>
+                    <h3 class="text-lg font-black mb-2 italic uppercase">Cardápio Digital</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Seus clientes pedem em segundos, sem precisar baixar nada.</p>
                 </div>
-                <div class="p-10 rounded-[2.5rem] bg-gray-50 hover:bg-orange-50 transition-all border border-gray-100 group">
-                    <div class="text-4xl mb-6 group-hover:scale-110 transition-transform">⚙️</div>
-                    <h3 class="text-xl font-black mb-3 italic uppercase">Controle Total</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed font-medium">Altere preços, cadastre novos pratos ou pause produtos esgotados no seu próprio painel administrativo.</p>
+                <div class="p-10 rounded-[2.5rem] bg-gray-50 border border-gray-100">
+                    <div class="text-3xl mb-4">⚙️</div>
+                    <h3 class="text-lg font-black mb-2 italic uppercase">Controle Total</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Mude preços ou pause itens esgotados instantaneamente.</p>
                 </div>
-                <div class="p-10 rounded-[2.5rem] bg-gray-50 hover:bg-orange-50 transition-all border border-gray-100 group">
-                    <div class="text-4xl mb-6 group-hover:scale-110 transition-transform">💸</div>
-                    <h3 class="text-xl font-black mb-3 italic uppercase">Sem Comissões</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed font-medium">Diga adeus às comissões por cada venda. Trabalhamos com planos fixos para você lucrar muito mais.</p>
+                <div class="p-10 rounded-[2.5rem] bg-gray-50 border border-gray-100">
+                    <div class="text-3xl mb-4">💸</div>
+                    <h3 class="text-lg font-black mb-2 italic uppercase">Taxa Zero</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Não cobramos porcentagem sobre o valor das suas vendas.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <footer class="bg-gray-900 border-t border-white/5 py-12 text-center">
-        <p class="text-gray-500 text-sm font-bold">© 2026 Melo Delivery - Todos os direitos reservados.</p>
-        <p class="text-gray-600 text-[10px] mt-2 font-black uppercase tracking-widest italic opacity-40">O sabor bate à sua porta</p>
+    <footer class="bg-gray-900 border-t border-white/5 py-12 text-center text-gray-500 text-xs font-bold uppercase italic tracking-widest">
+        © 2026 Melo Delivery - O sabor bate à sua porta
     </footer>
 
     <script>
-        // Lógica do Slider Dinâmico
-        let currentSlide = 0;
-        const totalSlides = 3;
-        const container = document.getElementById('slider-container');
+        let current = 0;
         const dots = document.querySelectorAll('.dot');
-
-        function moveSlide() {
-            currentSlide = (currentSlide + 1) % totalSlides;
+        const container = document.getElementById('slider-container');
+        
+        function move() {
+            current = (current + 1) % 3;
+            container.style.transform = `translateX(-${current * 33.333}%)`;
             
-            // Move o container lateralmente
-            container.style.transform = `translateX(-${(currentSlide * 100) / totalSlides}%)`;
-            
-            // Atualiza os pontinhos
-            dots.forEach((dot, index) => {
-                if (index === currentSlide) {
-                    dot.classList.add('dot-active');
-                    dot.classList.replace('bg-gray-600', 'bg-orange-500');
+            dots.forEach((dot, i) => {
+                if(i === current) {
+                    dot.classList.add('w-6', 'bg-orange-500');
+                    dot.classList.remove('bg-gray-600');
                 } else {
-                    dot.classList.remove('dot-active');
-                    dot.classList.replace('bg-orange-500', 'bg-gray-600');
+                    dot.classList.remove('w-6', 'bg-orange-500');
+                    dot.classList.add('bg-gray-600');
                 }
             });
         }
-
-        // Inicia o slide automático a cada 4 segundos
-        setInterval(moveSlide, 4000);
+        setInterval(move, 4000);
     </script>
 </body>
 </html>

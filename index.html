@@ -19,11 +19,9 @@
     </header>
 
     <div class="max-w-4xl mx-auto -mt-8 px-4 relative z-20">
-        <div class="relative group transition-all hover:-translate-y-1">
-            <input type="text" id="searchInput" onkeyup="filtrarLojas()" 
-                   placeholder="O que você procura hoje?" 
-                   class="w-full p-6 pl-14 rounded-2xl shadow-xl border-none outline-none bg-white text-lg text-gray-600 focus:ring-4 focus:ring-orange-100 placeholder-gray-400 transition-all">
-            <span class="absolute left-5 top-6 text-gray-400 text-xl group-focus-within:text-orange-500 transition-colors">🔍</span>
+        <div class="relative group">
+            <input type="text" id="searchInput" onkeyup="filtrarLojas()" placeholder="O que você procura hoje?" class="w-full p-6 pl-14 rounded-2xl shadow-xl border-none outline-none bg-white text-lg text-gray-600 focus:ring-4 focus:ring-orange-100 placeholder-gray-400 transition-all">
+            <span class="absolute left-5 top-6 text-gray-400 text-xl">🔍</span>
         </div>
     </div>
 
@@ -50,30 +48,23 @@
         const SUPABASE_URL = 'https://xhfwrbjxitcrktccdrpn.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZndyYmp4aXRjcmt0Y2NkcnBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MjQ5NTksImV4cCI6MjA4NjIwMDk1OX0.nyGJxdNT-qiH-oqJL4KDKA-7bRtlj5UxmXy32RswPUc';
         const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        let todasLojas = [];
 
         async function carregarLojas() {
             const { data: profiles } = await sbClient.from('profiles').select('*');
             const { data: info } = await sbClient.from('store_info').select('*');
             if (!profiles) return;
-            todasLojas = profiles.map(p => {
-                const extra = info?.find(i => i.name === p.store_name);
-                return { ...p, logo: extra?.logo_url || 'https://via.placeholder.com/200' };
-            });
-            exibirLojas(todasLojas);
-        }
-
-        function exibirLojas(lojas) {
             const container = document.getElementById('lista-lojas');
             container.innerHTML = '';
-            lojas.forEach(loja => {
-                const link = `cardapio.html?loja=${loja.slug || loja.id}`;
+            profiles.forEach(p => {
+                const extra = info?.find(i => i.name === p.store_name);
+                const logo = extra?.logo_url || 'https://via.placeholder.com/200';
+                const link = `cardapio.html?loja=${p.slug || p.id}`;
                 container.innerHTML += `
                     <div class="bg-white p-6 rounded-[2.5rem] shadow-lg border border-gray-50 flex flex-col items-center text-center transition-all hover:-translate-y-1 hover:shadow-xl cursor-pointer group" onclick="window.location.href='${link}'">
                         <div class="w-24 h-24 bg-gray-50 rounded-full mb-4 overflow-hidden border-4 border-white shadow-md group-hover:border-orange-100 transition-colors">
-                            <img src="${loja.logo}" class="w-full h-full object-cover">
+                            <img src="${logo}" class="w-full h-full object-cover">
                         </div>
-                        <h3 class="text-lg font-black italic text-gray-800 uppercase tracking-tighter">${loja.store_name}</h3>
+                        <h3 class="text-lg font-black italic text-gray-800 uppercase tracking-tighter">${p.store_name}</h3>
                     </div>`;
             });
         }

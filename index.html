@@ -6,10 +6,6 @@
     <title>Melo Delivery - O Shopping da Cidade</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <style>
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans selection:bg-orange-100">
 
@@ -19,26 +15,23 @@
     </header>
 
     <div class="max-w-4xl mx-auto -mt-8 px-4 relative z-20">
-        <div class="relative group">
-            <input type="text" id="searchInput" onkeyup="filtrarLojas()" placeholder="O que você procura hoje?" class="w-full p-6 pl-14 rounded-2xl shadow-xl border-none outline-none bg-white text-lg text-gray-600 focus:ring-4 focus:ring-orange-100 placeholder-gray-400 transition-all">
-            <span class="absolute left-5 top-6 text-gray-400 text-xl">🔍</span>
-        </div>
+        <input type="text" id="searchInput" onkeyup="filtrarLojas()" placeholder="O que você procura hoje?" class="w-full p-6 pl-14 rounded-2xl shadow-xl border-none outline-none bg-white text-lg text-gray-600 focus:ring-4 focus:ring-orange-100 placeholder-gray-400 transition-all">
     </div>
 
     <main class="max-w-6xl mx-auto py-12 px-4 mb-20">
-        <h2 class="text-xl font-black text-gray-800 mb-6 flex items-center gap-2 px-2 italic uppercase">
+        <h2 class="text-xl font-black text-gray-800 mb-6 flex items-center gap-2 italic uppercase">
             <span class="w-1.5 h-6 bg-orange-500 rounded-full shadow-sm"></span> Lojas Parceiras
         </h2>
         <div id="lista-lojas" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
     </main>
 
-    <footer class="bg-white border-t border-gray-100 pt-10 pb-6">
+    <footer class="bg-white border-t border-gray-100 pt-10 pb-6 mt-10">
         <div class="max-w-2xl mx-auto px-6 text-center">
             <div class="flex justify-center gap-6 mb-4 text-gray-400 text-sm font-bold uppercase italic">
                 <a href="parceiro.html" class="hover:text-orange-500 transition-colors">Seja um Parceiro</a>
                 <a href="login.html" class="hover:text-orange-500 transition-colors">Área do Lojista</a>
             </div>
-            <p class="text-gray-300 text-[10px] uppercase tracking-widest font-bold font-sans">
+            <p class="text-gray-300 text-[10px] uppercase tracking-widest font-bold">
                 &copy; 2026 Melo Delivery. Todos os direitos reservados.
             </p>
         </div>

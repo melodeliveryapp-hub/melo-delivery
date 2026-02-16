@@ -7,24 +7,24 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        .aba-ativa { color: #f97316; border-bottom: 4px solid #f97316; background: white; border-radius: 1.5rem 1.5rem 0 0; }
+        .aba-ativa { color: #f97316; border-bottom: 4px solid #f97316; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade { animation: fadeIn 0.4s ease-out; }
     </style>
 </head>
-<body class="bg-[#fcfcfc] min-h-screen pb-20 font-sans text-gray-800">
+<body class="bg-[#fcfcfc] min-h-screen pb-20 font-sans">
 
     <header class="bg-gradient-to-r from-orange-500 to-orange-600 pb-20 pt-8 px-6 rounded-b-[3rem] shadow-lg text-white">
         <nav class="max-w-5xl mx-auto flex justify-between items-center">
             <h1 class="font-black italic uppercase tracking-tighter text-xl">Melo Delivery <span class="text-orange-200 text-xs block font-normal tracking-widest uppercase mt-1 italic" id="nome-loja-nav">Carregando...</span></h1>
-            <button onclick="logout()" class="bg-white/10 hover:bg-red-500 px-5 py-2 rounded-full text-[10px] font-black border border-white/20 transition-all uppercase italic tracking-widest">SAIR</button>
+            <button onclick="logout()" class="bg-white/10 hover:bg-red-500 px-5 py-2 rounded-full text-[10px] font-black border border-white/20 transition-all uppercase italic">SAIR</button>
         </nav>
     </header>
 
-    <div class="max-w-4xl mx-auto -mt-10 px-6">
+    <div class="max-w-4xl mx-auto -mt-10 px-6 relative z-20">
         <div class="bg-white rounded-[2rem] shadow-xl p-2 flex gap-2">
             <button onclick="mudarAba('produtos')" id="tab-produtos" class="flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-ativa">📦 Itens</button>
-            <button onclick="mudarAba('loja')" id="tab-loja" class="flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] text-gray-400">🚌 Config</button>
+            <button onclick="mudarAba('loja')" id="tab-loja" class="flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] text-gray-400">⚙️ Config</button>
         </div>
     </div>
 
@@ -34,9 +34,9 @@
                 <div class="flex gap-2 items-center">
                     <input type="time" id="inp-abre" class="bg-gray-50 font-bold p-2 rounded-lg text-xs border-none outline-none">
                     <input type="time" id="inp-fecha" class="bg-gray-50 font-bold p-2 rounded-lg text-xs border-none outline-none">
-                    <button onclick="salvarHorario()" class="bg-gray-900 text-white text-[10px] px-4 py-2 rounded-xl font-black active:scale-95 transition-all">OK</button>
+                    <button onclick="salvarHorario()" class="bg-gray-900 text-white text-[10px] px-4 py-2 rounded-xl font-black">OK</button>
                 </div>
-                <button onclick="abrirModalCriacao()" class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black italic uppercase text-xs shadow-lg shadow-orange-100 active:scale-95 transition-all"> + NOVO </button>
+                <button onclick="abrirModalCriacao()" class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black italic uppercase text-xs shadow-lg active:scale-95 transition-all"> + NOVO </button>
             </section>
             <div id="lista-produtos" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </div>
@@ -44,11 +44,11 @@
         <div id="conteudo-loja" class="hidden animate-fade space-y-6">
             <section class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm text-center">
                 <h2 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-6 italic">Taxas de Entrega</h2>
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <input type="number" id="fee-main" placeholder="Bairros Próximos" class="bg-gray-50 p-4 rounded-2xl font-bold border-none outline-none text-gray-700">
-                    <input type="number" id="fee-far" placeholder="Bairros Distantes" class="bg-gray-50 p-4 rounded-2xl font-bold border-none outline-none text-gray-700">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="number" id="fee-main" placeholder="Padrão" class="bg-gray-50 p-4 rounded-2xl font-bold border-none outline-none text-gray-700">
+                    <input type="number" id="fee-far" placeholder="Distante" class="bg-gray-50 p-4 rounded-2xl font-bold border-none outline-none text-gray-700">
                 </div>
-                <button onclick="salvarConfigLoja()" class="w-full bg-gray-900 text-white py-5 rounded-2xl font-black italic uppercase text-xs tracking-widest shadow-lg active:scale-95 transition-all">Salvar Mudanças</button>
+                <button onclick="salvarConfigLoja()" class="w-full mt-6 bg-gray-900 text-white py-5 rounded-2xl font-black italic uppercase text-xs tracking-widest shadow-lg">Salvar Mudanças</button>
             </section>
         </div>
     </main>
@@ -65,8 +65,8 @@
                     <input list="categorias-existentes" id="prod-cat" placeholder="Categoria" class="w-1/2 p-4 bg-gray-50 rounded-2xl outline-none font-bold text-gray-500">
                     <datalist id="categorias-existentes"></datalist>
                 </div>
-                <textarea id="prod-desc" rows="2" placeholder="Descrição curta" class="w-full p-4 bg-gray-50 rounded-2xl outline-none font-bold text-gray-700 resize-none"></textarea>
-                <button type="submit" id="btn-criar" class="w-full py-5 bg-orange-500 text-white font-black italic uppercase text-xs rounded-2xl shadow-lg shadow-orange-100">SALVAR NO CARDÁPIO</button>
+                <textarea id="prod-desc" rows="2" placeholder="Descrição" class="w-full p-4 bg-gray-50 rounded-2xl outline-none font-bold text-gray-700 resize-none"></textarea>
+                <button type="submit" id="btn-criar" class="w-full py-5 bg-orange-500 text-white font-black italic uppercase text-xs rounded-2xl shadow-lg">SALVAR NO CARDÁPIO</button>
             </form>
         </div>
     </div>
@@ -118,8 +118,8 @@
                             <p class="text-green-600 font-black text-sm italic">R$ ${p.price.toFixed(2)}</p>
                         </div>
                         <div class="flex gap-2 items-center">
-                            <button onclick="abrirModalEdicao('${p.id}')" class="text-xs p-1">✏️</button>
-                            <button onclick="deletarProduto('${p.id}')" class="text-xs p-1">🗑️</button>
+                            <button onclick="abrirModalEdicao('${p.id}')" class="text-xs">✏️</button>
+                            <button onclick="deletarProduto('${p.id}')" class="text-xs">🗑️</button>
                             <button onclick="toggleStatus('${p.id}', ${p.is_active})" class="text-[9px] font-black uppercase px-3 py-1.5 rounded-lg border border-gray-100 ${statusColor}">${statusTxt}</button>
                         </div>
                     </div>`;
@@ -130,22 +130,11 @@
         async function salvarProduto(e) {
             e.preventDefault();
             const id = document.getElementById('prod-id-edit').value;
-            const dados = { 
-                name: document.getElementById('prod-nome').value, 
-                price: parseFloat(document.getElementById('prod-preco').value), 
-                categoria_produtos: document.getElementById('prod-cat').value, 
-                description: document.getElementById('prod-desc').value, 
-                tenant_id: user.id 
-            };
-            if (id) await sbClient.from('products').update(dados).eq('id', id); 
-            else await sbClient.from('products').insert(dados);
+            const dados = { name: document.getElementById('prod-nome').value, price: parseFloat(document.getElementById('prod-preco').value), categoria_produtos: document.getElementById('prod-cat').value, description: document.getElementById('prod-desc').value, tenant_id: user.id };
+            if (id) await sbClient.from('products').update(dados).eq('id', id); else await sbClient.from('products').insert(dados);
             fecharModalProduto(); carregarProdutos();
         }
-        function abrirModalCriacao() { 
-            document.getElementById('prod-id-edit').value = ""; 
-            document.querySelector('form').reset(); 
-            document.getElementById('modal-produto').classList.remove('hidden'); 
-        }
+        function abrirModalCriacao() { document.getElementById('prod-id-edit').value = ""; document.querySelector('form').reset(); document.getElementById('modal-produto').classList.remove('hidden'); }
         function fecharModalProduto() { document.getElementById('modal-produto').classList.add('hidden'); }
         function abrirModalEdicao(id) {
             const p = produtosCache.find(x => x.id === id);
@@ -161,7 +150,6 @@
             const tL = document.getElementById('tab-loja');
             const cP = document.getElementById('conteudo-produtos');
             const cL = document.getElementById('conteudo-loja');
-            
             if(aba === 'produtos') {
                 tP.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-ativa";
                 tL.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] text-gray-400";
@@ -172,20 +160,8 @@
                 cL.classList.remove('hidden'); cP.classList.add('hidden');
             }
         }
-        async function salvarHorario() { 
-            await sbClient.from('store_info').update({ 
-                opening_time: document.getElementById('inp-abre').value, 
-                closing_time: document.getElementById('inp-fecha').value 
-            }).eq('id', storeInfoId); 
-            alert("Horário atualizado!"); 
-        }
-        async function salvarConfigLoja() {
-            await sbClient.from('store_info').update({
-                delivery_fee_main: parseFloat(document.getElementById('fee-main').value),
-                delivery_fee_far: parseFloat(document.getElementById('fee-far').value)
-            }).eq('id', storeInfoId);
-            alert("Configurações salvas!");
-        }
+        async function salvarHorario() { await sbClient.from('store_info').update({ opening_time: document.getElementById('inp-abre').value, closing_time: document.getElementById('inp-fecha').value }).eq('id', storeInfoId); alert("Horário atualizado!"); }
+        async function salvarConfigLoja() { await sbClient.from('store_info').update({ delivery_fee_main: parseFloat(document.getElementById('fee-main').value), delivery_fee_far: parseFloat(document.getElementById('fee-far').value) }).eq('id', storeInfoId); alert("Configurações salvas!"); }
         async function logout() { await sbClient.auth.signOut(); window.location.href = 'login.html'; }
         async function deletarProduto(id) { if(confirm("Excluir item?")) { await sbClient.from('products').delete().eq('id', id); carregarProdutos(); } }
         checkAuth();

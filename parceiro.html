@@ -1,69 +1,223 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Melo Delivery para Parceiros - Venda Mais!</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        .gradient-text { background-clip: text; -webkit-background-clip: text; color: transparent; background-image: linear-gradient(to right, #ea580c, #c2410c); }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-pop { animation: slideUp 0.5s ease-out; }
+        .aba-ativa { color: #f97316; border-bottom: 4px solid #f97316; }
+        .aba-inativa { color: #9ca3af; }
+        .aba-ativa { color: #f97316; border-bottom: 4px solid #f97316; background: white; border-radius: 1.5rem 1.5rem 0 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fadeIn 0.4s ease-out; }
     </style>
-</head>
-<body class="bg-gray-900 text-white font-sans selection:bg-orange-500">
+@@ -17,62 +16,57 @@
 
-    <nav class="w-full py-6 px-6 flex justify-between items-center max-w-6xl mx-auto border-b border-white/5">
-        <div class="font-black text-2xl tracking-tighter italic">MELO<span class="text-orange-500">.PARCEIROS</span></div>
-        <div class="flex gap-4">
-            <a href="index.html" class="hidden md:block text-gray-400 hover:text-white font-bold py-2 transition-colors">Sou Cliente</a>
-            <a href="login.html" class="bg-white text-gray-900 px-6 py-2 rounded-full font-black hover:bg-orange-500 hover:text-white transition-all shadow-lg">LOGIN →</a>
-        </div>
-    </nav>
-
-    <header class="max-w-6xl mx-auto px-6 py-20 md:py-32 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-        <div class="space-y-8 animate-pop">
-            <div class="inline-block bg-orange-500/10 text-orange-400 px-4 py-1 rounded-full text-xs font-black tracking-widest uppercase border border-orange-500/20 italic">SaaS Delivery</div>
-            <h1 class="text-5xl md:text-7xl font-black leading-tight italic uppercase tracking-tighter">Sua loja como uma <br><span class="gradient-text">Máquina de Vendas</span></h1>
-            <p class="text-gray-400 text-lg md:text-xl font-medium">Cardápio digital dinâmico e gestão total em tempo real. Sem taxas por pedido.</p>
-            <div class="flex flex-col sm:flex-row gap-4">
-                <a href="https://wa.me/5599999999999?text=Quero%20ser%20parceiro" target="_blank" class="bg-orange-600 text-white px-8 py-5 rounded-2xl font-black text-center hover:bg-orange-500 transition-all flex items-center justify-center gap-3 italic">
-                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.438 9.889-9.887.002-5.462-4.415-9.89-9.881-9.891-5.446 0-9.884 4.438-9.887 9.887-.001 2.221.634 3.8 1.703 5.491l-.957 3.498 3.741-.981z"/></svg>
-                    QUERO ME CADASTRAR 🚀
-                </a>
-            </div>
-        </div>
-        
-        <div class="relative hidden md:block animate-pop">
-            <div id="slider-wrapper" class="overflow-hidden rounded-[2.5rem] bg-gray-800 border border-gray-700 shadow-2xl relative">
-                <div id="slider-container" class="flex transition-transform duration-700 ease-in-out" style="width: 300%;">
-                    <div class="w-1/3 flex flex-col items-center justify-center p-10 text-center bg-gray-900 aspect-[4/3]">
-                        <span class="text-5xl mb-4">📈</span>
-                        <h3 class="text-xl font-black italic uppercase text-orange-500 tracking-tighter">Painel VIP</h3>
-                        <p class="text-gray-500 text-sm mt-2">Gestão total de produtos e preços.</p>
-                    </div>
-                    <div class="w-1/3 flex flex-col items-center justify-center p-10 text-center bg-gray-900 aspect-[4/3]">
-                        <span class="text-5xl mb-4">⚡</span>
-                        <h3 class="text-xl font-black italic uppercase text-blue-400 tracking-tighter">Agilidade</h3>
-                        <p class="text-gray-500 text-sm mt-2">Pedidos via WhatsApp.</p>
-                    </div>
-                    <div class="w-1/3 flex flex-col items-center justify-center p-10 text-center bg-gray-900 aspect-[4/3]">
-                        <span class="text-5xl mb-4">💰</span>
-                        <h3 class="text-xl font-black italic uppercase text-green-500 tracking-tighter">Lucro 100%</h3>
-                        <p class="text-gray-500 text-sm mt-2">Sem comissões abusivas.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <header class="bg-gradient-to-r from-orange-500 to-orange-600 pb-20 pt-8 px-6 rounded-b-[3rem] shadow-lg text-white">
+        <nav class="max-w-5xl mx-auto flex justify-between items-center">
+            <h1 class="font-black italic uppercase tracking-tighter text-xl">Melo Delivery <span class="text-orange-200 text-xs block font-normal tracking-widest uppercase mt-1" id="nome-loja-nav">Carregando...</span></h1>
+            <button onclick="logout()" class="bg-white/10 hover:bg-red-500 px-5 py-2 rounded-full text-[10px] font-black border border-white/20 transition-all">SAIR</button>
+            <h1 class="font-black italic uppercase tracking-tighter text-xl">Melo Delivery <span class="text-orange-200 text-xs block font-normal tracking-widest uppercase mt-1 italic" id="nome-loja-nav">Carregando...</span></h1>
+            <button onclick="logout()" class="bg-white/10 hover:bg-red-500 px-5 py-2 rounded-full text-[10px] font-black border border-white/20 transition-all uppercase italic tracking-widest">SAIR</button>
+        </nav>
     </header>
 
-    <script>
-        let current = 0;
-        const container = document.getElementById('slider-container');
-        setInterval(() => {
-            current = (current + 1) % 3;
-            container.style.transform = `translateX(-${current * 33.333}%)`;
-        }, 4000);
+    <div class="max-w-4xl mx-auto -mt-10 px-6">
+        <div class="bg-white rounded-[2rem] shadow-xl p-2 flex gap-2">
+            <button onclick="mudarAba('produtos')" id="tab-produtos" class="flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-ativa">📦 Itens</button>
+            <button onclick="mudarAba('loja')" id="tab-loja" class="flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-inativa">🏪 Config</button>
+            <button onclick="mudarAba('loja')" id="tab-loja" class="flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] text-gray-400">🚌 Config</button>
+        </div>
+    </div>
+
+    <main class="max-w-4xl mx-auto p-6 mt-4">
+        <div id="conteudo-produtos" class="space-y-6 animate-fade">
+            <section class="bg-white p-6 rounded-[2.5rem] border border-gray-100 flex justify-between items-center">
+                <div class="flex gap-2">
+                    <input type="time" id="inp-abre" class="bg-gray-50 font-bold p-2 rounded-lg text-xs">
+                    <input type="time" id="inp-fecha" class="bg-gray-50 font-bold p-2 rounded-lg text-xs">
+                    <button onclick="salvarHorario()" class="bg-gray-900 text-white text-[10px] px-4 rounded-xl font-black">OK</button>
+            <section class="bg-white p-6 rounded-[2.5rem] border border-gray-100 flex justify-between items-center shadow-sm">
+                <div class="flex gap-2 items-center">
+                    <input type="time" id="inp-abre" class="bg-gray-50 font-bold p-2 rounded-lg text-xs border-none outline-none">
+                    <input type="time" id="inp-fecha" class="bg-gray-50 font-bold p-2 rounded-lg text-xs border-none outline-none">
+                    <button onclick="salvarHorario()" class="bg-gray-900 text-white text-[10px] px-4 py-2 rounded-xl font-black active:scale-95 transition-all">OK</button>
+                </div>
+                <button onclick="abrirModalCriacao()" class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black italic uppercase text-xs shadow-lg shadow-orange-100"> + Novo </button>
+                <button onclick="abrirModalCriacao()" class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black italic uppercase text-xs shadow-lg shadow-orange-100 active:scale-95 transition-all"> + NOVO </button>
+            </section>
+            <div id="lista-produtos" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+
+        <div id="conteudo-loja" class="hidden animate-fade space-y-6">
+            <section class="bg-white p-8 rounded-[2.5rem] border border-gray-100 space-y-4 text-center">
+                <h2 class="text-xs font-black uppercase tracking-widest text-gray-400">Identidade da Loja</h2>
+                <div class="flex justify-center gap-10">
+                    <div class="w-24 h-24 bg-gray-50 rounded-full border-2 border-dashed border-gray-200 overflow-hidden">
+                        <img id="view-logo" class="w-full h-full object-cover">
+                    </div>
+            <section class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm text-center">
+                <h2 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-6 italic">Taxas de Entrega</h2>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <input type="number" id="fee-main" placeholder="Bairros Próximos" class="bg-gray-50 p-4 rounded-2xl font-bold border-none outline-none text-gray-700">
+                    <input type="number" id="fee-far" placeholder="Bairros Distantes" class="bg-gray-50 p-4 rounded-2xl font-bold border-none outline-none text-gray-700">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="number" id="fee-main" placeholder="Taxa Padrão" class="bg-gray-50 p-4 rounded-2xl font-bold border-none outline-none">
+                    <input type="number" id="fee-far" placeholder="Taxa Distante" class="bg-gray-50 p-4 rounded-2xl font-bold border-none outline-none">
+                </div>
+                <button onclick="salvarConfigLoja()" class="w-full bg-gray-900 text-white py-5 rounded-2xl font-black italic uppercase text-xs tracking-widest">Salvar Mudanças</button>
+                <button onclick="salvarConfigLoja()" class="w-full bg-gray-900 text-white py-5 rounded-2xl font-black italic uppercase text-xs tracking-widest shadow-lg active:scale-95 transition-all">Salvar Mudanças</button>
+            </section>
+        </div>
+    </main>
+
+    <div id="modal-produto" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-[3rem] p-8 shadow-2xl relative animate-fade">
+            <button onclick="fecharModalProduto()" class="absolute top-6 right-8 text-gray-300 font-black text-2xl">&times;</button>
+            <button onclick="fecharModalProduto()" class="absolute top-6 right-8 text-gray-300 font-black text-2xl hover:text-orange-500">&times;</button>
+            <h3 class="text-2xl font-black italic text-gray-800 mb-8 uppercase tracking-tighter">Gerir Item</h3>
+            <form onsubmit="salvarProduto(event)" class="space-y-4">
+                <input type="hidden" id="prod-id-edit">
+                <input type="text" id="prod-nome" placeholder="Nome" required class="w-full p-4 bg-gray-50 rounded-2xl outline-none font-bold">
+                <input type="text" id="prod-nome" placeholder="Nome do Produto" required class="w-full p-4 bg-gray-50 rounded-2xl outline-none font-bold text-gray-700">
+                <div class="flex gap-4">
+                    <input type="number" id="prod-preco" step="0.01" placeholder="Preço" required class="w-1/2 p-4 bg-gray-50 rounded-2xl outline-none font-bold">
+                    <input type="number" id="prod-preco" step="0.01" placeholder="Preço" required class="w-1/2 p-4 bg-gray-50 rounded-2xl outline-none font-bold text-gray-700">
+                    <input list="categorias-existentes" id="prod-cat" placeholder="Categoria" class="w-1/2 p-4 bg-gray-50 rounded-2xl outline-none font-bold text-gray-500">
+                    <datalist id="categorias-existentes"></datalist>
+                </div>
+                <textarea id="prod-desc" rows="2" placeholder="Descrição" class="w-full p-4 bg-gray-50 rounded-2xl outline-none font-bold resize-none"></textarea>
+                <button type="submit" id="btn-criar" class="w-full py-5 bg-orange-500 text-white font-black italic uppercase text-xs rounded-2xl shadow-lg">SALVAR NO CARDÁPIO</button>
+                <textarea id="prod-desc" rows="2" placeholder="Descrição curta" class="w-full p-4 bg-gray-50 rounded-2xl outline-none font-bold text-gray-700 resize-none"></textarea>
+                <button type="submit" id="btn-criar" class="w-full py-5 bg-orange-500 text-white font-black italic uppercase text-xs rounded-2xl shadow-lg shadow-orange-100">SALVAR NO CARDÁPIO</button>
+            </form>
+        </div>
+    </div>
+@@ -85,7 +79,7 @@ <h3 class="text-2xl font-black italic text-gray-800 mb-8 uppercase tracking-tigh
+
+        async function checkAuth() {
+            const { data: { session } } = await sbClient.auth.getSession();
+            if (!session) window.location.href = 'login.html';
+            if (!session) return window.location.href = 'login.html';
+            user = session.user; carregarDadosLoja();
+        }
+
+@@ -95,11 +89,10 @@ <h3 class="text-2xl font-black italic text-gray-800 mb-8 uppercase tracking-tigh
+            const { data: info } = await sbClient.from('store_info').select('*').eq('name', profile.store_name).single();
+            if (info) {
+                storeInfoId = info.id;
+                document.getElementById('inp-abre').value = info.opening_time || "18:00";
+                document.getElementById('inp-fecha').value = info.closing_time || "23:59";
+                document.getElementById('inp-abre').value = info.opening_time || "08:00";
+                document.getElementById('inp-fecha').value = info.closing_time || "18:00";
+                document.getElementById('fee-main').value = info.delivery_fee_main;
+                document.getElementById('fee-far').value = info.delivery_fee_far;
+                document.getElementById('view-logo').src = info.logo_url || 'https://via.placeholder.com/100';
+            }
+            carregarProdutos();
+        }
+@@ -110,24 +103,24 @@ <h3 class="text-2xl font-black italic text-gray-800 mb-8 uppercase tracking-tigh
+            const lista = document.getElementById('lista-produtos');
+            lista.innerHTML = '';
+
+            // Preenche o Datalist de categorias
+            const cats = [...new Set(produtos.map(p => p.categoria_produtos))].filter(Boolean);
+            document.getElementById('categorias-existentes').innerHTML = cats.map(c => `<option value="${c}">`).join('');
+
+            produtos.forEach(p => {
+                const opacity = p.is_active ? 'opacity-100' : 'opacity-40 grayscale';
+                const statusTxt = p.is_active ? 'PAUSAR' : 'ATIVAR';
+                const statusColor = p.is_active ? 'bg-orange-50 text-orange-500' : 'bg-green-50 text-green-600';
+                
+                lista.innerHTML += `
+                    <div class="bg-white p-4 rounded-[2rem] border border-gray-50 flex items-center gap-4 transition-all ${opacity}">
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-gray-800 text-xs uppercase italic tracking-tighter">${p.name}</h3>
+                    <div class="bg-white p-4 rounded-[1.5rem] border border-gray-100 flex items-center justify-between shadow-sm transition-all ${opacity}">
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-[11px] uppercase italic tracking-tighter">${p.name}</h3>
+                            <p class="text-green-600 font-black text-sm italic">R$ ${p.price.toFixed(2)}</p>
+                        </div>
+                        <div class="flex flex-col gap-2 items-center">
+                            <div class="flex gap-2">
+                                <button onclick="abrirModalEdicao('${p.id}')" class="text-xs">✏️</button>
+                                <button onclick="deletarProduto('${p.id}')" class="text-xs">🗑️</button>
+                            </div>
+                            <button onclick="toggleStatus('${p.id}', ${p.is_active})" class="text-[8px] font-black uppercase px-3 py-1 rounded-lg ${p.is_active ? 'bg-orange-100 text-orange-600' : 'bg-green-100 text-green-600'}">${p.is_active ? 'Pausar' : 'Ativar'}</button>
+                        <div class="flex gap-2 items-center">
+                            <button onclick="abrirModalEdicao('${p.id}')" class="text-xs p-1">✏️</button>
+                            <button onclick="deletarProduto('${p.id}')" class="text-xs p-1">🗑️</button>
+                            <button onclick="toggleStatus('${p.id}', ${p.is_active})" class="text-[9px] font-black uppercase px-3 py-1.5 rounded-lg border border-gray-100 ${statusColor}">${statusTxt}</button>
+                        </div>
+                    </div>`;
+            });
+@@ -137,28 +130,64 @@ <h3 class="font-bold text-gray-800 text-xs uppercase italic tracking-tighter">${
+        async function salvarProduto(e) {
+            e.preventDefault();
+            const id = document.getElementById('prod-id-edit').value;
+            const dados = { name: document.getElementById('prod-nome').value, price: parseFloat(document.getElementById('prod-preco').value), categoria_produtos: document.getElementById('prod-cat').value, description: document.getElementById('prod-desc').value, tenant_id: user.id };
+            if (id) await sbClient.from('products').update(dados).eq('id', id); else await sbClient.from('products').insert(dados);
+            const dados = { 
+                name: document.getElementById('prod-nome').value, 
+                price: parseFloat(document.getElementById('prod-preco').value), 
+                categoria_produtos: document.getElementById('prod-cat').value, 
+                description: document.getElementById('prod-desc').value, 
+                tenant_id: user.id 
+            };
+            if (id) await sbClient.from('products').update(dados).eq('id', id); 
+            else await sbClient.from('products').insert(dados);
+            fecharModalProduto(); carregarProdutos();
+        }
+        function abrirModalCriacao() { document.getElementById('prod-id-edit').value = ""; document.querySelector('form').reset(); document.getElementById('modal-produto').classList.remove('hidden'); }
+        function abrirModalCriacao() { 
+            document.getElementById('prod-id-edit').value = ""; 
+            document.querySelector('form').reset(); 
+            document.getElementById('modal-produto').classList.remove('hidden'); 
+        }
+        function fecharModalProduto() { document.getElementById('modal-produto').classList.add('hidden'); }
+        function abrirModalEdicao(id) {
+            const p = produtosCache.find(x => x.id === id);
+            document.getElementById('prod-id-edit').value = p.id;
+            document.getElementById('prod-nome').value = p.name;
+            document.getElementById('prod-preco').value = p.price;
+            document.getElementById('prod-cat').value = p.categoria_produtos;
+            document.getElementById('prod-desc').value = p.description;
+            document.getElementById('prod-desc').value = p.description || "";
+            document.getElementById('modal-produto').classList.remove('hidden');
+        }
+        function mudarAba(aba) {
+            document.getElementById('tab-produtos').className = aba === 'produtos' ? 'flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-ativa' : 'flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-inativa';
+            document.getElementById('tab-loja').className = aba === 'loja' ? 'flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-ativa' : 'flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-inativa';
+            document.getElementById('conteudo-produtos').classList.toggle('hidden', aba !== 'produtos');
+            document.getElementById('conteudo-loja').classList.toggle('hidden', aba !== 'loja');
+            const tP = document.getElementById('tab-produtos');
+            const tL = document.getElementById('tab-loja');
+            const cP = document.getElementById('conteudo-produtos');
+            const cL = document.getElementById('conteudo-loja');
+            
+            if(aba === 'produtos') {
+                tP.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-ativa";
+                tL.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] text-gray-400";
+                cP.classList.remove('hidden'); cL.classList.add('hidden');
+            } else {
+                tL.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-ativa";
+                tP.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] text-gray-400";
+                cL.classList.remove('hidden'); cP.classList.add('hidden');
+            }
+        }
+        async function salvarHorario() { 
+            await sbClient.from('store_info').update({ 
+                opening_time: document.getElementById('inp-abre').value, 
+                closing_time: document.getElementById('inp-fecha').value 
+            }).eq('id', storeInfoId); 
+            alert("Horário atualizado!"); 
+        }
+        async function salvarConfigLoja() {
+            await sbClient.from('store_info').update({
+                delivery_fee_main: parseFloat(document.getElementById('fee-main').value),
+                delivery_fee_far: parseFloat(document.getElementById('fee-far').value)
+            }).eq('id', storeInfoId);
+            alert("Configurações salvas!");
+        }
+        async function logout() { await sbClient.auth.signOut(); window.location.href = 'login.html'; }
+        async function deletarProduto(id) { if(confirm("Excluir item?")) { await sbClient.from('products').delete().eq('id', id); carregarProdutos(); } }
+        checkAuth();
     </script>
 </body>
-</html>

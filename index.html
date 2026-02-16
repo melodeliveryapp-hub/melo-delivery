@@ -6,7 +6,6 @@
     <title>Melo Delivery - O Shopping da Cidade</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <link rel="icon" type="image/png" href="favicon.png">
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -28,41 +27,22 @@
         </div>
     </div>
 
-    <div class="max-w-6xl mx-auto mt-12 px-4">
-        <div class="flex gap-3 overflow-x-auto no-scrollbar pb-6 pl-1" id="container-filtros">
-            <button onclick="filtrarCategoriaGeral('')" 
-                    class="flex flex-col items-center justify-center min-w-[100px] h-[105px] bg-white rounded-2xl shadow-sm border border-orange-500 relative shrink-0 gap-2 group transition-all active:scale-95 cursor-pointer">
-                <span class="text-3xl filter drop-shadow-sm group-hover:scale-110 transition-transform">🏪</span>
-                <span class="text-xs font-bold text-orange-600">Ver Tudo</span>
-                <div class="absolute bottom-0 w-full h-1 bg-orange-500 rounded-b-2xl opacity-50"></div>
-            </button>
-        </div>
-    </div>
-
-    <main class="max-w-6xl mx-auto py-4 px-4 mb-20">
-        <h2 class="text-xl font-black text-gray-800 mb-6 flex items-center gap-2 px-2">
+    <main class="max-w-6xl mx-auto py-12 px-4 mb-20">
+        <h2 class="text-xl font-black text-gray-800 mb-6 flex items-center gap-2 px-2 italic uppercase">
             <span class="w-1.5 h-6 bg-orange-500 rounded-full shadow-sm"></span> Lojas Parceiras
         </h2>
-
         <div id="lista-lojas" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
-        
-        <div id="feedback-busca" class="hidden text-center py-16 px-6 bg-orange-50 rounded-[3rem] border-4 border-dashed border-orange-200 mt-6 mx-auto max-w-lg">
-            <div class="text-6xl mb-4">😕</div>
-            <p class="text-orange-800 font-black text-xl italic">"Poxa, não encontramos essa loja..."</p>
-            <p class="text-orange-600 mt-2 font-bold text-sm">Mas você pode indicá-la para o Melo Delivery! 🚀</p>
-        </div>
     </main>
 
     <footer class="bg-white border-t border-gray-100 pt-10 pb-6">
         <div class="max-w-2xl mx-auto px-6 text-center">
-            <div class="flex justify-center gap-6 mb-4 text-gray-400 text-sm font-bold">
+            <div class="flex justify-center gap-6 mb-4 text-gray-400 text-sm font-bold uppercase italic">
                 <a href="parceiro.html" class="hover:text-orange-500 transition-colors">Seja um Parceiro</a>
                 <a href="login.html" class="hover:text-orange-500 transition-colors">Área do Lojista</a>
             </div>
-            <p class="text-gray-300 text-[10px] uppercase tracking-widest font-bold">
+            <p class="text-gray-300 text-[10px] uppercase tracking-widest font-bold font-sans">
                 &copy; 2026 Melo Delivery. Todos os direitos reservados.
             </p>
-            <p class="text-gray-200 text-[8px] mt-2 italic">Desenvolvido com ❤️</p>
         </div>
     </footer>
 
@@ -70,44 +50,33 @@
         const SUPABASE_URL = 'https://xhfwrbjxitcrktccdrpn.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZndyYmp4aXRjcmt0Y2NkcnBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MjQ5NTksImV4cCI6MjA4NjIwMDk1OX0.nyGJxdNT-qiH-oqJL4KDKA-7bRtlj5UxmXy32RswPUc';
         const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        
         let todasLojas = [];
 
         async function carregarLojas() {
-            try {
-                const { data: profiles } = await sbClient.from('profiles').select('*');
-                const { data: info } = await sbClient.from('store_info').select('*');
-
-                if (!profiles) return;
-
-                todasLojas = profiles.map(p => {
-                    const extra = info?.find(i => i.name?.trim().toLowerCase() === p.store_name?.trim().toLowerCase());
-                    return { 
-                        ...p, 
-                        logoFinal: extra?.logo_url || 'https://via.placeholder.com/200?text=Loja', 
-                        categorias: (p.categoria_loja || 'Outros').split(';').map(c => c.trim()) 
-                    };
-                });
-                exibirLojas(todasLojas);
-            } catch (e) { console.error(e); }
+            const { data: profiles } = await sbClient.from('profiles').select('*');
+            const { data: info } = await sbClient.from('store_info').select('*');
+            if (!profiles) return;
+            todasLojas = profiles.map(p => {
+                const extra = info?.find(i => i.name === p.store_name);
+                return { ...p, logo: extra?.logo_url || 'https://via.placeholder.com/200' };
+            });
+            exibirLojas(todasLojas);
         }
 
         function exibirLojas(lojas) {
             const container = document.getElementById('lista-lojas');
             container.innerHTML = '';
             lojas.forEach(loja => {
-                const link = loja.slug ? `cardapio.html?loja=${loja.slug}` : `cardapio.html?loja=${loja.id}`;
+                const link = `cardapio.html?loja=${loja.slug || loja.id}`;
                 container.innerHTML += `
-                    <div class="bg-white p-6 rounded-[2.5rem] shadow-lg border border-gray-50 flex flex-col items-center text-center transition-all hover:-translate-y-1 hover:shadow-xl cursor-pointer group" 
-                         onclick="window.location.href='${link}'">
+                    <div class="bg-white p-6 rounded-[2.5rem] shadow-lg border border-gray-50 flex flex-col items-center text-center transition-all hover:-translate-y-1 hover:shadow-xl cursor-pointer group" onclick="window.location.href='${link}'">
                         <div class="w-24 h-24 bg-gray-50 rounded-full mb-4 overflow-hidden border-4 border-white shadow-md group-hover:border-orange-100 transition-colors">
-                            <img src="${loja.logoFinal}" class="w-full h-full object-cover">
+                            <img src="${loja.logo}" class="w-full h-full object-cover">
                         </div>
-                        <h3 class="text-lg font-black text-gray-800 leading-tight group-hover:text-orange-600 transition-colors">${loja.store_name}</h3>
+                        <h3 class="text-lg font-black italic text-gray-800 uppercase tracking-tighter">${loja.store_name}</h3>
                     </div>`;
             });
         }
-
         carregarLojas();
     </script>
 </body>

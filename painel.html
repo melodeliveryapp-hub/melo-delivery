@@ -12,7 +12,7 @@
         .animate-fade { animation: fadeIn 0.4s ease-out; }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen pb-20 font-sans text-gray-800">
+<body class="bg-[#fcfcfc] min-h-screen pb-20 font-sans text-gray-800">
 
     <header class="bg-gradient-to-r from-orange-500 to-orange-600 pb-20 pt-8 px-6 rounded-b-[3rem] shadow-lg text-white">
         <nav class="max-w-5xl mx-auto flex justify-between items-center">
@@ -34,12 +34,12 @@
     <main class="max-w-4xl mx-auto p-6 mt-4">
         <div id="conteudo-produtos" class="space-y-6 animate-fade">
             <section class="bg-white p-6 rounded-[2.5rem] border border-gray-100 flex justify-between items-center shadow-sm">
-                <div class="flex gap-2">
-                    <input type="time" id="inp-abre" class="bg-gray-50 font-bold p-2 rounded-lg text-xs outline-none">
-                    <input type="time" id="inp-fecha" class="bg-gray-50 font-bold p-2 rounded-lg text-xs outline-none">
+                <div class="flex gap-2 items-center">
+                    <input type="time" id="inp-abre" class="bg-gray-50 font-bold p-2 rounded-lg text-xs border-none outline-none">
+                    <input type="time" id="inp-fecha" class="bg-gray-50 font-bold p-2 rounded-lg text-xs border-none outline-none">
                     <button onclick="salvarHorario()" class="bg-gray-900 text-white text-[10px] px-4 py-2 rounded-xl font-black">OK</button>
                 </div>
-                <button onclick="abrirModalCriacao()" class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black italic uppercase text-xs shadow-lg active:scale-95 transition-all"> + NOVO ITEM </button>
+                <button onclick="abrirModalCriacao()" class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black italic uppercase text-xs shadow-lg shadow-orange-100"> + NOVO ITEM </button>
             </section>
             <div id="lista-produtos" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </div>
@@ -48,10 +48,10 @@
             <section class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm text-center">
                 <h2 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-6 italic">Taxas de Entrega</h2>
                 <div class="grid grid-cols-2 gap-4">
-                    <input type="number" id="fee-main" placeholder="Padrão" class="bg-gray-100 p-4 rounded-2xl font-bold outline-none">
-                    <input type="number" id="fee-far" placeholder="Distante" class="bg-gray-100 p-4 rounded-2xl font-bold outline-none">
+                    <input type="number" id="fee-main" placeholder="Padrão" class="bg-gray-50 p-4 rounded-2xl font-bold border-none outline-none">
+                    <input type="number" id="fee-far" placeholder="Distante" class="bg-gray-50 p-4 rounded-2xl font-bold border-none outline-none">
                 </div>
-                <button onclick="salvarConfigLoja()" class="w-full mt-6 bg-gray-900 text-white py-5 rounded-2xl font-black italic uppercase text-xs shadow-lg">SALVAR CONFIGURAÇÕES</button>
+                <button onclick="salvarConfigLoja()" class="w-full mt-6 bg-gray-900 text-white py-5 rounded-2xl font-black italic uppercase text-xs shadow-lg">Salvar Mudanças</button>
             </section>
         </div>
     </main>
@@ -60,10 +60,8 @@
         <div class="bg-white w-full max-w-lg rounded-[3rem] p-8 shadow-2xl relative animate-fade">
             <button onclick="fecharModalProduto()" class="absolute top-6 right-8 text-gray-300 font-black text-2xl hover:text-orange-500">&times;</button>
             <h3 class="text-2xl font-black italic text-gray-800 mb-6 uppercase tracking-tighter">Gerenciar Produto</h3>
-            
             <form onsubmit="salvarProduto(event)" class="space-y-4">
                 <input type="hidden" id="prod-id-edit">
-                
                 <div class="w-full h-32 bg-gray-100 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden group">
                     <input type="file" id="prod-img" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="previewImg(this)">
                     <img id="img-preview" src="" class="hidden w-full h-full object-cover">
@@ -72,18 +70,14 @@
                         <p class="text-[10px] font-black text-gray-400 uppercase">Foto do Produto</p>
                     </div>
                 </div>
-
-                <input type="text" id="prod-nome" placeholder="Nome" required class="w-full p-4 bg-gray-100 rounded-2xl outline-none font-bold">
-                
+                <input type="text" id="prod-nome" placeholder="Nome" required class="w-full p-4 bg-gray-50 rounded-2xl outline-none font-bold">
                 <div class="flex gap-4">
-                    <input type="number" id="prod-preco" step="0.01" placeholder="Preço" required class="w-1/2 p-4 bg-gray-100 rounded-2xl outline-none font-bold">
-                    <input list="categorias-existentes" id="prod-cat" placeholder="Categoria" class="w-1/2 p-4 bg-gray-100 rounded-2xl outline-none font-bold">
+                    <input type="number" id="prod-preco" step="0.01" placeholder="Preço" required class="w-1/2 p-4 bg-gray-50 rounded-2xl outline-none font-bold">
+                    <input list="categorias-existentes" id="prod-cat" placeholder="Categoria" class="w-1/2 p-4 bg-gray-50 rounded-2xl outline-none font-bold">
                     <datalist id="categorias-existentes"></datalist>
                 </div>
-                
-                <textarea id="prod-desc" rows="2" placeholder="Descrição (opcional)" class="w-full p-4 bg-gray-100 rounded-2xl outline-none font-bold resize-none"></textarea>
-                
-                <button type="submit" id="btn-salvar" class="w-full py-5 bg-orange-500 text-white font-black italic uppercase text-xs rounded-2xl shadow-lg">SALVAR NO CARDÁPIO</button>
+                <textarea id="prod-desc" rows="2" placeholder="Descrição" class="w-full p-4 bg-gray-50 rounded-2xl outline-none font-bold resize-none"></textarea>
+                <button type="submit" id="btn-salvar" class="w-full py-5 bg-orange-500 text-white font-black italic uppercase text-xs rounded-2xl shadow-lg shadow-orange-100">SALVAR NO CARDÁPIO</button>
             </form>
         </div>
     </div>
@@ -109,8 +103,8 @@
                     storeInfoId = info.id;
                     document.getElementById('inp-abre').value = info.opening_time || "18:00";
                     document.getElementById('inp-fecha').value = info.closing_time || "23:59";
-                    document.getElementById('fee-main').value = info.delivery_fee_main || 0;
-                    document.getElementById('fee-far').value = info.delivery_fee_far || 0;
+                    document.getElementById('fee-main').value = info.delivery_fee_main;
+                    document.getElementById('fee-far').value = info.delivery_fee_far;
                 }
             }
             carregarProdutos();
@@ -122,67 +116,52 @@
             const lista = document.getElementById('lista-produtos');
             lista.innerHTML = '';
             
-            // Preencher datalist de categorias
             const cats = [...new Set(produtos.map(p => p.categoria_produtos))].filter(Boolean);
             document.getElementById('categorias-existentes').innerHTML = cats.map(c => `<option value="${c}">`).join('');
 
             produtos.forEach(p => {
-                const isAtivo = p.is_active !== false; // Garante que nulos sejam tratados como ativos
-                const opacity = isAtivo ? 'opacity-100' : 'opacity-40 grayscale';
-                const btnTxt = isAtivo ? 'Pausar' : 'Ativar';
-                const btnColor = isAtivo ? 'bg-orange-100 text-orange-600' : 'bg-green-100 text-green-600';
-
+                const ativo = p.is_active !== false; // Trata null como true
+                const opacity = ativo ? 'opacity-100' : 'opacity-40 grayscale';
+                const btnTxt = ativo ? 'Pausar' : 'Ativar';
+                const btnColor = ativo ? 'bg-orange-50 text-orange-500' : 'bg-green-50 text-green-600';
+                
                 lista.innerHTML += `
-                    <div class="bg-white p-4 rounded-[2rem] border border-gray-100 flex items-center justify-between shadow-sm transition-all ${opacity}">
-                        <div class="flex items-center gap-3">
-                            <img src="${p.image_url || 'https://via.placeholder.com/100'}" class="w-12 h-12 rounded-xl object-cover bg-gray-50">
-                            <div>
-                                <h3 class="font-bold text-gray-800 text-[11px] uppercase italic tracking-tighter">${p.name}</h3>
+                    <div class="bg-white p-4 rounded-[1.5rem] border border-gray-100 flex items-center justify-between shadow-sm transition-all ${opacity}">
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
+                            <img src="${p.image_url || 'https://via.placeholder.com/100'}" class="w-12 h-12 rounded-xl object-cover bg-gray-50 shrink-0">
+                            <div class="truncate">
+                                <h3 class="font-bold text-gray-800 text-[11px] uppercase italic tracking-tighter truncate">${p.name}</h3>
                                 <p class="text-green-600 font-black text-sm italic">R$ ${p.price.toFixed(2)}</p>
                             </div>
                         </div>
-                        <div class="flex gap-2 items-center">
-                            <button onclick="abrirModalEdicao('${p.id}')" class="p-2 hover:bg-gray-100 rounded-lg">✏️</button>
-                            <button onclick="toggleStatus('${p.id}', ${isAtivo})" class="text-[9px] font-black uppercase px-3 py-1.5 rounded-lg border ${btnColor} transition-colors">
-                                ${btnTxt}
-                            </button>
-                            <button onclick="deletarProduto('${p.id}')" class="p-2 hover:bg-red-50 rounded-lg">🗑️</button>
+                        <div class="flex gap-2 items-center ml-2">
+                            <button onclick="abrirModalEdicao('${p.id}')" class="text-xs">✏️</button>
+                            <button onclick="toggleStatus('${p.id}', ${ativo})" class="text-[9px] font-black uppercase px-3 py-1.5 rounded-lg border border-gray-100 ${btnColor}">${btnTxt}</button>
+                            <button onclick="deletarProduto('${p.id}')" class="text-xs">🗑️</button>
                         </div>
                     </div>`;
             });
         }
 
-        // FUNÇÃO DE PAUSA (CORRIGIDA)
         async function toggleStatus(id, statusAtual) {
-            const { error } = await sbClient.from('products')
-                .update({ is_active: !statusAtual })
-                .eq('id', id);
-            
-            if (error) {
-                console.error("Erro ao pausar:", error);
-                alert("Erro ao mudar status.");
-            } else {
-                carregarProdutos();
-            }
+            const { error } = await sbClient.from('products').update({ is_active: !statusAtual }).eq('id', id);
+            if (!error) carregarProdutos();
         }
 
         async function salvarProduto(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-salvar');
-            btn.innerText = "Salvando..."; btn.disabled = true;
+            btn.innerText = "Sincronizando..."; btn.disabled = true;
 
             const id = document.getElementById('prod-id-edit').value;
             const file = document.getElementById('prod-img').files[0];
             let url = document.getElementById('img-preview').src;
 
-            // Se tiver novo arquivo, faz upload
             if (file) {
                 const fileName = `${user.id}/${Date.now()}`;
-                const { error: uploadError } = await sbClient.storage.from('product-images').upload(fileName, file);
-                if(!uploadError) {
-                    const { data } = sbClient.storage.from('product-images').getPublicUrl(fileName);
-                    url = data.publicUrl;
-                }
+                await sbClient.storage.from('product-images').upload(fileName, file);
+                const { data } = sbClient.storage.from('product-images').getPublicUrl(fileName);
+                url = data.publicUrl;
             }
 
             const dados = { 
@@ -190,18 +169,13 @@
                 price: parseFloat(document.getElementById('prod-preco').value), 
                 categoria_produtos: document.getElementById('prod-cat').value, 
                 description: document.getElementById('prod-desc').value,
-                image_url: url.includes('placeholder') ? 'https://via.placeholder.com/150' : url
+                image_url: url.includes('base64') || url.includes('placeholder') ? (url.includes('base64') ? url : 'https://via.placeholder.com/150') : url
             };
 
-            if (id) {
-                await sbClient.from('products').update(dados).eq('id', id); 
-            } else {
-                dados.tenant_id = user.id;
-                await sbClient.from('products').insert(dados); 
-            }
+            if (id) await sbClient.from('products').update(dados).eq('id', id); 
+            else { dados.tenant_id = user.id; await sbClient.from('products').insert(dados); }
 
-            fecharModalProduto(); 
-            carregarProdutos();
+            fecharModalProduto(); carregarProdutos();
             btn.innerText = "SALVAR NO CARDÁPIO"; btn.disabled = false;
         }
 
@@ -232,8 +206,8 @@
             document.getElementById('prod-preco').value = p.price;
             document.getElementById('prod-cat').value = p.categoria_produtos;
             document.getElementById('prod-desc').value = p.description || "";
-            document.getElementById('img-preview').src = p.image_url || "";
             if(p.image_url) {
+                document.getElementById('img-preview').src = p.image_url;
                 document.getElementById('img-preview').classList.remove('hidden');
                 document.getElementById('upload-txt').classList.add('hidden');
             }
@@ -257,12 +231,10 @@
                 cL.classList.remove('hidden'); cP.classList.add('hidden');
             }
         }
-
         async function salvarHorario() { await sbClient.from('store_info').update({ opening_time: document.getElementById('inp-abre').value, closing_time: document.getElementById('inp-fecha').value }).eq('id', storeInfoId); alert("Horário atualizado!"); }
-        async function salvarConfigLoja() { await sbClient.from('store_info').update({ delivery_fee_main: parseFloat(document.getElementById('fee-main').value), delivery_fee_far: parseFloat(document.getElementById('fee-far').value) }).eq('id', storeInfoId); alert("Taxas salvas!"); }
+        async function salvarConfigLoja() { await sbClient.from('store_info').update({ delivery_fee_main: parseFloat(document.getElementById('fee-main').value), delivery_fee_far: parseFloat(document.getElementById('fee-far').value) }).eq('id', storeInfoId); alert("Configurações salvas!"); }
         async function logout() { await sbClient.auth.signOut(); window.location.href = 'login.html'; }
-        async function deletarProduto(id) { if(confirm("Deseja excluir permanentemente este item?")) { await sbClient.from('products').delete().eq('id', id); carregarProdutos(); } }
-        
+        async function deletarProduto(id) { if(confirm("Excluir item permanentemente?")) { await sbClient.from('products').delete().eq('id', id); carregarProdutos(); } }
         checkAuth();
     </script>
 </body>

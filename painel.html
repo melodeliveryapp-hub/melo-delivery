@@ -210,31 +210,59 @@
         }
 
         async function carregarProdutos() {
-            const { data: produtos } = await sbClient.from('products').select('*').eq('tenant_id', user.id).order('name', { ascending: true });
-            produtosCache = produtos || [];
-            const lista = document.getElementById('lista-produtos');
-            lista.innerHTML = '';
-            
-            if (produtos.length === 0) {
-                lista.innerHTML = '<div class="col-span-full py-10 text-center text-gray-300 font-bold italic uppercase">Seu cardápio está vazio</div>';
-                return;
-            }
+    const { data: produtos } = await sbClient.from('products')
+        .select('*')
+        .eq('tenant_id', user.id)
+        .order('name', { ascending: true });
+    
+    produtosCache = produtos || [];
+    const lista = document.getElementById('lista-produtos');
+    lista.innerHTML = '';
+    
+    if (produtos.length === 0) {
+        lista.innerHTML = '<div class="col-span-full py-10 text-center text-gray-300 font-bold italic uppercase">Seu cardápio está vazio</div>';
+        return;
+    }
 
-            produtos.forEach(p => {
-                lista.innerHTML += `
-                    <div class="bg-white p-4 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-4 card-hover transition-all group">
-                        <img src="${p.image_url}" class="w-20 h-20 rounded-2xl object-cover bg-gray-50 border border-gray-50 shrink-0">
-                        <div class="flex-1 min-w-0">
-                            <h3 class="font-bold text-gray-800 truncate uppercase text-xs tracking-tight">${p.name}</h3>
-                            <p class="text-green-600 font-black text-sm mt-1 italic">R$ ${p.price.toFixed(2)}</p>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="abrirModalEdicao('${p.id}')" class="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 hover:bg-orange-500 hover:text-white transition-all flex items-center justify-center">✏️</button>
-                            <button onclick="deletarProduto('${p.id}')" class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center">🗑️</button>
-                        </div>
-                    </div>`;
-            });
-        }
+    produtos.forEach(p => {
+        // Define se o item está visualmente "pausado"
+        const opacity = p.is_active ? 'opacity-100' : 'opacity-50 grayscale';
+        const btnStatusText = p.is_active ? 'Pausar' : 'Ativar';
+        const btnStatusColor = p.is_active ? 'bg-orange-100 text-orange-600' : 'bg-green-100 text-green-600';
+
+        lista.innerHTML += `
+            <div class="bg-white p-4 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-4 card-hover transition-all group ${opacity}">
+                <img src="${p.image_url}" class="w-20 h-20 rounded-2xl object-cover bg-gray-50 border border-gray-50 shrink-0">
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2">
+                        <h3 class="font-bold text-gray-800 truncate uppercase text-xs tracking-tight">${p.name}</h3>
+                        ${!p.is_active ? '<span class="text-[8px] bg-red-500 text-white px-2 py-0.5 rounded-full font-black">PAUSADO</span>' : ''}
+                    </div>
+                    <p class="text-green-600 font-black text-sm mt-1 italic">R$ ${p.price.toFixed(2)}</p>
+                    <p class="text-[9px] text-gray-400 font-bold uppercase mt-1">${p.categoria_produtos || 'Sem Categoria'}</p>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <div class="flex gap-2">
+                        <button onclick="abrirModalEdicao('${p.id}')" class="w-8 h-8 rounded-lg bg-gray-50 text-gray-400 hover:bg-orange-500 hover:text-white transition-all flex items-center justify-center text-xs">✏️</button>
+                        <button onclick="deletarProduto('${p.id}')" class="w-8 h-8 rounded-lg bg-gray-50 text-gray-400 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center text-xs">🗑️</button>
+                    </div>
+                    <button onclick="alternarStatus('${p.id}', ${p.is_active})" class="w-full py-1 rounded-lg font-black text-[9px] uppercase transition-all ${btnStatusColor}">
+                        ${btnStatusText}
+                    </button>
+                </div>
+            </div>`;
+    });
+}
+
+// NOVO: Função para alternar o status sem abrir modal
+async function alternarStatus(id, statusAtual) {
+    const { error } = await sbClient.from('products')
+        .update({ is_active: !statusAtual })
+        .eq('id', id);
+    
+    if (!error) carregarProdutos();
+}
+          
 
         // Funções de Modal e CRUD (Mantidas as mesmas do código anterior)
         function abrirModalCriacao() { 

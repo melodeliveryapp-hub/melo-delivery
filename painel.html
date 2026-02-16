@@ -12,7 +12,7 @@
         .animate-fade { animation: fadeIn 0.4s ease-out; }
     </style>
 </head>
-<body class="bg-[#fcfcfc] min-h-screen pb-20 font-sans">
+<body class="bg-[#fcfcfc] min-h-screen pb-20 font-sans text-gray-800">
 
     <header class="bg-gradient-to-r from-orange-500 to-orange-600 pb-20 pt-8 px-6 rounded-b-[3rem] shadow-lg text-white">
         <nav class="max-w-5xl mx-auto flex justify-between items-center">
@@ -118,8 +118,8 @@
                             <p class="text-green-600 font-black text-sm italic">R$ ${p.price.toFixed(2)}</p>
                         </div>
                         <div class="flex gap-2 items-center">
-                            <button onclick="abrirModalEdicao('${p.id}')" class="text-xs">✏️</button>
-                            <button onclick="deletarProduto('${p.id}')" class="text-xs">🗑️</button>
+                            <button onclick="abrirModalEdicao('${p.id}')" class="text-xs p-1">✏️</button>
+                            <button onclick="deletarProduto('${p.id}')" class="text-xs p-1">🗑️</button>
                             <button onclick="toggleStatus('${p.id}', ${p.is_active})" class="text-[9px] font-black uppercase px-3 py-1.5 rounded-lg border border-gray-100 ${statusColor}">${statusTxt}</button>
                         </div>
                     </div>`;
@@ -146,22 +146,18 @@
             document.getElementById('modal-produto').classList.remove('hidden');
         }
         function mudarAba(aba) {
-            const tP = document.getElementById('tab-produtos');
-            const tL = document.getElementById('tab-loja');
-            const cP = document.getElementById('conteudo-produtos');
-            const cL = document.getElementById('conteudo-loja');
             if(aba === 'produtos') {
-                tP.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-ativa";
-                tL.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] text-gray-400";
-                cP.classList.remove('hidden'); cL.classList.add('hidden');
+                document.getElementById('tab-produtos').className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-ativa";
+                document.getElementById('tab-loja').className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] text-gray-400";
+                document.getElementById('conteudo-produtos').classList.remove('hidden');
+                document.getElementById('conteudo-loja').classList.add('hidden');
             } else {
-                tL.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-ativa";
-                tP.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] text-gray-400";
-                cL.classList.remove('hidden'); cP.classList.add('hidden');
+                document.getElementById('tab-loja').className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-ativa";
+                document.getElementById('tab-produtos').className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] text-gray-400";
+                document.getElementById('conteudo-loja').classList.remove('hidden');
+                document.getElementById('conteudo-produtos').classList.add('hidden');
             }
         }
-        async function salvarHorario() { await sbClient.from('store_info').update({ opening_time: document.getElementById('inp-abre').value, closing_time: document.getElementById('inp-fecha').value }).eq('id', storeInfoId); alert("Horário atualizado!"); }
-        async function salvarConfigLoja() { await sbClient.from('store_info').update({ delivery_fee_main: parseFloat(document.getElementById('fee-main').value), delivery_fee_far: parseFloat(document.getElementById('fee-far').value) }).eq('id', storeInfoId); alert("Configurações salvas!"); }
         async function logout() { await sbClient.auth.signOut(); window.location.href = 'login.html'; }
         async function deletarProduto(id) { if(confirm("Excluir item?")) { await sbClient.from('products').delete().eq('id', id); carregarProdutos(); } }
         checkAuth();

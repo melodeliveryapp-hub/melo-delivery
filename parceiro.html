@@ -3,64 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parceiros - Melo Delivery</title>
+    <title>Melo Delivery para Parceiros - Venda Mais!</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="favicon.png">
     <style>
         .gradient-text { background-clip: text; -webkit-background-clip: text; color: transparent; background-image: linear-gradient(to right, #ea580c, #c2410c); }
-        #slider-wrapper { width: 100%; overflow: hidden; border-radius: 2.5rem; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-pop { animation: slideUp 0.5s ease-out; }
+        /* Ajuste fino do Slider para não quebrar o layout */
+        #slider-wrapper { width: 100%; overflow: hidden; border-radius: 2rem; }
     </style>
 </head>
-<body class="bg-gray-900 text-white font-sans antialiased">
+<body class="bg-gray-900 text-white font-sans antialiased selection:bg-orange-500 selection:text-white">
 
     <nav class="w-full py-6 px-6 flex justify-between items-center max-w-6xl mx-auto border-b border-white/5">
-        <div class="font-black text-2xl tracking-tighter italic uppercase">MELO<span class="text-orange-500">.PARCEIROS</span></div>
-        <a href="login.html" class="bg-white text-gray-900 px-6 py-2 rounded-full font-black hover:bg-orange-500 hover:text-white transition-all">LOGIN →</a>
+        <div class="font-black text-2xl tracking-tighter italic">MELO<span class="text-orange-500">.PARCEIROS</span></div>
+        <div class="flex gap-4">
+            <a href="index.html" class="hidden md:block text-gray-400 hover:text-white font-bold py-2 transition-colors">Sou Cliente</a>
+            <a href="login.html" class="bg-white text-gray-900 px-6 py-2 rounded-full font-black hover:bg-orange-500 hover:text-white transition-all shadow-lg active:scale-95">LOGIN →</a>
+        </div>
     </nav>
 
     <header class="max-w-6xl mx-auto px-6 py-20 md:py-32 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-        <div class="space-y-8">
-            <h1 class="text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-tight">Sua loja como uma <br><span class="gradient-text">Máquina de Vendas</span></h1>
-            <p class="text-gray-400 text-lg font-medium">Cardápio digital dinâmico e gestão total em tempo real.</p>
+        <div class="space-y-8 animate-pop">
+            <div class="inline-block bg-orange-500/10 text-orange-400 px-4 py-1 rounded-full text-xs font-black tracking-widest uppercase border border-orange-500/20">Plataforma de Delivery</div>
+            <h1 class="text-5xl md:text-7xl font-black leading-tight italic">
+                Sua loja como uma <br>
+                <span class="gradient-text">Máquina de Vendas</span>
+            </h1>
+            <p class="text-gray-400 text-lg md:text-xl leading-relaxed max-w-lg font-medium">
+                Tenha seu cardápio digital, receba pedidos organizados no WhatsApp e gerencie tudo em tempo real.
+            </p>
+            
             <div class="flex flex-col sm:flex-row gap-4">
-                <a href="https://wa.me/5599999999999?text=Olá!%20Quero%20ser%20parceiro%20do%20Melo%20Delivery." 
-                   target="_blank" class="bg-orange-600 text-white px-8 py-5 rounded-2xl font-black text-center hover:bg-orange-500 transition-all flex items-center justify-center gap-3 italic">
-                   QUERO ME CADASTRAR 🚀
+                <a href="https://wa.me/5588999465376?text=Olá!%20Tenho%20interesse%20em%20ser%20parceiro%20do%20Melo%20Delivery." 
+                   target="_blank"
+                   class="bg-orange-600 text-white px-8 py-5 rounded-2xl font-black text-center hover:bg-orange-500 transition-all shadow-xl shadow-orange-900/40 flex items-center justify-center gap-3 group">
+                   <svg class="w-6 h-6 fill-current group-hover:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.438 9.889-9.887.002-5.462-4.415-9.89-9.881-9.891-5.446 0-9.884 4.438-9.887 9.887-.001 2.221.634 3.8 1.703 5.491l-.957 3.498 3.741-.981z"/></svg>
+                   QUERO ME CADASTRAR
+                </a>
+                <a href="login.html" class="bg-gray-800 text-white px-8 py-5 rounded-2xl font-bold text-center border border-gray-700 hover:bg-gray-700 transition-all">
+                    Já tenho conta
                 </a>
             </div>
         </div>
         
-        <div class="relative hidden md:block">
+        <div class="relative hidden md:block animate-pop" style="animation-delay: 0.2s">
+            <div class="absolute inset-0 bg-orange-500 blur-[100px] opacity-10"></div>
             <div class="relative bg-gray-800 border border-gray-700 p-2 rounded-[2.5rem] shadow-2xl">
                 <div id="slider-wrapper">
                     <div id="slider-container" class="flex transition-transform duration-700 ease-in-out" style="width: 300%;">
-                        <div class="w-1/3 flex flex-col items-center justify-center p-10 text-center bg-gray-900 aspect-[4/3]">
+                        
+                        <div class="w-1/3 flex flex-col items-center justify-center p-10 text-center bg-gray-900 rounded-[2rem]">
                             <span class="text-5xl mb-4">📈</span>
-                            <h3 class="text-xl font-black italic uppercase text-orange-500">Painel VIP</h3>
-                            <p class="text-gray-500 text-sm mt-2 font-medium">Gestão total de produtos e preços.</p>
+                            <h3 class="text-xl font-black italic uppercase tracking-tighter text-orange-500">Painel VIP</h3>
+                            <p class="text-gray-500 text-sm mt-2">Gestão total de produtos e preços em tempo real.</p>
                         </div>
-                        <div class="w-1/3 flex flex-col items-center justify-center p-10 text-center bg-gray-900 aspect-[4/3]">
+
+                        <div class="w-1/3 flex flex-col items-center justify-center p-10 text-center bg-gray-900 rounded-[2rem]">
                             <span class="text-5xl mb-4">⚡</span>
-                            <h3 class="text-xl font-black italic uppercase text-blue-400">Agilidade</h3>
-                            <p class="text-gray-500 text-sm mt-2 font-medium">Pedidos via WhatsApp.</p>
+                            <h3 class="text-xl font-black italic uppercase tracking-tighter text-blue-400">Agilidade</h3>
+                            <p class="text-gray-500 text-sm mt-2">Receba pedidos organizados direto no seu WhatsApp.</p>
                         </div>
-                        <div class="w-1/3 flex flex-col items-center justify-center p-10 text-center bg-gray-900 aspect-[4/3]">
+
+                        <div class="w-1/3 flex flex-col items-center justify-center p-10 text-center bg-gray-900 rounded-[2rem]">
                             <span class="text-5xl mb-4">💰</span>
-                            <h3 class="text-xl font-black italic uppercase text-green-500">Lucro 100%</h3>
-                            <p class="text-gray-500 text-sm mt-2 font-medium">Sem comissões por venda.</p>
+                            <h3 class="text-xl font-black italic uppercase tracking-tighter text-green-500">Lucro Real</h3>
+                            <p class="text-gray-500 text-sm mt-2">Sem comissões por venda. O faturamento é 100% seu.</p>
                         </div>
+
                     </div>
+                </div>
+                <div class="absolute bottom-6 left-0 right-0 flex justify-center gap-2">
+                    <div class="dot w-2 h-2 rounded-full bg-orange-500 transition-all w-6"></div>
+                    <div class="dot w-2 h-2 rounded-full bg-gray-600 transition-all"></div>
+                    <div class="dot w-2 h-2 rounded-full bg-gray-600 transition-all"></div>
                 </div>
             </div>
         </div>
     </header>
 
+    <section class="bg-white text-gray-900 py-24 rounded-t-[3rem] md:rounded-t-[5rem]">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="grid md:grid-cols-3 gap-10">
+                <div class="p-10 rounded-[2.5rem] bg-gray-50 border border-gray-100">
+                    <div class="text-3xl mb-4">🚀</div>
+                    <h3 class="text-lg font-black mb-2 italic uppercase">Cardápio Digital</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Seus clientes pedem em segundos, sem precisar baixar nada.</p>
+                </div>
+                <div class="p-10 rounded-[2.5rem] bg-gray-50 border border-gray-100">
+                    <div class="text-3xl mb-4">⚙️</div>
+                    <h3 class="text-lg font-black mb-2 italic uppercase">Controle Total</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Mude preços ou pause itens esgotados instantaneamente.</p>
+                </div>
+                <div class="p-10 rounded-[2.5rem] bg-gray-50 border border-gray-100">
+                    <div class="text-3xl mb-4">💸</div>
+                    <h3 class="text-lg font-black mb-2 italic uppercase">Taxa Zero</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Não cobramos porcentagem sobre o valor das suas vendas.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-gray-900 border-t border-white/5 py-12 text-center text-gray-500 text-xs font-bold uppercase italic tracking-widest">
+        © 2026 Melo Delivery - O sabor bate à sua porta
+    </footer>
+
     <script>
-        let cur = 0;
+        let current = 0;
+        const dots = document.querySelectorAll('.dot');
         const container = document.getElementById('slider-container');
-        setInterval(() => {
-            cur = (cur + 1) % 3;
-            container.style.transform = `translateX(-${cur * 33.333}%)`;
-        }, 4000);
+        
+        function move() {
+            current = (current + 1) % 3;
+            container.style.transform = `translateX(-${current * 33.333}%)`;
+            
+            dots.forEach((dot, i) => {
+                if(i === current) {
+                    dot.classList.add('w-6', 'bg-orange-500');
+                    dot.classList.remove('bg-gray-600');
+                } else {
+                    dot.classList.remove('w-6', 'bg-orange-500');
+                    dot.classList.add('bg-gray-600');
+                }
+            });
+        }
+        setInterval(move, 4000);
     </script>
 </body>
 </html>

@@ -35,8 +35,8 @@
         <div id="conteudo-produtos" class="space-y-6 animate-fade">
             <section class="bg-white p-6 rounded-[2.5rem] border border-gray-100 flex justify-between items-center shadow-sm">
                 <div class="flex gap-2">
-                    <input type="time" id="inp-abre" class="bg-gray-100 font-bold p-2 rounded-lg text-xs outline-none">
-                    <input type="time" id="inp-fecha" class="bg-gray-100 font-bold p-2 rounded-lg text-xs outline-none">
+                    <input type="time" id="inp-abre" class="bg-gray-50 font-bold p-2 rounded-lg text-xs outline-none">
+                    <input type="time" id="inp-fecha" class="bg-gray-50 font-bold p-2 rounded-lg text-xs outline-none">
                     <button onclick="salvarHorario()" class="bg-gray-900 text-white text-[10px] px-4 py-2 rounded-xl font-black">OK</button>
                 </div>
                 <button onclick="abrirModalCriacao()" class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black italic uppercase text-xs shadow-lg active:scale-95 transition-all"> + NOVO ITEM </button>
@@ -83,7 +83,7 @@
                 
                 <textarea id="prod-desc" rows="2" placeholder="Descrição (opcional)" class="w-full p-4 bg-gray-100 rounded-2xl outline-none font-bold resize-none"></textarea>
                 
-                <button type="submit" id="btn-salvar" class="w-full py-5 bg-orange-500 text-white font-black italic uppercase text-xs rounded-2xl shadow-lg shadow-orange-100">SALVAR NO CARDÁPIO</button>
+                <button type="submit" id="btn-salvar" class="w-full py-5 bg-orange-500 text-white font-black italic uppercase text-xs rounded-2xl shadow-lg">SALVAR NO CARDÁPIO</button>
             </form>
         </div>
     </div>
@@ -102,14 +102,16 @@
 
         async function carregarDadosLoja() {
             const { data: profile } = await sbClient.from('profiles').select('*').eq('id', user.id).single();
-            document.getElementById('nome-loja-nav').innerText = profile.store_name;
-            const { data: info } = await sbClient.from('store_info').select('*').eq('name', profile.store_name).single();
-            if (info) {
-                storeInfoId = info.id;
-                document.getElementById('inp-abre').value = info.opening_time || "18:00";
-                document.getElementById('inp-fecha').value = info.closing_time || "23:59";
-                document.getElementById('fee-main').value = info.delivery_fee_main;
-                document.getElementById('fee-far').value = info.delivery_fee_far;
+            if(profile) {
+                document.getElementById('nome-loja-nav').innerText = profile.store_name;
+                const { data: info } = await sbClient.from('store_info').select('*').eq('name', profile.store_name).single();
+                if (info) {
+                    storeInfoId = info.id;
+                    document.getElementById('inp-abre').value = info.opening_time || "18:00";
+                    document.getElementById('inp-fecha').value = info.closing_time || "23:59";
+                    document.getElementById('fee-main').value = info.delivery_fee_main || 0;
+                    document.getElementById('fee-far').value = info.delivery_fee_far || 0;
+                }
             }
             carregarProdutos();
         }
@@ -120,45 +122,67 @@
             const lista = document.getElementById('lista-produtos');
             lista.innerHTML = '';
             
+            // Preencher datalist de categorias
             const cats = [...new Set(produtos.map(p => p.categoria_produtos))].filter(Boolean);
             document.getElementById('categorias-existentes').innerHTML = cats.map(c => `<option value="${c}">`).join('');
 
             produtos.forEach(p => {
-                const opacity = p.is_active ? 'opacity-100' : 'opacity-40 grayscale';
+                const isAtivo = p.is_active !== false; // Garante que nulos sejam tratados como ativos
+                const opacity = isAtivo ? 'opacity-100' : 'opacity-40 grayscale';
+                const btnTxt = isAtivo ? 'Pausar' : 'Ativar';
+                const btnColor = isAtivo ? 'bg-orange-100 text-orange-600' : 'bg-green-100 text-green-600';
+
                 lista.innerHTML += `
                     <div class="bg-white p-4 rounded-[2rem] border border-gray-100 flex items-center justify-between shadow-sm transition-all ${opacity}">
                         <div class="flex items-center gap-3">
-                            <img src="${p.image_url || 'https://via.placeholder.com/100'}" class="w-12 h-12 rounded-xl object-cover">
+                            <img src="${p.image_url || 'https://via.placeholder.com/100'}" class="w-12 h-12 rounded-xl object-cover bg-gray-50">
                             <div>
                                 <h3 class="font-bold text-gray-800 text-[11px] uppercase italic tracking-tighter">${p.name}</h3>
                                 <p class="text-green-600 font-black text-sm italic">R$ ${p.price.toFixed(2)}</p>
                             </div>
                         </div>
                         <div class="flex gap-2 items-center">
-                            <button onclick="abrirModalEdicao('${p.id}')" class="text-xs">✏️</button>
-                            <button onclick="deletarProduto('${p.id}')" class="text-xs">🗑️</button>
-                            <button onclick="toggleStatus('${p.id}', ${p.is_active})" class="text-[9px] font-black uppercase px-3 py-1.5 rounded-lg border ${p.is_active ? 'bg-orange-50 text-orange-500' : 'bg-green-50 text-green-600'}">${p.is_active ? 'Pausar' : 'Ativar'}</button>
+                            <button onclick="abrirModalEdicao('${p.id}')" class="p-2 hover:bg-gray-100 rounded-lg">✏️</button>
+                            <button onclick="toggleStatus('${p.id}', ${isAtivo})" class="text-[9px] font-black uppercase px-3 py-1.5 rounded-lg border ${btnColor} transition-colors">
+                                ${btnTxt}
+                            </button>
+                            <button onclick="deletarProduto('${p.id}')" class="p-2 hover:bg-red-50 rounded-lg">🗑️</button>
                         </div>
                     </div>`;
             });
         }
 
-        async function toggleStatus(id, atual) { await sbClient.from('products').update({ is_active: !atual }).eq('id', id); carregarProdutos(); }
-        
+        // FUNÇÃO DE PAUSA (CORRIGIDA)
+        async function toggleStatus(id, statusAtual) {
+            const { error } = await sbClient.from('products')
+                .update({ is_active: !statusAtual })
+                .eq('id', id);
+            
+            if (error) {
+                console.error("Erro ao pausar:", error);
+                alert("Erro ao mudar status.");
+            } else {
+                carregarProdutos();
+            }
+        }
+
         async function salvarProduto(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-salvar');
-            btn.innerText = "Sincronizando..."; btn.disabled = true;
+            btn.innerText = "Salvando..."; btn.disabled = true;
 
             const id = document.getElementById('prod-id-edit').value;
             const file = document.getElementById('prod-img').files[0];
             let url = document.getElementById('img-preview').src;
 
+            // Se tiver novo arquivo, faz upload
             if (file) {
                 const fileName = `${user.id}/${Date.now()}`;
-                await sbClient.storage.from('product-images').upload(fileName, file);
-                const { data } = sbClient.storage.from('product-images').getPublicUrl(fileName);
-                url = data.publicUrl;
+                const { error: uploadError } = await sbClient.storage.from('product-images').upload(fileName, file);
+                if(!uploadError) {
+                    const { data } = sbClient.storage.from('product-images').getPublicUrl(fileName);
+                    url = data.publicUrl;
+                }
             }
 
             const dados = { 
@@ -166,14 +190,18 @@
                 price: parseFloat(document.getElementById('prod-preco').value), 
                 categoria_produtos: document.getElementById('prod-cat').value, 
                 description: document.getElementById('prod-desc').value,
-                image_url: url || 'https://via.placeholder.com/150',
-                tenant_id: user.id 
+                image_url: url.includes('placeholder') ? 'https://via.placeholder.com/150' : url
             };
 
-            if (id) await sbClient.from('products').update(dados).eq('id', id); 
-            else await sbClient.from('products').insert(dados);
+            if (id) {
+                await sbClient.from('products').update(dados).eq('id', id); 
+            } else {
+                dados.tenant_id = user.id;
+                await sbClient.from('products').insert(dados); 
+            }
 
-            fecharModalProduto(); carregarProdutos();
+            fecharModalProduto(); 
+            carregarProdutos();
             btn.innerText = "SALVAR NO CARDÁPIO"; btn.disabled = false;
         }
 
@@ -204,9 +232,11 @@
             document.getElementById('prod-preco').value = p.price;
             document.getElementById('prod-cat').value = p.categoria_produtos;
             document.getElementById('prod-desc').value = p.description || "";
-            document.getElementById('img-preview').src = p.image_url;
-            document.getElementById('img-preview').classList.remove('hidden');
-            document.getElementById('upload-txt').classList.add('hidden');
+            document.getElementById('img-preview').src = p.image_url || "";
+            if(p.image_url) {
+                document.getElementById('img-preview').classList.remove('hidden');
+                document.getElementById('upload-txt').classList.add('hidden');
+            }
             document.getElementById('modal-produto').classList.remove('hidden');
         }
 
@@ -227,10 +257,12 @@
                 cL.classList.remove('hidden'); cP.classList.add('hidden');
             }
         }
+
         async function salvarHorario() { await sbClient.from('store_info').update({ opening_time: document.getElementById('inp-abre').value, closing_time: document.getElementById('inp-fecha').value }).eq('id', storeInfoId); alert("Horário atualizado!"); }
-        async function salvarConfigLoja() { await sbClient.from('store_info').update({ delivery_fee_main: parseFloat(document.getElementById('fee-main').value), delivery_fee_far: parseFloat(document.getElementById('fee-far').value) }).eq('id', storeInfoId); alert("Configurações salvas!"); }
+        async function salvarConfigLoja() { await sbClient.from('store_info').update({ delivery_fee_main: parseFloat(document.getElementById('fee-main').value), delivery_fee_far: parseFloat(document.getElementById('fee-far').value) }).eq('id', storeInfoId); alert("Taxas salvas!"); }
         async function logout() { await sbClient.auth.signOut(); window.location.href = 'login.html'; }
-        async function deletarProduto(id) { if(confirm("Excluir item?")) { await sbClient.from('products').delete().eq('id', id); carregarProdutos(); } }
+        async function deletarProduto(id) { if(confirm("Deseja excluir permanentemente este item?")) { await sbClient.from('products').delete().eq('id', id); carregarProdutos(); } }
+        
         checkAuth();
     </script>
 </body>

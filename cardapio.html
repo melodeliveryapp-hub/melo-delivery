@@ -6,107 +6,77 @@
     <title>Cardápio Online - Melo Delivery</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <style>
-        .categoria-header { position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,0.9); backdrop-filter: blur(8px); }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-item { animation: slideUp 0.4s ease-out forwards; }
-    </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans pb-24">
+<body class="bg-gray-50 text-gray-900">
 
-    <header class="relative h-48 bg-orange-600">
-        <img id="store-banner" src="" class="w-full h-full object-cover opacity-50">
-        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-        <div class="absolute -bottom-10 left-6 flex items-end gap-4">
-            <div class="w-24 h-24 bg-white rounded-3xl shadow-2xl p-1">
-                <img id="store-logo" src="" class="w-full h-full object-cover rounded-[1.2rem]">
-            </div>
-            <div class="mb-4 text-white">
-                <h1 id="store-name" class="text-2xl font-black italic uppercase tracking-tighter">Carregando...</h1>
-                <p id="store-status" class="text-[10px] font-bold uppercase tracking-widest bg-white/20 px-2 py-1 rounded-full inline-block">Verificando Horário...</p>
-            </div>
+    <header id="header-loja" class="h-40 bg-orange-600 flex items-end p-6 text-white relative overflow-hidden">
+        <div class="z-10">
+            <h1 id="view-store-name" class="text-3xl font-black italic uppercase tracking-tighter">Carregando...</h1>
+            <p id="view-store-cat" class="text-[10px] font-bold uppercase tracking-widest opacity-80"></p>
         </div>
+        <div class="absolute inset-0 bg-black/20"></div>
     </header>
 
-    <main class="max-w-2xl mx-auto px-6 mt-16 space-y-10" id="cardapio-container">
-        <div class="py-20 text-center text-gray-400 font-bold italic animate-pulse">CARREGANDO CARDÁPIO...</div>
-    </main>
-
-    <footer class="mt-20 border-t border-gray-100 py-10 text-center">
-        <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest italic">Melo Delivery - O sabor bate à sua porta</p>
-    </footer>
+    <main class="max-w-2xl mx-auto p-6 space-y-8" id="lista-categorias">
+        </main>
 
     <script>
-        const SUPABASE_URL = 'https://xhfwrbjxitcrktccdrpn.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZndyYmp4aXRjcmt0Y2NkcnBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MjQ5NTksImV4cCI6MjA4NjIwMDk1OX0.nyGJxdNT-qiH-oqJL4KDKA-7bRtlj5UxmXy32RswPUc';
-        const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const SUPABASE_URL = 'SUA_URL';
+        const SUPABASE_KEY = 'SUA_KEY';
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Pega o slug ou ID da loja pela URL (ex: cardapio.html?loja=pizzaria-melo)
-        const params = new URLSearchParams(window.location.search);
-        const lojaSlug = params.get('loja');
+        // Pega o slug da URL: site.com/cardapio.html?loja=NOME-DA-LOJA
+        const slug = new URLSearchParams(window.location.search).get('loja');
 
         async function carregarCardapio() {
-            // 1. Busca os dados da loja
-            const { data: profiles } = await sbClient.from('profiles').select('*').or(`slug.eq.${lojaSlug},id.eq.${lojaSlug}`).single();
-            if (!profiles) return document.body.innerHTML = "Loja não encontrada.";
+            // 1. Busca a loja pelo slug na tabela PROFILES
+            const { data: profile, error: errP } = await sb.from('profiles')
+                .select('id, store_name, categoria_loja')
+                .eq('slug', slug)
+                .single();
 
-            document.getElementById('store-name').innerText = profiles.store_name;
-
-            const { data: info } = await sbClient.from('store_info').select('*').eq('name', profiles.store_name).single();
-            if (info) {
-                document.getElementById('store-logo').src = info.logo_url || 'https://via.placeholder.com/150';
-                document.getElementById('store-banner').src = info.banner_url || 'https://via.placeholder.com/800x400';
-            }
-
-            // 2. Busca os produtos que estão ATIVOS (is_active = true)
-            const { data: produtos } = await sbClient.from('products')
-                .select('*')
-                .eq('tenant_id', profiles.id)
-                .eq('is_active', true) // <--- O FILTRO DA PAUSA ESTÁ AQUI
-                .order('name', { ascending: true });
-
-            renderizarProdutos(produtos);
-        }
-
-        function renderizarProdutos(produtos) {
-            const container = document.getElementById('cardapio-container');
-            container.innerHTML = "";
-
-            if (!produtos || produtos.length === 0) {
-                container.innerHTML = "<div class='text-center py-20 font-bold text-gray-400 uppercase italic'>Nenhum item disponível no momento.</div>";
+            if (errP || !profile) {
+                document.body.innerHTML = "<div class='p-10 text-center font-bold'>Loja não encontrada ou link inválido.</div>";
                 return;
             }
 
-            // Agrupa por categorias dinamicamente
-            const categorias = [...new Set(produtos.map(p => p.categoria_produtos || 'Destaques'))];
+            document.getElementById('view-store-name').innerText = profile.store_name;
+            document.getElementById('view-store-cat').innerText = profile.categoria_loja;
 
-            categorias.forEach(cat => {
-                const produtosDaCat = produtos.filter(p => p.categoria_produtos === cat);
+            // 2. Busca os produtos ATIVOS vinculados a este ID (tenant_id)
+            const { data: produtos, error: errPr } = await sb.from('products')
+                .select('*')
+                .eq('tenant_id', profile.id)
+                .eq('is_active', true) // Apenas o que NÃO está pausado
+                .order('categoria_produtos', { ascending: true });
+
+            renderizar(produtos);
+        }
+
+        function renderizar(produtos) {
+            const container = document.getElementById('lista-categorias');
+            container.innerHTML = '';
+            
+            // Agrupar por categorias
+            const cats = [...new Set(produtos.map(p => p.categoria_produtos || 'Diversos'))];
+
+            cats.forEach(cat => {
+                let section = `<div><h2 class='text-sm font-black uppercase italic text-orange-500 mb-4'>${cat}</h2><div class='grid gap-3'>`;
                 
-                let htmlSection = `
-                    <section>
-                        <h2 class="text-xl font-black italic uppercase tracking-tighter text-gray-800 mb-4 flex items-center gap-2">
-                            <span class="w-1.5 h-6 bg-orange-500 rounded-full"></span> ${cat}
-                        </h2>
-                        <div class="grid gap-4">
-                `;
-
-                produtosDaCat.forEach(p => {
-                    htmlSection += `
-                        <div class="bg-white p-4 rounded-[2rem] shadow-sm border border-gray-100 flex gap-4 animate-item">
-                            <img src="${p.image_url || 'https://via.placeholder.com/150'}" class="w-20 h-20 rounded-2xl object-cover bg-gray-50">
-                            <div class="flex-1">
-                                <h3 class="font-black text-sm uppercase italic tracking-tight text-gray-800">${p.name}</h3>
-                                <p class="text-gray-400 text-[10px] font-medium leading-tight mt-1 mb-2">${p.description || ''}</p>
-                                <span class="text-orange-600 font-black italic text-base">R$ ${p.price.toFixed(2)}</span>
+                produtos.filter(p => p.categoria_produtos === cat).forEach(p => {
+                    section += `
+                        <div class='bg-white p-4 rounded-[2rem] shadow-sm flex justify-between items-center border border-gray-50'>
+                            <div class='flex-1'>
+                                <h4 class='font-black italic uppercase text-xs'>${p.name}</h4>
+                                <p class='text-[10px] text-gray-400 font-bold mb-2'>${p.descripition || ''}</p>
+                                <span class='text-orange-600 font-black italic'>R$ ${p.price.toFixed(2)}</span>
                             </div>
-                            <button class="self-end bg-gray-900 text-white w-10 h-10 rounded-2xl font-black text-xl active:scale-95 transition-all">+</button>
-                        </div>
-                    `;
+                            <button class='bg-gray-900 text-white w-10 h-10 rounded-2xl font-black text-xl'>+</button>
+                        </div>`;
                 });
 
-                htmlSection += `</div></section>`;
-                container.innerHTML += htmlSection;
+                section += `</div></div>`;
+                container.innerHTML += section;
             });
         }
 

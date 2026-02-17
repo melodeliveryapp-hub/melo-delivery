@@ -7,32 +7,74 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        .rounded-melo { border-radius: 2.5rem; }
-        .sticky-cat { position: sticky; top: 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); z-index: 40; }
+        .card-melo { border-radius: 2rem; transition: all 0.3s ease; }
+        .sacola-container { border-radius: 2.5rem 2.5rem 0 0; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .sacola-aberta { transform: translateY(0); }
+        @keyframes pop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .animate-pop { animation: pop 0.3s ease-out; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 pb-32">
+<body class="bg-gray-50 text-gray-800 font-sans pb-32">
 
-    <header id="loja-header" class="h-44 bg-orange-600 flex items-end p-8 text-white relative overflow-hidden">
-        <div class="z-10">
-            <h1 id="view-store-name" class="text-3xl font-black italic uppercase tracking-tighter leading-none italic">Carregando...</h1>
-            <p id="view-store-cat" class="text-[10px] font-bold uppercase tracking-widest opacity-80 mt-1 italic"></p>
+    <header class="relative h-48 bg-orange-600 overflow-hidden">
+        <img id="view-banner" src="https://via.placeholder.com/800x400" class="w-full h-full object-cover opacity-60">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+        <div class="absolute -bottom-8 left-6 flex items-end gap-4">
+            <div class="w-24 h-24 bg-white rounded-[2rem] shadow-2xl p-1">
+                <img id="view-logo" src="https://via.placeholder.com/150" class="w-full h-full object-cover rounded-[1.8rem]">
+            </div>
+            <div class="mb-4 text-white">
+                <h1 id="view-store-name" class="text-2xl font-black italic uppercase tracking-tighter">Carregando...</h1>
+                <p id="view-store-cat" class="text-[10px] font-bold uppercase tracking-widest bg-white/20 px-2 py-1 rounded-full inline-block italic">Delivery</p>
+            </div>
         </div>
-        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
     </header>
 
-    <main class="max-w-2xl mx-auto p-6 space-y-10" id="lista-categorias">
-        <div class="py-20 text-center font-bold italic uppercase text-gray-400 animate-pulse">Sincronizando cardápio...</div>
-    </main>
+    <main class="max-w-2xl mx-auto px-6 mt-16 space-y-10" id="cardapio-container">
+        </main>
 
-    <div id="sacola-flutuante" class="fixed bottom-6 left-6 right-6 hidden z-50">
-        <button onclick="finalizarPedido()" class="w-full bg-gray-900 text-white p-5 rounded-[2rem] shadow-2xl flex justify-between items-center group active:scale-95 transition-all">
+    <div id="btn-sacola-flutuante" class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md hidden z-40">
+        <button onclick="toggleSacola()" class="w-full bg-gray-900 text-white p-5 rounded-[2rem] shadow-2xl flex justify-between items-center animate-pop">
             <div class="flex items-center gap-3">
-                <span class="bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-black text-xs" id="cart-count">0</span>
+                <span class="bg-orange-500 text-white w-7 h-7 flex items-center justify-center rounded-full font-black text-xs" id="cart-count">0</span>
                 <span class="font-black italic uppercase text-xs tracking-widest">Ver Sacola</span>
             </div>
-            <span class="font-black italic text-lg" id="cart-total">R$ 0,00</span>
+            <span class="font-black italic" id="cart-total-btn">R$ 0,00</span>
         </button>
+    </div>
+
+    <div id="sacola-painel" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end">
+        <div class="bg-white w-full max-w-2xl mx-auto sacola-container p-8 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-black italic uppercase tracking-tighter text-gray-800">Sua Sacola</h2>
+                <button onclick="toggleSacola()" class="text-gray-300 font-black text-2xl">&times;</button>
+            </div>
+
+            <div id="cart-items" class="space-y-4 mb-8">
+                </div>
+
+            <div class="space-y-6 border-t pt-8">
+                <h3 class="text-sm font-black uppercase italic text-gray-400">Dados de Entrega</h3>
+                <div class="grid grid-cols-1 gap-4">
+                    <input type="text" id="cust-nome" placeholder="Seu Nome" class="w-full p-4 bg-gray-50 rounded-2xl outline-none font-bold border border-gray-100">
+                    <input type="text" id="cust-endereco" placeholder="Endereço Completo" class="w-full p-4 bg-gray-50 rounded-2xl outline-none font-bold border border-gray-100">
+                    <select id="cust-pagamento" class="w-full p-4 bg-gray-50 rounded-2xl outline-none font-bold border border-gray-100">
+                        <option value="Pix">Pix</option>
+                        <option value="Cartão">Cartão (na entrega)</option>
+                        <option value="Dinheiro">Dinheiro</option>
+                    </select>
+                </div>
+                
+                <div class="flex justify-between items-center py-4">
+                    <span class="font-black uppercase text-gray-400 text-xs italic">Total do Pedido:</span>
+                    <span class="text-2xl font-black italic text-orange-600" id="cart-total-final">R$ 0,00</span>
+                </div>
+
+                <button onclick="finalizarPedido()" class="w-full bg-orange-500 text-white py-6 rounded-[2rem] font-black italic uppercase tracking-widest shadow-xl shadow-orange-100 active:scale-95 transition-all">
+                    Finalizar no WhatsApp 🚀
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -42,75 +84,132 @@
 
         const slug = new URLSearchParams(window.location.search).get('loja');
         let carrinho = [];
-        let whatsappLoja = "";
+        let whatsAppLoja = "";
 
-        async function init() {
+        async function carregarDados() {
             const { data: profile } = await sb.from('profiles').select('*').eq('slug', slug).single();
-            if (!profile) return document.body.innerHTML = "Loja não encontrada.";
+            if(!profile) return;
 
+            whatsAppLoja = profile.whatsapp_number;
             document.getElementById('view-store-name').innerText = profile.store_name;
-            document.getElementById('view-store-cat').innerText = profile.categoria_loja || "DELIVERY";
-            whatsappLoja = profile.whatsapp_number;
+            document.getElementById('view-store-cat').innerText = profile.categoria_loja || "Delivery";
 
-            const { data: produtos } = await sb.from('products').select('*').eq('tenant_id', profile.id).eq('is_active', true);
-            renderizar(produtos);
+            const { data: info } = await sb.from('store_info').select('*').eq('name', profile.store_name).single();
+            if(info) {
+                document.getElementById('view-logo').src = info.logo_url || "https://via.placeholder.com/150";
+                document.getElementById('view-banner').src = info.banner_url || "https://via.placeholder.com/800x400";
+            }
+
+            const { data: produtos } = await sb.from('products').select('*').eq('tenant_id', profile.id).eq('is_active', true).order('name', { ascending: true });
+            renderizarCardapio(produtos);
         }
 
-        function renderizar(produtos) {
-            const container = document.getElementById('lista-categorias');
-            container.innerHTML = '';
-            const categorias = [...new Set(produtos.map(p => p.categoria_produtos || 'Destaques'))];
+        function renderizarCardapio(produtos) {
+            const container = document.getElementById('cardapio-container');
+            const cats = [...new Set(produtos.map(p => p.categoria_produtos || 'Destaques'))];
+            container.innerHTML = "";
 
-            categorias.forEach(cat => {
-                let html = `<div class="space-y-4">
-                    <h2 class="text-xs font-black uppercase italic text-orange-500 tracking-widest sticky-cat py-2">${cat}</h2>
+            cats.forEach(cat => {
+                let section = `<section>
+                    <h2 class="text-xl font-black italic uppercase tracking-tighter text-gray-800 mb-6 flex items-center gap-2">
+                        <span class="w-1.5 h-6 bg-orange-500 rounded-full"></span> ${cat}
+                    </h2>
                     <div class="grid gap-4">`;
                 
                 produtos.filter(p => p.categoria_produtos === cat).forEach(p => {
-                    html += `
-                        <div class="bg-white p-4 rounded-melo shadow-sm flex items-center gap-4 border border-gray-100">
-                            <img src="${p.image_url || 'https://via.placeholder.com/150'}" class="w-16 h-16 rounded-2xl object-cover bg-gray-50">
+                    section += `
+                        <div class="bg-white p-4 card-melo shadow-sm border border-gray-100 flex gap-4 animate-item">
+                            <img src="${p.image_url || 'https://via.placeholder.com/150'}" class="w-20 h-20 rounded-2xl object-cover bg-gray-50">
                             <div class="flex-1 pr-2">
                                 <h4 class="font-black italic uppercase text-xs tracking-tight">${p.name}</h4>
-                                <p class="text-[10px] text-gray-400 font-bold leading-tight mt-1 line-clamp-2">${p.description || ''}</p>
-                                <p class="text-orange-600 font-black italic mt-2">R$ ${parseFloat(p.price).toFixed(2)}</p>
+                                <p class="text-[9px] text-gray-400 font-bold mt-1 leading-tight">${p.description || ''}</p>
+                                <p class="text-orange-600 font-black italic mt-3 text-lg">R$ ${p.price.toFixed(2)}</p>
                             </div>
-                            <button onclick="add('${p.name}', ${p.price})" class="bg-gray-900 text-white w-10 h-10 rounded-2xl font-black text-xl active:scale-90 transition-all shadow-lg">+</button>
+                            <div class="flex flex-col justify-end">
+                                <button onclick="adicionar('${p.name}', ${p.price})" class="bg-gray-900 text-white w-10 h-10 rounded-2xl font-black text-xl active:scale-95 transition-all shadow-lg">+</button>
+                            </div>
                         </div>`;
                 });
-                html += `</div></div>`;
-                container.innerHTML += html;
+                section += "</div></section>";
+                container.innerHTML += section;
             });
         }
 
-        function add(nome, preco) {
-            carrinho.push({ nome, preco });
-            atualizarSacola();
+        function adicionar(nome, preco) {
+            const item = carrinho.find(i => i.nome === nome);
+            if(item) item.qtd++;
+            else carrinho.push({ nome, preco, qtd: 1 });
+            atualizarUI();
         }
 
-        function atualizarSacola() {
-            const count = carrinho.length;
-            const total = carrinho.reduce((sum, item) => sum + item.preco, 0);
-            
-            document.getElementById('cart-count').innerText = count;
-            document.getElementById('cart-total').innerText = `R$ ${total.toFixed(2)}`;
-            
-            if(count > 0) document.getElementById('sacola-flutuante').classList.remove('hidden');
+        function remover(nome) {
+            const index = carrinho.findIndex(i => i.nome === nome);
+            if(index > -1) {
+                carrinho[index].qtd--;
+                if(carrinho[index].qtd === 0) carrinho.splice(index, 1);
+            }
+            atualizarUI();
+        }
+
+        function atualizarUI() {
+            const total = carrinho.reduce((acc, i) => acc + (i.preco * i.qtd), 0);
+            const qtdTotal = carrinho.reduce((acc, i) => acc + i.qtd, 0);
+
+            document.getElementById('cart-count').innerText = qtdTotal;
+            document.getElementById('cart-total-btn').innerText = `R$ ${total.toFixed(2)}`;
+            document.getElementById('cart-total-final').innerText = `R$ ${total.toFixed(2)}`;
+
+            const container = document.getElementById('cart-items');
+            container.innerHTML = carrinho.map(i => `
+                <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl">
+                    <div>
+                        <p class="font-black italic uppercase text-[10px] tracking-tight">${i.nome}</p>
+                        <p class="text-orange-600 font-black text-xs italic">R$ ${(i.preco * i.qtd).toFixed(2)}</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <button onclick="remover('${i.nome}')" class="bg-white border w-8 h-8 rounded-xl font-black text-gray-400">-</button>
+                        <span class="font-black italic text-xs">${i.qtd}</span>
+                        <button onclick="adicionar('${i.nome}', ${i.preco})" class="bg-white border w-8 h-8 rounded-xl font-black text-orange-500">+</button>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('btn-sacola-flutuante').classList.toggle('hidden', carrinho.length === 0);
+        }
+
+        function toggleSacola() {
+            const painel = document.getElementById('sacola-painel');
+            const container = painel.querySelector('.sacola-container');
+            if(painel.classList.contains('hidden')) {
+                painel.classList.remove('hidden');
+                setTimeout(() => container.classList.add('sacola-aberta'), 10);
+            } else {
+                container.classList.remove('sacola-aberta');
+                setTimeout(() => painel.classList.add('hidden'), 400);
+            }
         }
 
         function finalizarPedido() {
-            let texto = `*NOVO PEDIDO - MELO DELIVERY*\n\n`;
-            carrinho.forEach(item => {
-                texto += `• ${item.nome} - R$ ${item.preco.toFixed(2)}\n`;
+            const nome = document.getElementById('cust-nome').value;
+            const endereco = document.getElementById('cust-endereco').value;
+            const pag = document.getElementById('cust-pagamento').value;
+
+            if(!nome || !endereco) return alert("Preencha seu nome e endereço!");
+
+            let texto = `*NOVO PEDIDO - MELO DELIVERY*%0A%0A`;
+            texto += `*Cliente:* ${nome}%0A`;
+            texto += `*Endereço:* ${endereco}%0A`;
+            texto += `*Pagamento:* ${pag}%0A%0A`;
+            texto += `*ITENS:*%0A`;
+            carrinho.forEach(i => {
+                texto += `${i.qtd}x ${i.nome} - R$ ${(i.preco * i.qtd).toFixed(2)}%0A`;
             });
-            const total = carrinho.reduce((sum, item) => sum + item.preco, 0);
-            texto += `\n*TOTAL: R$ ${total.toFixed(2)}*`;
-            
-            const url = `https://wa.me/${whatsappLoja}?text=${encodeURIComponent(texto)}`;
-            window.open(url, '_blank');
+            texto += `%0A*TOTAL: ${document.getElementById('cart-total-final').innerText}*`;
+
+            window.open(`https://wa.me/${whatsAppLoja}?text=${texto}`, '_blank');
         }
 
-        init();
+        carregarDados();
     </script>
 </body>
 </html>

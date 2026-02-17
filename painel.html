@@ -1,241 +1,63 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Administrativo - Melo Delivery</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <style>
-        .aba-ativa { color: #f97316; border-bottom: 4px solid #f97316; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade { animation: fadeIn 0.4s ease-out; }
-    </style>
-</head>
-<body class="bg-[#fcfcfc] min-h-screen pb-20 font-sans text-gray-800">
+async function carregarProdutos() {
+    const { data: produtos, error } = await sbClient
+        .from('products')
+        .select('*')
+        .eq('tenant_id', user.id)
+        .order('name', { ascending: true });
 
-    <header class="bg-gradient-to-r from-orange-500 to-orange-600 pb-20 pt-8 px-6 rounded-b-[3rem] shadow-lg text-white">
-        <nav class="max-w-5xl mx-auto flex justify-between items-center">
-            <div>
-                <h1 class="font-black italic uppercase tracking-tighter text-xl leading-none">Melo Delivery</h1>
-                <p class="text-orange-100 text-[10px] font-bold uppercase tracking-widest mt-1 italic" id="nome-loja-nav">Carregando...</p>
-            </div>
-            <button onclick="logout()" class="bg-white/10 hover:bg-red-500 px-5 py-2 rounded-full text-[10px] font-black border border-white/20 transition-all uppercase italic">SAIR</button>
-        </nav>
-    </header>
+    if (error) { console.error("Erro ao carregar:", error); return; }
+    
+    produtosCache = produtos || [];
+    const lista = document.getElementById('lista-produtos');
+    lista.innerHTML = '';
+    
+    // Atualiza sugestões de categorias para o datalist
+    const cats = [...new Set(produtos.map(p => p.categoria_produtos))].filter(Boolean);
+    const datalist = document.getElementById('categorias-existentes');
+    if(datalist) datalist.innerHTML = cats.map(c => `<option value="${c}">`).join('');
 
-    <div class="max-w-4xl mx-auto -mt-10 px-6 relative z-20">
-        <div class="bg-white rounded-[2rem] shadow-xl p-2 flex gap-2">
-            <button onclick="mudarAba('produtos')" id="tab-produtos" class="flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-ativa">📦 Meus Itens</button>
-            <button onclick="mudarAba('loja')" id="tab-loja" class="flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] text-gray-400">⚙️ Configurações</button>
-        </div>
-    </div>
-
-    <main class="max-w-4xl mx-auto p-6 mt-4">
-        <div id="conteudo-produtos" class="space-y-6 animate-fade">
-            <section class="bg-white p-6 rounded-[2.5rem] border border-gray-100 flex justify-between items-center shadow-sm">
-                <div class="flex gap-2 items-center">
-                    <input type="time" id="inp-abre" class="bg-gray-50 font-bold p-2 rounded-lg text-xs border-none outline-none">
-                    <input type="time" id="inp-fecha" class="bg-gray-50 font-bold p-2 rounded-lg text-xs border-none outline-none">
-                    <button onclick="salvarHorario()" class="bg-gray-900 text-white text-[10px] px-4 py-2 rounded-xl font-black">OK</button>
-                </div>
-                <button onclick="abrirModalCriacao()" class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black italic uppercase text-xs shadow-lg shadow-orange-100"> + NOVO ITEM </button>
-            </section>
-            <div id="lista-produtos" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-        </div>
-
-        <div id="conteudo-loja" class="hidden animate-fade space-y-6">
-            <section class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm text-center">
-                <h2 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-6 italic">Taxas de Entrega</h2>
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="number" id="fee-main" placeholder="Padrão" class="bg-gray-50 p-4 rounded-2xl font-bold border-none outline-none">
-                    <input type="number" id="fee-far" placeholder="Distante" class="bg-gray-50 p-4 rounded-2xl font-bold border-none outline-none">
-                </div>
-                <button onclick="salvarConfigLoja()" class="w-full mt-6 bg-gray-900 text-white py-5 rounded-2xl font-black italic uppercase text-xs shadow-lg">Salvar Mudanças</button>
-            </section>
-        </div>
-    </main>
-
-    <div id="modal-produto" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-lg rounded-[3rem] p-8 shadow-2xl relative animate-fade">
-            <button onclick="fecharModalProduto()" class="absolute top-6 right-8 text-gray-300 font-black text-2xl hover:text-orange-500">&times;</button>
-            <h3 class="text-2xl font-black italic text-gray-800 mb-6 uppercase tracking-tighter">Gerenciar Produto</h3>
-            <form onsubmit="salvarProduto(event)" class="space-y-4">
-                <input type="hidden" id="prod-id-edit">
-                <div class="w-full h-32 bg-gray-100 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden group">
-                    <input type="file" id="prod-img" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="previewImg(this)">
-                    <img id="img-preview" src="" class="hidden w-full h-full object-cover">
-                    <div id="upload-txt" class="text-center">
-                        <span class="text-2xl">📸</span>
-                        <p class="text-[10px] font-black text-gray-400 uppercase">Foto do Produto</p>
+    produtos.forEach(p => {
+        // LÓGICA DA PAUSA: Baseada na sua coluna 'is_active'
+        const ativo = p.is_active === true; 
+        const opacity = ativo ? 'opacity-100' : 'opacity-40 grayscale';
+        const btnTxt = ativo ? 'PAUSAR' : 'ATIVAR';
+        const btnColor = ativo ? 'bg-orange-50 text-orange-500' : 'bg-green-50 text-green-600';
+        
+        lista.innerHTML += `
+            <div class="bg-white p-4 rounded-[1.5rem] border border-gray-100 flex items-center justify-between shadow-sm transition-all ${opacity}">
+                <div class="flex items-center gap-3 min-w-0 flex-1">
+                    <img src="${p.image_url || 'https://via.placeholder.com/100'}" class="w-12 h-12 rounded-xl object-cover bg-gray-50 shrink-0">
+                    <div class="truncate">
+                        <h3 class="font-bold text-gray-800 text-[11px] uppercase italic tracking-tighter truncate">${p.name}</h3>
+                        <p class="text-green-600 font-black text-sm italic">R$ ${parseFloat(p.price).toFixed(2)}</p>
                     </div>
                 </div>
-                <input type="text" id="prod-nome" placeholder="Nome" required class="w-full p-4 bg-gray-50 rounded-2xl outline-none font-bold">
-                <div class="flex gap-4">
-                    <input type="number" id="prod-preco" step="0.01" placeholder="Preço" required class="w-1/2 p-4 bg-gray-50 rounded-2xl outline-none font-bold">
-                    <input list="categorias-existentes" id="prod-cat" placeholder="Categoria" class="w-1/2 p-4 bg-gray-50 rounded-2xl outline-none font-bold">
-                    <datalist id="categorias-existentes"></datalist>
+                <div class="flex gap-2 items-center ml-2">
+                    <button onclick="abrirModalEdicao('${p.id}')" class="text-xs p-1">✏️</button>
+                    <button onclick="toggleStatus('${p.id}', ${ativo})" class="text-[9px] font-black uppercase px-3 py-1.5 rounded-lg border border-gray-100 ${btnColor} transition-all active:scale-95">
+                        ${btnTxt}
+                    </button>
+                    <button onclick="deletarProduto('${p.id}')" class="text-xs p-1">🗑️</button>
                 </div>
-                <textarea id="prod-desc" rows="2" placeholder="Descrição" class="w-full p-4 bg-gray-50 rounded-2xl outline-none font-bold resize-none"></textarea>
-                <button type="submit" id="btn-salvar" class="w-full py-5 bg-orange-500 text-white font-black italic uppercase text-xs rounded-2xl shadow-lg shadow-orange-100">SALVAR NO CARDÁPIO</button>
-            </form>
-        </div>
-    </div>
+            </div>`;
+    });
+}
 
-    <script>
-        const SUPABASE_URL = 'https://xhfwrbjxitcrktccdrpn.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZndyYmp4aXRjcmt0Y2NkcnBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MjQ5NTksImV4cCI6MjA4NjIwMDk1OX0.nyGJxdNT-qiH-oqJL4KDKA-7bRtlj5UxmXy32RswPUc';
-        const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        let user = null, storeInfoId = null, produtosCache = [];
+// FUNÇÃO DE PAUSA CORRIGIDA PARA A TABELA 'products' E COLUNA 'is_active'
+async function toggleStatus(id, statusAtual) {
+    // Muda de true para false ou de false para true
+    const novoStatus = !statusAtual;
 
-        async function checkAuth() {
-            const { data: { session } } = await sbClient.auth.getSession();
-            if (!session) return window.location.href = 'login.html';
-            user = session.user; carregarDadosLoja();
-        }
-
-        async function carregarDadosLoja() {
-            const { data: profile } = await sbClient.from('profiles').select('*').eq('id', user.id).single();
-            if(profile) {
-                document.getElementById('nome-loja-nav').innerText = profile.store_name;
-                const { data: info } = await sbClient.from('store_info').select('*').eq('name', profile.store_name).single();
-                if (info) {
-                    storeInfoId = info.id;
-                    document.getElementById('inp-abre').value = info.opening_time || "18:00";
-                    document.getElementById('inp-fecha').value = info.closing_time || "23:59";
-                    document.getElementById('fee-main').value = info.delivery_fee_main;
-                    document.getElementById('fee-far').value = info.delivery_fee_far;
-                }
-            }
-            carregarProdutos();
-        }
-
-        async function carregarProdutos() {
-            const { data: produtos } = await sbClient.from('products').select('*').eq('tenant_id', user.id).order('name', { ascending: true });
-            produtosCache = produtos || [];
-            const lista = document.getElementById('lista-produtos');
-            lista.innerHTML = '';
-            
-            const cats = [...new Set(produtos.map(p => p.categoria_produtos))].filter(Boolean);
-            document.getElementById('categorias-existentes').innerHTML = cats.map(c => `<option value="${c}">`).join('');
-
-            produtos.forEach(p => {
-                const ativo = p.is_active !== false; // Trata null como true
-                const opacity = ativo ? 'opacity-100' : 'opacity-40 grayscale';
-                const btnTxt = ativo ? 'Pausar' : 'Ativar';
-                const btnColor = ativo ? 'bg-orange-50 text-orange-500' : 'bg-green-50 text-green-600';
-                
-                lista.innerHTML += `
-                    <div class="bg-white p-4 rounded-[1.5rem] border border-gray-100 flex items-center justify-between shadow-sm transition-all ${opacity}">
-                        <div class="flex items-center gap-3 min-w-0 flex-1">
-                            <img src="${p.image_url || 'https://via.placeholder.com/100'}" class="w-12 h-12 rounded-xl object-cover bg-gray-50 shrink-0">
-                            <div class="truncate">
-                                <h3 class="font-bold text-gray-800 text-[11px] uppercase italic tracking-tighter truncate">${p.name}</h3>
-                                <p class="text-green-600 font-black text-sm italic">R$ ${p.price.toFixed(2)}</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-2 items-center ml-2">
-                            <button onclick="abrirModalEdicao('${p.id}')" class="text-xs">✏️</button>
-                            <button onclick="toggleStatus('${p.id}', ${ativo})" class="text-[9px] font-black uppercase px-3 py-1.5 rounded-lg border border-gray-100 ${btnColor}">${btnTxt}</button>
-                            <button onclick="deletarProduto('${p.id}')" class="text-xs">🗑️</button>
-                        </div>
-                    </div>`;
-            });
-        }
-
-        async function toggleStatus(id, statusAtual) {
-            const { error } = await sbClient.from('products').update({ is_active: !statusAtual }).eq('id', id);
-            if (!error) carregarProdutos();
-        }
-
-        async function salvarProduto(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btn-salvar');
-            btn.innerText = "Sincronizando..."; btn.disabled = true;
-
-            const id = document.getElementById('prod-id-edit').value;
-            const file = document.getElementById('prod-img').files[0];
-            let url = document.getElementById('img-preview').src;
-
-            if (file) {
-                const fileName = `${user.id}/${Date.now()}`;
-                await sbClient.storage.from('product-images').upload(fileName, file);
-                const { data } = sbClient.storage.from('product-images').getPublicUrl(fileName);
-                url = data.publicUrl;
-            }
-
-            const dados = { 
-                name: document.getElementById('prod-nome').value, 
-                price: parseFloat(document.getElementById('prod-preco').value), 
-                categoria_produtos: document.getElementById('prod-cat').value, 
-                description: document.getElementById('prod-desc').value,
-                image_url: url.includes('base64') || url.includes('placeholder') ? (url.includes('base64') ? url : 'https://via.placeholder.com/150') : url
-            };
-
-            if (id) await sbClient.from('products').update(dados).eq('id', id); 
-            else { dados.tenant_id = user.id; await sbClient.from('products').insert(dados); }
-
-            fecharModalProduto(); carregarProdutos();
-            btn.innerText = "SALVAR NO CARDÁPIO"; btn.disabled = false;
-        }
-
-        function previewImg(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    document.getElementById('img-preview').src = e.target.result;
-                    document.getElementById('img-preview').classList.remove('hidden');
-                    document.getElementById('upload-txt').classList.add('hidden');
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function abrirModalCriacao() { 
-            document.getElementById('prod-id-edit').value = ""; 
-            document.querySelector('form').reset(); 
-            document.getElementById('img-preview').classList.add('hidden');
-            document.getElementById('upload-txt').classList.remove('hidden');
-            document.getElementById('modal-produto').classList.remove('hidden'); 
-        }
-
-        function abrirModalEdicao(id) {
-            const p = produtosCache.find(x => x.id === id);
-            document.getElementById('prod-id-edit').value = p.id;
-            document.getElementById('prod-nome').value = p.name;
-            document.getElementById('prod-preco').value = p.price;
-            document.getElementById('prod-cat').value = p.categoria_produtos;
-            document.getElementById('prod-desc').value = p.description || "";
-            if(p.image_url) {
-                document.getElementById('img-preview').src = p.image_url;
-                document.getElementById('img-preview').classList.remove('hidden');
-                document.getElementById('upload-txt').classList.add('hidden');
-            }
-            document.getElementById('modal-produto').classList.remove('hidden');
-        }
-
-        function fecharModalProduto() { document.getElementById('modal-produto').classList.add('hidden'); }
-        
-        function mudarAba(aba) {
-            const tP = document.getElementById('tab-produtos');
-            const tL = document.getElementById('tab-loja');
-            const cP = document.getElementById('conteudo-produtos');
-            const cL = document.getElementById('conteudo-loja');
-            if(aba === 'produtos') {
-                tP.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-ativa";
-                tL.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] text-gray-400";
-                cP.classList.remove('hidden'); cL.classList.add('hidden');
-            } else {
-                tL.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-ativa";
-                tP.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] text-gray-400";
-                cL.classList.remove('hidden'); cP.classList.add('hidden');
-            }
-        }
-        async function salvarHorario() { await sbClient.from('store_info').update({ opening_time: document.getElementById('inp-abre').value, closing_time: document.getElementById('inp-fecha').value }).eq('id', storeInfoId); alert("Horário atualizado!"); }
-        async function salvarConfigLoja() { await sbClient.from('store_info').update({ delivery_fee_main: parseFloat(document.getElementById('fee-main').value), delivery_fee_far: parseFloat(document.getElementById('fee-far').value) }).eq('id', storeInfoId); alert("Configurações salvas!"); }
-        async function logout() { await sbClient.auth.signOut(); window.location.href = 'login.html'; }
-        async function deletarProduto(id) { if(confirm("Excluir item permanentemente?")) { await sbClient.from('products').delete().eq('id', id); carregarProdutos(); } }
-        checkAuth();
-    </script>
-</body>
-</html>
+    const { error } = await sbClient
+        .from('products')
+        .update({ is_active: novoStatus })
+        .eq('id', id);
+    
+    if (error) {
+        console.error("Erro ao atualizar status:", error);
+        alert("Não foi possível alterar o status do produto.");
+    } else {
+        // Recarrega a lista para mostrar a alteração visual na hora
+        carregarProdutos();
+    }
+}

@@ -150,6 +150,20 @@
             }
         }
 
+        async function carregarProdutosDoCardapio() {
+    // A mágica está no .eq('is_active', true)
+    const { data: produtos, error } = await sbClient
+        .from('products')
+        .select('*')
+        .eq('tenant_id', lojaId) 
+        .eq('is_active', true) // <--- ISSO AQUI garante que o pausado não apareça
+        .order('name', { ascending: true });
+
+    if (error) return console.error(error);
+
+    // ... restante do código de renderizar na tela
+}
+
         // --- FUNÇÃO NOVA: Configurar Taxas ---
         function configurarTaxas(taxaMain, taxaFar) {
             const select = document.getElementById('cli-taxa');
@@ -298,3 +312,4 @@
     </script>
 </body>
 </html>
+

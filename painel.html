@@ -7,17 +7,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        .aba-ativa { color: #f97316; border-bottom: 4px solid #f97316; }
-        .animate-fade { animation: fadeIn 0.4s ease-out; }
+        .aba-ativa { color: #f97316; border-bottom: 4px solid #f97316; background: white; border-radius: 1.5rem 1.5rem 0 0; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fadeIn 0.4s ease-out; }
     </style>
 </head>
 <body class="bg-[#fcfcfc] min-h-screen pb-20 font-sans text-gray-800">
 
-    <header class="bg-gradient-to-r from-orange-500 to-orange-600 pb-20 pt-8 px-6 rounded-b-[3rem] shadow-lg text-white">
+    <header class="bg-gradient-to-r from-orange-500 to-orange-600 pb-20 pt-8 px-6 rounded-b-[3rem] shadow-lg text-white text-center md:text-left">
         <nav class="max-w-5xl mx-auto flex justify-between items-center">
-            <div class="leading-tight">
-                <h1 class="font-black italic uppercase tracking-tighter text-xl">Melo Delivery</h1>
+            <div>
+                <h1 class="font-black italic uppercase tracking-tighter text-xl leading-none">Melo Delivery</h1>
                 <p id="nome-loja-nav" class="text-orange-200 text-[10px] font-bold uppercase tracking-widest mt-1 italic">Sincronizando...</p>
             </div>
             <button onclick="logout()" class="bg-white/10 hover:bg-red-500 px-5 py-2 rounded-full text-[10px] font-black border border-white/20 transition-all uppercase italic">SAIR</button>
@@ -26,31 +26,41 @@
 
     <div class="max-w-4xl mx-auto -mt-10 px-6 relative z-20">
         <div class="bg-white rounded-[2rem] shadow-xl p-2 flex gap-2">
-            <button onclick="mudarAba('produtos')" id="tab-produtos" class="flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-ativa">📦 Meus Itens</button>
-            <button onclick="mudarAba('loja')" id="tab-loja" class="flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] text-gray-400">⚙️ Loja</button>
+            <button onclick="mudarAba('produtos')" id="tab-produtos" class="flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-ativa transition-all">Meus Itens</button>
+            <button onclick="mudarAba('loja')" id="tab-loja" class="flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] text-gray-400 transition-all">Config Loja</button>
         </div>
     </div>
 
     <main class="max-w-4xl mx-auto p-6 mt-4">
         <div id="conteudo-produtos" class="space-y-6 animate-fade">
-            <div class="flex justify-between items-center px-2">
-                <h2 class="text-xs font-black uppercase italic text-gray-400">Cardápio Ativo</h2>
-                <button onclick="abrirModalCriacao()" class="bg-orange-500 text-white px-6 py-3 rounded-2xl font-black italic uppercase text-xs shadow-lg shadow-orange-100">+ Novo Item</button>
-            </div>
+            <section class="bg-white p-6 rounded-[2.5rem] border border-gray-100 flex justify-between items-center shadow-sm">
+                <div class="flex gap-2 items-center">
+                    <input type="time" id="inp-abre" class="bg-gray-50 font-bold p-2 rounded-lg text-xs border-none outline-none">
+                    <input type="time" id="inp-fecha" class="bg-gray-50 font-bold p-2 rounded-lg text-xs border-none outline-none">
+                    <button onclick="salvarHorario()" class="bg-[#0f172a] text-white text-[10px] px-4 py-2 rounded-xl font-black uppercase">OK</button>
+                </div>
+                <button onclick="abrirModalCriacao()" class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black italic uppercase text-xs shadow-lg active:scale-95 transition-all"> + NOVO </button>
+            </section>
             <div id="lista-produtos" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </div>
 
         <div id="conteudo-loja" class="hidden animate-fade space-y-6">
             <section class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm text-center">
-                <p class="text-gray-400 font-bold uppercase italic text-[10px]">Configurações da loja em manutenção.</p>
+                <h2 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-6 italic">Taxas de Entrega</h2>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <input type="number" id="fee-main" placeholder="Bairros Próximos" class="bg-gray-50 p-4 rounded-2xl font-bold border-none outline-none text-gray-700">
+                    <input type="number" id="fee-far" placeholder="Bairros Distantes" class="bg-gray-50 p-4 rounded-2xl font-bold border-none outline-none text-gray-700">
+                </div>
+                <button onclick="salvarConfigLoja()" class="w-full bg-gray-900 text-white py-5 rounded-2xl font-black italic uppercase text-xs tracking-widest shadow-lg">Salvar Mudanças</button>
             </section>
         </div>
     </main>
 
     <div id="modal-produto" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-lg rounded-[3rem] p-8 shadow-2xl relative">
+            <button onclick="fecharModalProduto()" class="absolute top-6 right-8 text-gray-300 font-black text-2xl hover:text-orange-500">&times;</button>
             <h3 class="text-2xl font-black italic text-gray-800 mb-8 uppercase tracking-tighter">Gerir Item</h3>
-            <form onsubmit="salvarProduto(event)" class="space-y-4">
+            <form id="form-produto" onsubmit="salvarProduto(event)" class="space-y-4">
                 <input type="hidden" id="prod-id-edit">
                 <input type="text" id="prod-nome" placeholder="Nome do Produto" required class="w-full p-4 bg-gray-50 rounded-2xl outline-none font-bold text-gray-700">
                 <div class="flex gap-4">
@@ -59,8 +69,7 @@
                     <datalist id="categorias-existentes"></datalist>
                 </div>
                 <textarea id="prod-desc" rows="2" placeholder="Descrição curta" class="w-full p-4 bg-gray-50 rounded-2xl outline-none font-bold text-gray-700 resize-none"></textarea>
-                <button type="submit" id="btn-criar" class="w-full py-5 bg-orange-500 text-white font-black italic uppercase text-xs rounded-2xl shadow-lg">SALVAR NO CARDÁPIO</button>
-                <button type="button" onclick="fecharModalProduto()" class="w-full text-center text-gray-400 font-bold text-[10px] uppercase mt-2">Cancelar</button>
+                <button type="submit" class="w-full py-5 bg-orange-500 text-white font-black italic uppercase text-xs rounded-2xl shadow-lg shadow-orange-100">SALVAR NO CARDÁPIO</button>
             </form>
         </div>
     </div>
@@ -69,41 +78,53 @@
         const SUPABASE_URL = 'https://xhfwrbjxitcrktccdrpn.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZndyYmp4aXRjcmt0Y2NkcnBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MjQ5NTksImV4cCI6MjA4NjIwMDk1OX0.nyGJxdNT-qiH-oqJL4KDKA-7bRtlj5UxmXy32RswPUc';
         const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        let user = null, produtosCache = [];
+        let user = null, storeInfoId = null, produtosCache = [];
 
         async function checkAuth() {
             const { data: { session } } = await sbClient.auth.getSession();
             if (!session) return window.location.href = 'login.html';
-            user = session.user;
-            carregarDadosLoja();
+            user = session.user; carregarDadosLoja();
         }
 
         async function carregarDadosLoja() {
             const { data: profile } = await sbClient.from('profiles').select('store_name').eq('id', user.id).single();
-            if (profile) document.getElementById('nome-loja-nav').innerText = profile.store_name;
+            if(profile) {
+                document.getElementById('nome-loja-nav').innerText = profile.store_name;
+                const { data: info } = await sbClient.from('store_info').select('*').eq('name', profile.store_name).single();
+                if (info) {
+                    storeInfoId = info.tenant_id;
+                    document.getElementById('inp-abre').value = info.opening_time || "08:00";
+                    document.getElementById('inp-fecha').value = info.closing_time || "18:00";
+                    document.getElementById('fee-main').value = info.delivery_fee_main || 0;
+                    document.getElementById('fee-far').value = info.delivery_fee_far || 0;
+                }
+            }
             carregarProdutos();
         }
 
         async function carregarProdutos() {
-            const { data: produtos } = await sbClient.from('products').select('*').eq('tenant_id', user.id).order('created_at', { ascending: false });
+            const { data: produtos } = await sbClient.from('products').select('*').eq('tenant_id', user.id).order('name', { ascending: true });
             produtosCache = produtos || [];
             const lista = document.getElementById('lista-produtos');
             lista.innerHTML = '';
+            
+            const cats = [...new Set(produtos.map(p => p.categoria_produtos))].filter(Boolean);
+            document.getElementById('categorias-existentes').innerHTML = cats.map(c => `<option value="${c}">`).join('');
 
             produtos.forEach(p => {
-                const ativo = p.is_active === true;
+                const isAtivo = p.is_active === true;
                 lista.innerHTML += `
-                    <div class="bg-white p-4 rounded-[1.5rem] border border-gray-100 flex items-center justify-between shadow-sm ${ativo ? '' : 'opacity-40 grayscale'}">
+                    <div class="bg-white p-4 rounded-[1.5rem] border border-gray-100 flex items-center justify-between shadow-sm transition-all ${isAtivo ? 'opacity-100' : 'opacity-40 grayscale'}">
                         <div>
                             <h3 class="font-bold text-gray-800 text-[11px] uppercase italic tracking-tighter">${p.name}</h3>
                             <p class="text-green-600 font-black text-sm italic">R$ ${parseFloat(p.price).toFixed(2)}</p>
                         </div>
                         <div class="flex gap-2 items-center">
-                            <button onclick="abrirModalEdicao('${p.id}')" class="text-xs">✏️</button>
-                            <button onclick="toggleStatus('${p.id}', ${ativo})" class="text-[9px] font-black uppercase px-3 py-1.5 rounded-lg border ${ativo ? 'bg-orange-50 text-orange-500' : 'bg-green-50 text-green-600'}">
-                                ${ativo ? 'PAUSAR' : 'ATIVAR'}
+                            <button onclick="abrirModalEdicao('${p.id}')" class="text-xs p-1">✏️</button>
+                            <button onclick="toggleStatus('${p.id}', ${isAtivo})" class="text-[9px] font-black uppercase px-3 py-1.5 rounded-lg border border-gray-100 ${isAtivo ? 'bg-orange-50 text-orange-500' : 'bg-green-50 text-green-600'} transition-all active:scale-95">
+                                ${isAtivo ? 'PAUSAR' : 'ATIVAR'}
                             </button>
-                            <button onclick="deletarProduto('${p.id}')" class="text-xs">🗑️</button>
+                            <button onclick="deletarProduto('${p.id}')" class="text-xs p-1">🗑️</button>
                         </div>
                     </div>`;
             });
@@ -121,23 +142,22 @@
                 name: document.getElementById('prod-nome').value, 
                 price: parseFloat(document.getElementById('prod-preco').value), 
                 categoria_produtos: document.getElementById('prod-cat').value, 
-                description: document.getElementById('prod-desc').value 
+                description: document.getElementById('description') ? document.getElementById('description').value : document.getElementById('prod-desc').value
             };
 
-            if (id) await sbClient.from('products').update(dados).eq('id', id);
+            if (id) await sbClient.from('products').update(dados).eq('id', id); 
             else { dados.tenant_id = user.id; await sbClient.from('products').insert(dados); }
-            
             fecharModalProduto(); carregarProdutos();
         }
 
         function abrirModalCriacao() { 
             document.getElementById('prod-id-edit').value = ""; 
-            document.querySelector('form').reset(); 
+            document.getElementById('form-produto').reset(); 
             document.getElementById('modal-produto').classList.remove('hidden'); 
         }
 
         function fecharModalProduto() { document.getElementById('modal-produto').classList.add('hidden'); }
-
+        
         function abrirModalEdicao(id) {
             const p = produtosCache.find(x => x.id === id);
             document.getElementById('prod-id-edit').value = p.id;
@@ -151,7 +171,7 @@
         function mudarAba(aba) {
             const tP = document.getElementById('tab-produtos'), tL = document.getElementById('tab-loja');
             const cP = document.getElementById('conteudo-produtos'), cL = document.getElementById('conteudo-loja');
-            if (aba === 'produtos') {
+            if(aba === 'produtos') {
                 tP.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-ativa";
                 tL.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] text-gray-400";
                 cP.classList.remove('hidden'); cL.classList.add('hidden');
@@ -162,9 +182,10 @@
             }
         }
 
+        async function salvarHorario() { await sbClient.from('store_info').update({ opening_time: document.getElementById('inp-abre').value, closing_time: document.getElementById('inp-fecha').value }).eq('name', document.getElementById('nome-loja-nav').innerText); alert("Horário salvo!"); }
+        async function salvarConfigLoja() { await sbClient.from('store_info').update({ delivery_fee_main: parseFloat(document.getElementById('fee-main').value), delivery_fee_far: parseFloat(document.getElementById('fee-far').value) }).eq('name', document.getElementById('nome-loja-nav').innerText); alert("Taxas salvas!"); }
         async function logout() { await sbClient.auth.signOut(); window.location.href = 'login.html'; }
         async function deletarProduto(id) { if(confirm("Excluir item?")) { await sbClient.from('products').delete().eq('id', id); carregarProdutos(); } }
-        
         checkAuth();
     </script>
 </body>

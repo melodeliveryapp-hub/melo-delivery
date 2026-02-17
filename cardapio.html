@@ -9,16 +9,16 @@
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans pb-24">
 
-    <header class="h-40 bg-orange-600 flex items-end p-6 text-white relative overflow-hidden">
+    <header class="h-44 bg-orange-600 flex items-end p-8 text-white relative overflow-hidden">
         <div class="z-10">
-            <h1 id="view-store-name" class="text-3xl font-black italic uppercase tracking-tighter leading-none">Carregando...</h1>
+            <h1 id="view-store-name" class="text-3xl font-black italic uppercase tracking-tighter leading-none italic">Carregando...</h1>
             <p id="view-store-cat" class="text-[10px] font-bold uppercase tracking-widest opacity-80 mt-1 italic"></p>
         </div>
-        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
     </header>
 
-    <main class="max-w-2xl mx-auto p-6 space-y-8" id="lista-categorias">
-        <div class="py-20 text-center font-bold italic uppercase text-gray-400 animate-pulse">Sincronizando Cardápio...</div>
+    <main class="max-w-2xl mx-auto p-6 space-y-10" id="lista-categorias">
+        <div class="py-20 text-center font-bold italic uppercase text-gray-400 animate-pulse">Buscando sabores...</div>
     </main>
 
     <script>
@@ -26,20 +26,32 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZndyYmp4aXRjcmt0Y2NkcnBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MjQ5NTksImV4cCI6MjA4NjIwMDk1OX0.nyGJxdNT-qiH-oqJL4KDKA-7bRtlj5UxmXy32RswPUc';
         const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        // Pega o slug da URL: cardapio.html?loja=NOME-DA-LOJA
         const slug = new URLSearchParams(window.location.search).get('loja');
 
         async function carregarCardapio() {
-            const { data: profile, error: errP } = await sbClient.from('profiles').select('id, store_name, categoria_loja').eq('slug', slug).single();
+            // 1. Busca o ID da loja pelo slug na tabela PROFILES
+            const { data: profile, error: errP } = await sbClient
+                .from('profiles')
+                .select('id, store_name, categoria_loja')
+                .eq('slug', slug)
+                .single();
 
             if (errP || !profile) {
-                document.getElementById('lista-categorias').innerHTML = "<div class='p-10 text-center font-bold'>Loja não encontrada ou link inválido.</div>";
+                document.getElementById('lista-categorias').innerHTML = "<div class='p-10 text-center font-bold text-gray-500'>Loja não encontrada ou link inválido.</div>";
                 return;
             }
 
             document.getElementById('view-store-name').innerText = profile.store_name;
             document.getElementById('view-store-cat').innerText = profile.categoria_loja || "Delivery";
 
-            const { data: produtos } = await sbClient.from('products').select('*').eq('tenant_id', profile.id).eq('is_active', true).order('name', { ascending: true });
+            // 2. Busca produtos ativos desse tenant_id
+            const { data: produtos } = await sbClient
+                .from('products')
+                .select('*')
+                .eq('tenant_id', profile.id)
+                .eq('is_active', true)
+                .order('name', { ascending: true });
 
             renderizar(produtos);
         }
@@ -56,17 +68,17 @@
             const categorias = [...new Set(produtos.map(p => p.categoria_produtos || 'Destaques'))];
 
             categorias.forEach(cat => {
-                let section = `<div><h2 class='text-xs font-black uppercase italic text-orange-500 mb-4 tracking-widest'>${cat}</h2><div class='grid gap-3'>`;
+                let section = `<div><h2 class='text-xs font-black uppercase italic text-orange-500 mb-4 tracking-widest'>${cat}</h2><div class='grid gap-4'>`;
                 
                 produtos.filter(p => p.categoria_produtos === cat).forEach(p => {
                     section += `
-                        <div class='bg-white p-4 rounded-[2rem] shadow-sm flex justify-between items-center border border-gray-100'>
-                            <div class='flex-1'>
+                        <div class='bg-white p-5 rounded-[2.5rem] shadow-sm flex justify-between items-center border border-gray-100'>
+                            <div class='flex-1 pr-4'>
                                 <h4 class='font-black italic uppercase text-xs tracking-tight'>${p.name}</h4>
-                                <p class='text-[10px] text-gray-400 font-bold mt-1'>${p.description || ''}</p>
-                                <p class='text-orange-600 font-black italic mt-2'>R$ ${parseFloat(p.price).toFixed(2)}</p>
+                                <p class='text-[10px] text-gray-400 font-bold mt-1 leading-tight'>${p.description || ''}</p>
+                                <p class='text-orange-600 font-black italic mt-3'>R$ ${parseFloat(p.price).toFixed(2)}</p>
                             </div>
-                            <button class='bg-gray-900 text-white w-10 h-10 rounded-2xl font-black text-xl active:scale-95'>+</button>
+                            <button class='bg-gray-900 text-white w-12 h-12 rounded-[1.5rem] font-black text-2xl active:scale-95 transition-all shadow-lg'>+</button>
                         </div>`;
                 });
 

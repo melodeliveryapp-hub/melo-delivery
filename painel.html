@@ -3,72 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Administrativo - Melo Delivery</title>
+    <title>Painel ADM - Melo Delivery</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
         .aba-ativa { color: #f97316; border-bottom: 4px solid #f97316; background: white; border-radius: 1.5rem 1.5rem 0 0; }
+        .card-melo { border-radius: 2.5rem; transition: all 0.3s ease; }
+        .card-melo:hover { transform: translateY(-3px); border-color: #fb923c; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade { animation: fadeIn 0.4s ease-out; }
     </style>
 </head>
-<body class="bg-[#fcfcfc] min-h-screen pb-20 font-sans text-gray-800">
+<body class="bg-[#fcfcfc] min-h-screen pb-20 text-gray-800">
 
-    <header class="bg-gradient-to-r from-orange-500 to-orange-600 pb-20 pt-8 px-6 rounded-b-[3rem] shadow-lg text-white">
-        <nav class="max-w-5xl mx-auto flex justify-between items-center">
-            <div class="leading-tight">
-                <h1 class="font-black italic uppercase tracking-tighter text-xl leading-none">Melo Delivery</h1>
-                <p class="text-orange-200 text-[10px] font-bold uppercase tracking-widest mt-1 italic" id="nome-loja-nav">Carregando...</p>
+    <header class="bg-gradient-to-r from-orange-500 to-orange-600 pb-24 pt-10 px-6 rounded-b-[3.5rem] shadow-2xl text-white relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
+        <nav class="max-w-5xl mx-auto flex justify-between items-center relative z-10">
+            <div>
+                <h1 class="font-black italic uppercase tracking-tighter text-2xl leading-none">Melo Delivery</h1>
+                <p id="nome-loja-nav" class="text-orange-100 text-[10px] font-bold uppercase tracking-widest mt-1 italic">Sincronizando loja...</p>
             </div>
-            <button onclick="logout()" class="bg-white/10 hover:bg-red-500 px-5 py-2 rounded-full text-[10px] font-black border border-white/20 transition-all uppercase italic">SAIR</button>
+            <button onclick="logout()" class="bg-white/10 hover:bg-red-500 px-6 py-2 rounded-full text-[10px] font-black border border-white/20 transition-all uppercase italic">Sair do Sistema</button>
         </nav>
     </header>
 
-    <div class="max-w-4xl mx-auto -mt-10 px-6 relative z-20">
-        <div class="bg-white rounded-[2rem] shadow-xl p-2 flex gap-2">
-            <button onclick="mudarAba('produtos')" id="tab-produtos" class="flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-ativa">📦 Itens</button>
-            <button onclick="mudarAba('loja')" id="tab-loja" class="flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] text-gray-400">⚙️ Config</button>
+    <div class="max-w-4xl mx-auto -mt-12 px-6 relative z-20">
+        <div class="bg-white rounded-[2.2rem] shadow-2xl p-2 flex gap-2">
+            <button onclick="mudarAba('produtos')" id="tab-produtos" class="flex-1 py-4 font-black italic uppercase text-[11px] tracking-wider rounded-[1.8rem] aba-ativa transition-all">📦 Gestão de Itens</button>
+            <button onclick="mudarAba('loja')" id="tab-loja" class="flex-1 py-4 font-black italic uppercase text-[11px] tracking-wider rounded-[1.8rem] text-gray-400 transition-all">⚙️ Configurações</button>
         </div>
     </div>
 
-    <main class="max-w-4xl mx-auto p-6 mt-4">
+    <main class="max-w-4xl mx-auto p-6 mt-6">
+        
         <div id="conteudo-produtos" class="space-y-6 animate-fade">
-            <section class="bg-white p-6 rounded-[2.5rem] border border-gray-100 flex justify-between items-center shadow-sm">
-                <div class="flex gap-2 items-center">
-                    <input type="time" id="inp-abre" class="bg-gray-50 font-bold p-2 rounded-lg text-xs border-none outline-none">
-                    <input type="time" id="inp-fecha" class="bg-gray-50 font-bold p-2 rounded-lg text-xs border-none outline-none">
-                    <button onclick="salvarHorario()" class="bg-gray-900 text-white text-[10px] px-4 py-2 rounded-xl font-black active:scale-95 transition-all">OK</button>
+            <section class="bg-white p-6 card-melo border border-gray-100 flex flex-wrap justify-between items-center gap-4 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="space-y-1">
+                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Horário de Funcionamento</p>
+                        <div class="flex items-center gap-2">
+                            <input type="time" id="inp-abre" class="bg-gray-50 font-bold p-2 rounded-xl text-xs outline-none border border-gray-100">
+                            <span class="text-gray-300 font-bold">às</span>
+                            <input type="time" id="inp-fecha" class="bg-gray-50 font-bold p-2 rounded-xl text-xs outline-none border border-gray-100">
+                            <button onclick="salvarHorario()" class="bg-gray-900 text-white text-[10px] px-4 py-2 rounded-xl font-black hover:bg-orange-500 transition-all">OK</button>
+                        </div>
+                    </div>
                 </div>
-                <button onclick="abrirModalCriacao()" class="bg-orange-500 text-white px-6 py-4 rounded-2xl font-black italic uppercase text-xs shadow-lg shadow-orange-100 active:scale-95 transition-all"> + NOVO </button>
+                <button onclick="abrirModalCriacao()" class="bg-orange-500 text-white px-8 py-4 rounded-2xl font-black italic uppercase text-xs shadow-lg shadow-orange-100 active:scale-95 transition-all"> + Novo Produto </button>
             </section>
-            <div id="lista-produtos" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+            <div id="lista-produtos" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="col-span-full py-20 text-center text-gray-300 font-black italic uppercase">Buscando itens no banco...</div>
+            </div>
         </div>
-        </main>
+
+        <div id="conteudo-loja" class="hidden animate-fade space-y-6">
+            <section class="bg-white p-8 card-melo border border-gray-100 shadow-sm">
+                <h2 class="text-sm font-black italic text-gray-800 mb-6 uppercase tracking-tighter">Taxas e Entregas</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Taxa Bairros Próximos</label>
+                        <input type="number" id="fee-main" step="0.50" class="w-full p-4 bg-gray-50 rounded-2xl font-bold border-none outline-none focus:ring-2 focus:ring-orange-100">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Taxa Bairros Distantes</label>
+                        <input type="number" id="fee-far" step="0.50" class="w-full p-4 bg-gray-50 rounded-2xl font-bold border-none outline-none focus:ring-2 focus:ring-orange-100">
+                    </div>
+                </div>
+                <button onclick="salvarConfigLoja()" class="w-full mt-8 py-5 bg-gray-900 text-white font-black italic uppercase text-xs tracking-widest rounded-2xl shadow-xl hover:bg-orange-500 transition-all">Salvar Alterações</button>
+            </section>
+        </div>
+    </main>
 
     <div id="modal-produto" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-lg rounded-[3rem] p-8 shadow-2xl relative animate-fade">
-            <button onclick="fecharModalProduto()" class="absolute top-6 right-8 text-gray-300 font-black text-2xl hover:text-orange-500">&times;</button>
-            <h3 class="text-2xl font-black italic text-gray-800 mb-6 uppercase tracking-tighter">Gerir Item</h3>
+            <button onclick="fecharModalProduto()" class="absolute top-6 right-8 text-gray-300 font-black text-2xl hover:text-orange-500 transition-colors">&times;</button>
+            <h3 class="text-2xl font-black italic text-gray-800 mb-8 uppercase tracking-tighter">Gerenciar Item</h3>
+            
             <form onsubmit="salvarProduto(event)" class="space-y-4">
                 <input type="hidden" id="prod-id-edit">
                 
-                <div class="w-full h-32 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden group">
+                <div class="w-full h-40 bg-gray-50 border-2 border-dashed border-gray-200 rounded-[2rem] flex flex-col items-center justify-center relative overflow-hidden group transition-all hover:border-orange-200">
                     <input type="file" id="prod-img" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="previewImg(this)">
                     <img id="img-preview" src="" class="hidden w-full h-full object-cover">
                     <div id="upload-txt" class="text-center">
-                        <span class="text-2xl">📸</span>
-                        <p class="text-[9px] font-black text-gray-400 uppercase">Foto do Produto</p>
+                        <span class="text-3xl">📸</span>
+                        <p class="text-[10px] font-black text-gray-400 uppercase mt-2">Toque para selecionar foto</p>
                     </div>
                 </div>
 
-                <input type="text" id="prod-nome" placeholder="Nome do Produto" required class="w-full p-4 bg-gray-50 rounded-2xl outline-none font-bold text-gray-700">
+                <input type="text" id="prod-nome" placeholder="Nome do Produto" required class="w-full p-4 bg-gray-50 rounded-2xl outline-none font-bold text-gray-700 focus:ring-2 focus:ring-orange-100">
+                
                 <div class="flex gap-4">
-                    <input type="number" id="prod-preco" step="0.01" placeholder="Preço" required class="w-1/2 p-4 bg-gray-50 rounded-2xl outline-none font-bold text-gray-700">
+                    <input type="number" id="prod-preco" step="0.01" placeholder="R$ Preço" required class="w-1/2 p-4 bg-gray-50 rounded-2xl outline-none font-bold text-gray-700">
                     <input list="categorias-existentes" id="prod-cat" placeholder="Categoria" class="w-1/2 p-4 bg-gray-50 rounded-2xl outline-none font-bold text-gray-500">
                     <datalist id="categorias-existentes"></datalist>
                 </div>
-                <textarea id="prod-desc" rows="2" placeholder="Descrição" class="w-full p-4 bg-gray-50 rounded-2xl outline-none font-bold text-gray-700 resize-none"></textarea>
-                <button type="submit" id="btn-criar" class="w-full py-5 bg-orange-500 text-white font-black italic uppercase text-xs rounded-2xl shadow-lg shadow-orange-100">SALVAR NO CARDÁPIO</button>
+                
+                <textarea id="prod-desc" rows="2" placeholder="Descrição curta (ex: ingredientes, tamanho...)" class="w-full p-4 bg-gray-50 rounded-2xl outline-none font-bold text-gray-700 resize-none"></textarea>
+                
+                <button type="submit" id="btn-salvar-modal" class="w-full py-5 bg-orange-500 text-white font-black italic uppercase text-xs rounded-2xl shadow-lg shadow-orange-100 active:scale-95 transition-all">SALVAR NO CARDÁPIO</button>
             </form>
         </div>
     </div>
@@ -82,12 +118,23 @@
         async function checkAuth() {
             const { data: { session } } = await sbClient.auth.getSession();
             if (!session) return window.location.href = 'login.html';
-            user = session.user; carregarDadosLoja();
+            user = session.user;
+            carregarDadosLoja();
         }
 
         async function carregarDadosLoja() {
             const { data: profile } = await sbClient.from('profiles').select('store_name').eq('id', user.id).single();
-            if(profile) document.getElementById('nome-loja-nav').innerText = profile.store_name;
+            if(profile) {
+                document.getElementById('nome-loja-nav').innerText = profile.store_name;
+                const { data: info } = await sbClient.from('store_info').select('*').eq('name', profile.store_name).single();
+                if (info) {
+                    storeInfoId = info.tenant_id;
+                    document.getElementById('inp-abre').value = info.opening_time || "18:00";
+                    document.getElementById('inp-fecha').value = info.closing_time || "23:59";
+                    document.getElementById('fee-main').value = info.delivery_fee_main || 0;
+                    document.getElementById('fee-far').value = info.delivery_fee_far || 0;
+                }
+            }
             carregarProdutos();
         }
 
@@ -97,23 +144,28 @@
             const lista = document.getElementById('lista-produtos');
             lista.innerHTML = '';
             
+            // Categorias Dinâmicas (Datalist)
+            const cats = [...new Set(produtos.map(p => p.categoria_produtos))].filter(Boolean);
+            document.getElementById('categorias-existentes').innerHTML = cats.map(c => `<option value="${c}">`).join('');
+
             produtos.forEach(p => {
                 const isAtivo = p.is_active === true;
                 lista.innerHTML += `
-                    <div class="bg-white p-4 rounded-[1.5rem] border border-gray-100 flex items-center justify-between shadow-sm transition-all ${isAtivo ? 'opacity-100' : 'opacity-40 grayscale'}">
+                    <div class="bg-white p-4 card-melo border border-gray-100 flex items-center justify-between shadow-sm transition-all ${isAtivo ? 'opacity-100' : 'opacity-40 grayscale'}">
                         <div class="flex items-center gap-3 min-w-0 flex-1">
-                            <img src="${p.image_url || 'https://via.placeholder.com/100'}" class="w-12 h-12 rounded-xl object-cover bg-gray-50 border border-gray-50 shrink-0">
-                            <div class="truncate">
-                                <h3 class="font-bold text-gray-800 text-[11px] uppercase italic tracking-tighter truncate">${p.name}</h3>
+                            <img src="${p.image_url || 'https://via.placeholder.com/100'}" class="w-14 h-14 rounded-2xl object-cover bg-gray-50 border border-gray-100 shrink-0 shadow-sm">
+                            <div class="truncate pr-2">
+                                <h3 class="font-black italic uppercase text-[11px] tracking-tighter truncate text-gray-800">${p.name}</h3>
                                 <p class="text-green-600 font-black text-sm italic">R$ ${parseFloat(p.price).toFixed(2)}</p>
+                                <p class="text-[8px] font-bold text-gray-300 uppercase tracking-widest">${p.categoria_produtos || 'GERAL'}</p>
                             </div>
                         </div>
-                        <div class="flex gap-2 items-center ml-2">
-                            <button onclick="abrirModalEdicao('${p.id}')" class="text-xs p-1">✏️</button>
-                            <button onclick="toggleStatus('${p.id}', ${isAtivo})" class="text-[9px] font-black uppercase px-3 py-1.5 rounded-lg border border-gray-100 ${isAtivo ? 'bg-orange-50 text-orange-500' : 'bg-green-50 text-green-600'} transition-all active:scale-95">
+                        <div class="flex gap-2 items-center shrink-0">
+                            <button onclick="abrirModalEdicao('${p.id}')" class="p-2 hover:bg-gray-100 rounded-xl transition-all">✏️</button>
+                            <button onclick="toggleStatus('${p.id}', ${isAtivo})" class="text-[9px] font-black uppercase px-4 py-2 rounded-xl border ${isAtivo ? 'bg-orange-50 text-orange-600 border-orange-100' : 'bg-green-50 text-green-600 border-green-100'} transition-all active:scale-95">
                                 ${isAtivo ? 'PAUSAR' : 'ATIVAR'}
                             </button>
-                            <button onclick="deletarProduto('${p.id}')" class="text-xs p-1">🗑️</button>
+                            <button onclick="deletarProduto('${p.id}')" class="p-2 hover:bg-red-50 text-red-400 rounded-xl transition-all">🗑️</button>
                         </div>
                     </div>`;
             });
@@ -122,23 +174,25 @@
         async function toggleStatus(id, atual) {
             const { error } = await sbClient.from('products').update({ is_active: !atual }).eq('id', id);
             if (!error) carregarProdutos();
+            else console.error("Erro RLS:", error);
         }
 
         async function salvarProduto(e) {
             e.preventDefault();
-            const btn = document.getElementById('btn-criar');
-            btn.innerText = "Salvando..."; btn.disabled = true;
+            const btn = document.getElementById('btn-salvar-modal');
+            btn.innerText = "SINCRONIZANDO..."; btn.disabled = true;
 
             const id = document.getElementById('prod-id-edit').value;
             const file = document.getElementById('prod-img').files[0];
-            let imgUrl = document.getElementById('img-preview').src;
+            let url = document.getElementById('img-preview').src;
 
+            // UPLOAD STORAGE RESTAURADO
             if (file) {
                 const fileName = `${user.id}/${Date.now()}`;
                 const { error: uploadError } = await sbClient.storage.from('product-images').upload(fileName, file);
                 if(!uploadError) {
                     const { data } = sbClient.storage.from('product-images').getPublicUrl(fileName);
-                    imgUrl = data.publicUrl;
+                    url = data.publicUrl;
                 }
             }
 
@@ -147,7 +201,7 @@
                 price: parseFloat(document.getElementById('prod-preco').value), 
                 categoria_produtos: document.getElementById('prod-cat').value, 
                 description: document.getElementById('prod-desc').value,
-                image_url: imgUrl.includes('placeholder') ? 'https://via.placeholder.com/150' : imgUrl
+                image_url: url.includes('placeholder') ? 'https://via.placeholder.com/150' : url
             };
 
             if (id) await sbClient.from('products').update(dados).eq('id', id); 
@@ -171,14 +225,12 @@
 
         function abrirModalCriacao() { 
             document.getElementById('prod-id-edit').value = ""; 
-            document.querySelector('form').reset(); 
+            document.getElementById('form-produto')?.reset(); 
             document.getElementById('img-preview').classList.add('hidden');
             document.getElementById('upload-txt').classList.remove('hidden');
             document.getElementById('modal-produto').classList.remove('hidden'); 
         }
 
-        function fecharModalProduto() { document.getElementById('modal-produto').classList.add('hidden'); }
-        
         function abrirModalEdicao(id) {
             const p = produtosCache.find(x => x.id === id);
             document.getElementById('prod-id-edit').value = p.id;
@@ -186,30 +238,38 @@
             document.getElementById('prod-preco').value = p.price;
             document.getElementById('prod-cat').value = p.categoria_produtos;
             document.getElementById('prod-desc').value = p.description || "";
-            if(p.image_url) {
+            if(p.image_url && !p.image_url.includes('placeholder')) {
                 document.getElementById('img-preview').src = p.image_url;
                 document.getElementById('img-preview').classList.remove('hidden');
                 document.getElementById('upload-txt').classList.add('hidden');
+            } else {
+                document.getElementById('img-preview').classList.add('hidden');
+                document.getElementById('upload-txt').classList.remove('hidden');
             }
             document.getElementById('modal-produto').classList.remove('hidden');
         }
 
+        function fecharModalProduto() { document.getElementById('modal-produto').classList.add('hidden'); }
+        
         function mudarAba(aba) {
             const tP = document.getElementById('tab-produtos'), tL = document.getElementById('tab-loja');
             const cP = document.getElementById('conteudo-produtos'), cL = document.getElementById('conteudo-loja');
             if(aba === 'produtos') {
-                tP.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-ativa";
-                tL.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] text-gray-400";
-                cP.classList.remove('hidden'); if(cL) cL.classList.add('hidden');
+                tP.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.8rem] aba-ativa transition-all";
+                tL.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.8rem] text-gray-400 transition-all";
+                cP.classList.remove('hidden'); cL.classList.add('hidden');
             } else {
-                tL.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] aba-ativa";
-                tP.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.5rem] text-gray-400";
-                if(cL) cL.classList.remove('hidden'); cP.classList.add('hidden');
+                tL.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.8rem] aba-ativa transition-all";
+                tP.className = "flex-1 py-4 font-black italic uppercase text-xs tracking-wider rounded-[1.8rem] text-gray-400 transition-all";
+                cL.classList.remove('hidden'); cP.classList.add('hidden');
             }
         }
 
+        async function salvarHorario() { await sbClient.from('store_info').update({ opening_time: document.getElementById('inp-abre').value, closing_time: document.getElementById('inp-fecha').value }).eq('name', document.getElementById('nome-loja-nav').innerText); alert("Horário de funcionamento salvo!"); }
+        async function salvarConfigLoja() { await sbClient.from('store_info').update({ delivery_fee_main: parseFloat(document.getElementById('fee-main').value), delivery_fee_far: parseFloat(document.getElementById('fee-far').value) }).eq('name', document.getElementById('nome-loja-nav').innerText); alert("Taxas de entrega atualizadas!"); }
         async function logout() { await sbClient.auth.signOut(); window.location.href = 'login.html'; }
-        async function deletarProduto(id) { if(confirm("Excluir item?")) { await sbClient.from('products').delete().eq('id', id); carregarProdutos(); } }
+        async function deletarProduto(id) { if(confirm("Deseja apagar este item permanentemente?")) { await sbClient.from('products').delete().eq('id', id); carregarProdutos(); } }
+        
         checkAuth();
     </script>
 </body>

@@ -3,85 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cardápio Online - Melo Delivery</title>
+    <title>Cardápio - Melo Delivery</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        .animate-item { animation: slideUp 0.4s ease-out forwards; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .rounded-melo { border-radius: 2.5rem; }
+        .sticky-cat { position: sticky; top: 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); z-index: 40; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans pb-24">
+<body class="bg-gray-50 text-gray-900 pb-32">
 
-    <header class="h-44 bg-orange-600 flex items-end p-8 text-white relative overflow-hidden">
+    <header id="loja-header" class="h-44 bg-orange-600 flex items-end p-8 text-white relative overflow-hidden">
         <div class="z-10">
-            <h1 id="view-store-name" class="text-3xl font-black italic uppercase tracking-tighter italic">Carregando...</h1>
+            <h1 id="view-store-name" class="text-3xl font-black italic uppercase tracking-tighter leading-none italic">Carregando...</h1>
             <p id="view-store-cat" class="text-[10px] font-bold uppercase tracking-widest opacity-80 mt-1 italic"></p>
         </div>
-        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
     </header>
 
     <main class="max-w-2xl mx-auto p-6 space-y-10" id="lista-categorias">
-        <div class="py-20 text-center font-bold italic uppercase text-gray-400 animate-pulse">Sincronizando sabores...</div>
+        <div class="py-20 text-center font-bold italic uppercase text-gray-400 animate-pulse">Sincronizando cardápio...</div>
     </main>
+
+    <div id="sacola-flutuante" class="fixed bottom-6 left-6 right-6 hidden z-50">
+        <button onclick="finalizarPedido()" class="w-full bg-gray-900 text-white p-5 rounded-[2rem] shadow-2xl flex justify-between items-center group active:scale-95 transition-all">
+            <div class="flex items-center gap-3">
+                <span class="bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-black text-xs" id="cart-count">0</span>
+                <span class="font-black italic uppercase text-xs tracking-widest">Ver Sacola</span>
+            </div>
+            <span class="font-black italic text-lg" id="cart-total">R$ 0,00</span>
+        </button>
+    </div>
 
     <script>
         const SUPABASE_URL = 'https://xhfwrbjxitcrktccdrpn.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZndyYmp4aXRjcmt0Y2NkcnBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MjQ5NTksImV4cCI6MjA4NjIwMDk1OX0.nyGJxdNT-qiH-oqJL4KDKA-7bRtlj5UxmXy32RswPUc';
-        const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         const slug = new URLSearchParams(window.location.search).get('loja');
+        let carrinho = [];
+        let whatsappLoja = "";
 
-        async function carregarCardapio() {
-            const { data: profile, error } = await sbClient.from('profiles').select('id, store_name, categoria_loja').eq('slug', slug).single();
-            if (error || !profile) {
-                document.getElementById('lista-categorias').innerHTML = "<div class='p-10 text-center font-bold text-gray-500'>Loja não encontrada.</div>";
-                return;
-            }
+        async function init() {
+            const { data: profile } = await sb.from('profiles').select('*').eq('slug', slug).single();
+            if (!profile) return document.body.innerHTML = "Loja não encontrada.";
 
             document.getElementById('view-store-name').innerText = profile.store_name;
-            document.getElementById('view-store-cat').innerText = profile.categoria_loja || "Delivery";
+            document.getElementById('view-store-cat').innerText = profile.categoria_loja || "DELIVERY";
+            whatsappLoja = profile.whatsapp_number;
 
-            const { data: produtos } = await sbClient.from('products').select('*').eq('tenant_id', profile.id).eq('is_active', true).order('name', { ascending: true });
+            const { data: produtos } = await sb.from('products').select('*').eq('tenant_id', profile.id).eq('is_active', true);
             renderizar(produtos);
         }
 
         function renderizar(produtos) {
             const container = document.getElementById('lista-categorias');
             container.innerHTML = '';
-            if (!produtos || produtos.length === 0) {
-                container.innerHTML = "<div class='text-center py-20 font-bold text-gray-300 italic uppercase'>Cardápio vazio.</div>";
-                return;
-            }
-
             const categorias = [...new Set(produtos.map(p => p.categoria_produtos || 'Destaques'))];
+
             categorias.forEach(cat => {
-                let section = `<div><h2 class='text-xs font-black uppercase italic text-orange-500 mb-4 tracking-widest'>${cat}</h2><div class='grid gap-4'>`;
+                let html = `<div class="space-y-4">
+                    <h2 class="text-xs font-black uppercase italic text-orange-500 tracking-widest sticky-cat py-2">${cat}</h2>
+                    <div class="grid gap-4">`;
+                
                 produtos.filter(p => p.categoria_produtos === cat).forEach(p => {
-                    section += `
-                        <div class='bg-white p-4 rounded-[2rem] shadow-sm flex justify-between items-center border border-gray-100 animate-item'>
-                            <div class='flex items-center gap-4 flex-1'>
-                                <img src='${p.image_url || 'https://via.placeholder.com/150'}' class='w-16 h-16 rounded-2xl object-cover bg-gray-50'>
-                                <div class='flex-1 pr-2'>
-                                    <h4 class='font-black italic uppercase text-xs tracking-tight'>${p.name}</h4>
-                                    <p class='text-[10px] text-gray-400 font-bold mt-1 leading-tight'>${p.description || ''}</p>
-                                    <p class='text-orange-600 font-black italic mt-3'>R$ ${parseFloat(p.price).toFixed(2)}</p>
-                                </div>
+                    html += `
+                        <div class="bg-white p-4 rounded-melo shadow-sm flex items-center gap-4 border border-gray-100">
+                            <img src="${p.image_url || 'https://via.placeholder.com/150'}" class="w-16 h-16 rounded-2xl object-cover bg-gray-50">
+                            <div class="flex-1 pr-2">
+                                <h4 class="font-black italic uppercase text-xs tracking-tight">${p.name}</h4>
+                                <p class="text-[10px] text-gray-400 font-bold leading-tight mt-1 line-clamp-2">${p.description || ''}</p>
+                                <p class="text-orange-600 font-black italic mt-2">R$ ${parseFloat(p.price).toFixed(2)}</p>
                             </div>
-                            <button onclick="adicionarAoCarrinho('${p.name}', ${p.price})" class='bg-gray-900 text-white w-10 h-10 rounded-2xl font-black text-xl active:scale-95 transition-all shadow-lg'>+</button>
+                            <button onclick="add('${p.name}', ${p.price})" class="bg-gray-900 text-white w-10 h-10 rounded-2xl font-black text-xl active:scale-90 transition-all shadow-lg">+</button>
                         </div>`;
                 });
-                section += `</div></div>`;
-                container.innerHTML += section;
+                html += `</div></div>`;
+                container.innerHTML += html;
             });
         }
 
-        function adicionarAoCarrinho(nome, preco) {
-            alert(`Adicionado: ${nome} - R$ ${preco.toFixed(2)}`);
-            // Aqui futuramente entra a lógica da sacola de compras
+        function add(nome, preco) {
+            carrinho.push({ nome, preco });
+            atualizarSacola();
         }
 
-        carregarCardapio();
+        function atualizarSacola() {
+            const count = carrinho.length;
+            const total = carrinho.reduce((sum, item) => sum + item.preco, 0);
+            
+            document.getElementById('cart-count').innerText = count;
+            document.getElementById('cart-total').innerText = `R$ ${total.toFixed(2)}`;
+            
+            if(count > 0) document.getElementById('sacola-flutuante').classList.remove('hidden');
+        }
+
+        function finalizarPedido() {
+            let texto = `*NOVO PEDIDO - MELO DELIVERY*\n\n`;
+            carrinho.forEach(item => {
+                texto += `• ${item.nome} - R$ ${item.preco.toFixed(2)}\n`;
+            });
+            const total = carrinho.reduce((sum, item) => sum + item.preco, 0);
+            texto += `\n*TOTAL: R$ ${total.toFixed(2)}*`;
+            
+            const url = `https://wa.me/${whatsappLoja}?text=${encodeURIComponent(texto)}`;
+            window.open(url, '_blank');
+        }
+
+        init();
     </script>
 </body>
 </html>

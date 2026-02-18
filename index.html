@@ -6,6 +6,10 @@
     <title>Melo Delivery - O Shopping da Cidade</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fadeIn 0.4s ease-out forwards; }
+    </style>
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans selection:bg-orange-100">
 
@@ -15,14 +19,27 @@
     </header>
 
     <div class="max-w-4xl mx-auto -mt-8 px-4 relative z-20">
-        <input type="text" id="searchInput" onkeyup="filtrarLojas()" placeholder="O que você procura hoje?" class="w-full p-6 pl-14 rounded-2xl shadow-xl border-none outline-none bg-white text-lg text-gray-600 focus:ring-4 focus:ring-orange-100 placeholder-gray-400 transition-all">
+        <div class="relative">
+            <span class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xl">🔎</span>
+            <input type="text" id="searchInput" onkeyup="filtrarLojas()" placeholder="O que você procura hoje?" 
+                class="w-full p-6 pl-14 rounded-2xl shadow-xl border-none outline-none bg-white text-lg text-gray-600 focus:ring-4 focus:ring-orange-100 placeholder-gray-400 transition-all">
+        </div>
     </div>
 
     <main class="max-w-6xl mx-auto py-12 px-4 mb-20">
         <h2 class="text-xl font-black text-gray-800 mb-6 flex items-center gap-2 italic uppercase">
             <span class="w-1.5 h-6 bg-orange-500 rounded-full shadow-sm"></span> Lojas Parceiras
         </h2>
-        <div id="lista-lojas" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+        
+        <div id="lista-lojas" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="col-span-full py-10 text-center text-gray-400 font-bold italic animate-pulse uppercase">Sincronizando lojas...</div>
+        </div>
+
+        <div id="msg-indicacao" class="mt-16 p-8 bg-orange-100 rounded-[2.5rem] border-2 border-dashed border-orange-300 text-center animate-fade hidden">
+            <h4 class="text-orange-600 font-black italic uppercase tracking-tighter">Gostou da facilidade?</h4>
+            <p class="text-orange-800 text-sm font-bold mt-1">Indique a nossa plataforma para outros lojistas e ajude o comércio local!</p>
+            <button onclick="compartilhar()" class="mt-4 bg-orange-500 text-white px-6 py-2 rounded-full font-black text-[10px] uppercase italic shadow-md hover:bg-orange-600 transition-all">Compartilhar Melo Delivery</button>
+        </div>
     </main>
 
     <footer class="bg-white border-t border-gray-100 pt-10 pb-6 mt-10">
@@ -31,9 +48,7 @@
                 <a href="parceiro.html" class="hover:text-orange-500 transition-colors">Seja um Parceiro</a>
                 <a href="login.html" class="hover:text-orange-500 transition-colors">Área do Lojista</a>
             </div>
-            <p class="text-gray-300 text-[10px] uppercase tracking-widest font-bold">
-                &copy; 2026 Melo Delivery. Todos os direitos reservados.
-            </p>
+            <p class="text-gray-300 text-[10px] uppercase tracking-widest font-bold">&copy; 2026 Melo Delivery. Todos os direitos reservados.</p>
         </div>
     </footer>
 
@@ -42,24 +57,54 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZndyYmp4aXRjcmt0Y2NkcnBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MjQ5NTksImV4cCI6MjA4NjIwMDk1OX0.nyGJxdNT-qiH-oqJL4KDKA-7bRtlj5UxmXy32RswPUc';
         const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        let todasAsLojas = [];
+
         async function carregarLojas() {
             const { data: profiles } = await sbClient.from('profiles').select('*');
             const { data: info } = await sbClient.from('store_info').select('*');
             if (!profiles) return;
+            todasAsLojas = profiles.map(p => {
+                const extra = info?.find(i => i.tenant_id === p.id || i.name === p.store_name);
+                return { ...p, logo: extra?.logo_url || 'https://via.placeholder.com/200' };
+            });
+            exibirLojas(todasAsLojas);
+        }
+
+        function exibirLojas(lista) {
             const container = document.getElementById('lista-lojas');
+            const msgIndicacao = document.getElementById('msg-indicacao');
             container.innerHTML = '';
-            profiles.forEach(p => {
-                const extra = info?.find(i => i.name === p.store_name);
-                const logo = extra?.logo_url || 'https://via.placeholder.com/200';
+            if (lista.length === 0) {
+                container.innerHTML = `<div class="col-span-full py-12 text-center animate-fade"><div class="text-6xl mb-4">🔎</div><h3 class="text-gray-500 font-bold uppercase italic">Nenhuma loja encontrada.</h3></div>`;
+                msgIndicacao.classList.add('hidden');
+                return;
+            }
+            msgIndicacao.classList.remove('hidden');
+            lista.forEach(p => {
                 const link = `cardapio.html?loja=${p.slug || p.id}`;
                 container.innerHTML += `
-                    <div class="bg-white p-6 rounded-[2.5rem] shadow-lg border border-gray-50 flex flex-col items-center text-center transition-all hover:-translate-y-1 hover:shadow-xl cursor-pointer group" onclick="window.location.href='${link}'">
-                        <div class="w-24 h-24 bg-gray-50 rounded-full mb-4 overflow-hidden border-4 border-white shadow-md group-hover:border-orange-100 transition-colors">
-                            <img src="${logo}" class="w-full h-full object-cover">
+                    <div class="bg-white p-6 rounded-[2.5rem] shadow-lg border border-gray-50 flex flex-col items-center text-center transition-all hover:-translate-y-1 hover:shadow-xl cursor-pointer group animate-fade" onclick="window.location.href='${link}'">
+                        <div class="w-24 h-24 bg-gray-50 rounded-full mb-4 overflow-hidden border-4 border-white shadow-md group-hover:border-orange-100">
+                            <img src="${p.logo}" class="w-full h-full object-cover">
                         </div>
                         <h3 class="text-lg font-black italic text-gray-800 uppercase tracking-tighter">${p.store_name}</h3>
                     </div>`;
             });
+        }
+
+        function filtrarLojas() {
+            const termo = document.getElementById('searchInput').value.toLowerCase().trim();
+            const filtradas = todasAsLojas.filter(loja => {
+                const nome = (loja.store_name || "").toLowerCase();
+                const slug = (loja.slug || "").toLowerCase();
+                return nome.includes(termo) || slug.includes(termo);
+            });
+            exibirLojas(filtradas);
+        }
+
+        function compartilhar() {
+            if (navigator.share) { navigator.share({ title: 'Melo Delivery', url: window.location.href }); }
+            else { alert("Copie o link do navegador!"); }
         }
         carregarLojas();
     </script>

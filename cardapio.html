@@ -8,86 +8,97 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8f5f2; }
+        body { font-family: 'Inter', sans-serif; background-color: #fffaf5; }
         
-        /* Estilo Conserta CELL Original */
-        .header-melo { background-color: #e65100; position: relative; }
-        .logo-box { width: 85px; height: 85px; background: white; border-radius: 12px; position: absolute; top: 15px; left: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 5px; }
-        .store-info-bar { background-color: rgba(0,0,0,0.05); padding: 10px 20px; font-size: 11px; font-weight: bold; color: white; display: flex; gap: 15px; }
-        
-        .btn-aberto { background-color: #ffffff; color: #2e7d32; padding: 4px 12px; border-radius: 50px; font-size: 10px; font-weight: 900; text-transform: uppercase; }
-        
-        /* Cards de Produto Estilo Original */
-        .card-produto { background: white; border-radius: 35px; border: 1px solid #f0f0f0; padding: 20px; display: flex; align-items: center; gap: 15px; transition: all 0.2s; position: relative; }
-        .img-produto { width: 80px; height: 80px; border-radius: 15px; object-cover: cover; background: #f9f9f9; }
-        
-        .btn-add { background-color: #f57c00; color: white; width: 35px; height: 35px; border-radius: 12px; font-size: 20px; font-weight: bold; display: flex; items-center; justify-center; position: absolute; right: 20px; bottom: 20px; box-shadow: 0 4px 10px rgba(245, 124, 0, 0.3); }
+        /* Estilo das pílulas de categoria */
+        .categoria-pill {
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .categoria-pill.active {
+            background-color: #f97316;
+            color: white;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+        }
+
+        /* Card de Produto Estilo Conserta CELL */
+        .card-produto {
+            border-radius: 2.5rem;
+            transition: transform 0.2s ease;
+        }
+        .card-produto:active { transform: scale(0.98); }
 
         /* Sacola Slide Up */
-        .sacola-painel { border-radius: 40px 40px 0 0; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.1); }
-        .sacola-show { transform: translateY(0); }
+        .sacola-container {
+            border-radius: 3rem 3rem 0 0;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .sacola-aberta { transform: translateY(0); }
         
-        .input-melo { background: #f9f9f9; border-radius: 18px; padding: 15px; border: 1px solid #eee; font-weight: bold; outline: none; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="pb-32">
 
-    <header class="header-melo pt-24 pb-6">
-        <div class="logo-box">
-            <img id="view-logo" src="https://via.placeholder.com/100" class="w-full h-full object-contain rounded-lg">
+    <header class="relative">
+        <div class="h-40 bg-gray-200 overflow-hidden">
+            <img id="view-banner" src="" class="w-full h-full object-cover">
         </div>
-        <div class="px-6 mt-4">
-            <h1 id="view-store-name" class="text-white text-2xl font-black italic uppercase tracking-tighter">Carregando...</h1>
-            <div class="flex items-center justify-between mt-2">
-                <div class="text-white/80 text-[10px] font-bold uppercase tracking-widest flex gap-3">
-                    <span id="view-horario">🕒 --:-- as --:--</span>
-                    <span id="view-entrega">🛵 Entrega rápida</span>
+        
+        <div class="bg-orange-500 px-6 py-4 relative">
+            <div class="absolute -top-12 left-6 w-24 h-24 bg-white rounded-2xl shadow-xl p-1 border-4 border-white">
+                <img id="view-logo" src="" class="w-full h-full object-cover rounded-xl">
+            </div>
+            
+            <div class="ml-28 text-white">
+                <h1 id="view-store-name" class="text-xl font-black italic uppercase tracking-tighter leading-none">Carregando...</h1>
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="text-[9px] font-bold uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-full">🕒 07:00 as 17:00</span>
+                    <span class="text-[9px] font-black uppercase bg-green-400 text-white px-2 py-0.5 rounded-full">● ABERTO</span>
                 </div>
-                <span class="btn-aberto" id="view-status">Aberto</span>
             </div>
         </div>
     </header>
 
-    <nav class="flex gap-4 px-6 py-6 overflow-x-auto no-scrollbar bg-white shadow-sm sticky top-0 z-30">
-        <div id="category-list" class="flex gap-2">
+    <nav class="sticky top-0 bg-[#fffaf5]/80 backdrop-blur-md z-30 py-4 px-6 overflow-x-auto no-scrollbar flex gap-2">
+        <div id="nav-categorias" class="flex gap-2">
             </div>
     </nav>
 
-    <main class="max-w-3xl mx-auto px-6 mt-6 space-y-12" id="cardapio-container">
+    <main class="max-w-2xl mx-auto px-6 space-y-12 mt-4" id="cardapio-container">
         </main>
 
-    <div id="bar-sacola" class="fixed bottom-6 left-0 right-0 px-6 z-40 hidden">
-        <button onclick="toggleSacola()" class="w-full bg-[#1a1a1a] text-white p-5 rounded-[25px] flex justify-between items-center shadow-2xl active:scale-95 transition-transform">
+    <div id="btn-sacola-flutuante" class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md hidden z-40">
+        <button onclick="toggleSacola()" class="w-full bg-gray-900 text-white p-5 rounded-[2.5rem] shadow-2xl flex justify-between items-center border-4 border-white/10">
             <div class="flex items-center gap-3">
-                <span class="bg-[#f57c00] text-white w-6 h-6 flex items-center justify-center rounded-full text-[10px] font-black" id="cart-count">0</span>
-                <span class="uppercase font-black italic text-xs tracking-widest">Ver Minha Sacola</span>
+                <span class="bg-orange-500 text-white w-8 h-8 flex items-center justify-center rounded-2xl font-black text-sm" id="cart-count">0</span>
+                <span class="font-black italic uppercase text-xs tracking-widest">Ver Sacola</span>
             </div>
-            <span class="font-black italic text-sm" id="cart-total-bar">R$ 0,00</span>
+            <span class="font-black italic text-lg" id="cart-total-btn">R$ 0,00</span>
         </button>
     </div>
 
-    <div id="modal-sacola" class="fixed inset-0 bg-black/50 z-50 hidden flex items-end">
-        <div class="bg-white w-full max-w-2xl mx-auto sacola-painel p-8 overflow-y-auto" style="height: 85vh;">
-            <div class="flex justify-between items-center mb-6">
+    <div id="sacola-painel" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end">
+        <div class="bg-white w-full max-w-2xl mx-auto sacola-container p-8 max-h-[85vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-between items-center mb-8">
                 <h2 class="text-2xl font-black italic uppercase tracking-tighter">Sua Sacola</h2>
-                <button onclick="toggleSacola()" class="text-gray-300 text-3xl font-bold">&times;</button>
+                <button onclick="toggleSacola()" class="text-gray-300 font-black text-3xl">&times;</button>
             </div>
 
-            <div id="cart-items-list" class="space-y-4 mb-8">
-                </div>
+            <div id="cart-items" class="space-y-4 mb-8"></div>
 
-            <div class="space-y-4 border-t pt-6">
-                <h3 class="text-xs font-black uppercase tracking-widest text-gray-400 italic">Informações de Entrega</h3>
-                <input type="text" id="order-nome" placeholder="Seu Nome" class="w-full input-melo text-sm">
-                <input type="text" id="order-end" placeholder="Seu Endereço Completo" class="w-full input-melo text-sm">
+            <div class="border-t pt-6 space-y-4">
+                <input type="text" id="cust-nome" placeholder="Seu Nome" class="w-full p-4 bg-gray-50 rounded-2xl outline-none font-bold border-none">
+                <input type="text" id="cust-endereco" placeholder="Endereço de Entrega" class="w-full p-4 bg-gray-50 rounded-2xl outline-none font-bold border-none">
                 
-                <div class="flex justify-between items-center py-4">
-                    <span class="font-black text-gray-400 text-[10px] uppercase italic">Valor Total:</span>
-                    <span class="text-2xl font-black italic text-[#f57c00]" id="cart-total-final">R$ 0,00</span>
+                <div class="flex justify-between py-4 border-b border-dashed">
+                    <span class="font-black text-gray-400 uppercase text-[10px] tracking-widest">Total do Pedido</span>
+                    <span class="text-2xl font-black italic text-orange-600" id="cart-total-final">R$ 0,00</span>
                 </div>
 
-                <button onclick="enviarWhatsApp()" class="w-full bg-[#f57c00] text-white py-5 rounded-[20px] font-black italic uppercase text-sm shadow-lg shadow-orange-200 active:scale-95 transition-all">
-                    Finalizar Pedido via WhatsApp 🚀
+                <button onclick="finalizarPedido()" class="w-full bg-orange-500 text-white py-6 rounded-[2.2rem] font-black italic uppercase tracking-widest shadow-xl active:scale-95 transition-all">
+                    Finalizar no WhatsApp 🚀
                 </button>
             </div>
         </div>
@@ -98,21 +109,21 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZndyYmp4aXRjcmt0Y2NkcnBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MjQ5NTksImV4cCI6MjA4NjIwMDk1OX0.nyGJxdNT-qiH-oqJL4KDKA-7bRtlj5UxmXy32RswPUc';
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        const params = new URLSearchParams(window.location.search);
-        const slug = params.get('loja');
+        const slug = new URLSearchParams(window.location.search).get('loja');
         let carrinho = [];
-        let numZap = "";
+        let whatsAppLoja = "";
 
-        async function carregar() {
+        async function carregarDados() {
             const { data: profile } = await sb.from('profiles').select('*').eq('slug', slug).single();
             if(!profile) return;
-            numZap = profile.whatsapp_number;
+
+            whatsAppLoja = profile.whatsapp_number;
             document.getElementById('view-store-name').innerText = profile.store_name;
 
             const { data: info } = await sb.from('store_info').select('*').eq('name', profile.store_name).single();
             if(info) {
                 document.getElementById('view-logo').src = info.logo_url;
-                document.getElementById('view-horario').innerText = `🕒 ${info.opening_time} as ${info.closing_time}`;
+                document.getElementById('view-banner').src = info.banner_url;
             }
 
             const { data: produtos } = await sb.from('products').select('*').eq('tenant_id', profile.id).eq('is_active', true);
@@ -121,91 +132,96 @@
 
         function renderizar(produtos) {
             const container = document.getElementById('cardapio-container');
-            const cats = [...new Set(produtos.map(p => p.categoria_produtos || 'Geral'))];
-            
-            container.innerHTML = "";
-            cats.forEach(cat => {
-                let html = `<div><h2 class="text-sm font-black italic uppercase text-gray-400 mb-4 border-l-4 border-[#f57c00] pl-3">${cat}</h2><div class="space-y-4">`;
-                produtos.filter(p => p.categoria_produtos === cat).forEach(p => {
-                    html += `
-                        <div class="card-produto shadow-sm">
-                            <img src="${p.image_url || 'https://via.placeholder.com/150'}" class="img-produto">
-                            <div class="flex-1 pr-10">
-                                <h4 class="font-black italic uppercase text-[12px] leading-tight">${p.name}</h4>
-                                <p class="text-[10px] text-gray-400 font-bold mt-1 line-clamp-2">${p.description || ''}</p>
-                                <p class="text-[#f57c00] font-black italic mt-2 text-base font-sans">R$ ${p.price.toFixed(2)}</p>
+            const nav = document.getElementById('nav-categorias');
+            const categorias = [...new Set(produtos.map(p => p.categoria_produtos || 'Geral'))];
+
+            nav.innerHTML = categorias.map(cat => `<button class="categoria-pill bg-white px-6 py-2 rounded-full text-xs font-bold text-gray-400 shadow-sm border border-gray-100">${cat}</button>`).join('');
+
+            container.innerHTML = categorias.map(cat => `
+                <section>
+                    <h2 class="text-lg font-black italic uppercase tracking-tighter text-gray-800 mb-6 flex items-center gap-2">
+                        <span class="w-1 h-5 bg-orange-500 rounded-full"></span> ${cat}
+                    </h2>
+                    <div class="grid gap-6">
+                        ${produtos.filter(p => p.categoria_produtos === cat).map(p => `
+                            <div class="bg-white p-5 card-produto shadow-sm border border-gray-100 flex gap-4 items-center">
+                                <img src="${p.image_url || 'https://via.placeholder.com/150'}" class="w-20 h-20 rounded-[1.5rem] object-cover bg-gray-50 border border-gray-50">
+                                <div class="flex-1 pr-2">
+                                    <h4 class="font-black italic uppercase text-[11px] tracking-tight leading-tight">${p.name}</h4>
+                                    <p class="text-[9px] text-gray-400 font-bold mt-1 line-clamp-2">${p.description || ''}</p>
+                                    <p class="text-orange-600 font-black italic mt-3 text-lg">R$ ${p.price.toFixed(2)}</p>
+                                </div>
+                                <button onclick="adicionar('${p.name}', ${p.price})" class="bg-orange-500 text-white w-10 h-10 rounded-2xl font-black text-xl shadow-lg shadow-orange-100 active:scale-90 transition-all">+</button>
                             </div>
-                            <button onclick="add('${p.name}', ${p.price})" class="btn-add">+</button>
-                        </div>`;
-                });
-                html += "</div></div>";
-                container.innerHTML += html;
-            });
+                        `).join('')}
+                    </div>
+                </section>
+            `).join('');
         }
 
-        function add(nome, preco) {
+        function adicionar(nome, preco) {
             const item = carrinho.find(i => i.nome === nome);
-            if(item) item.qtd++; else carrinho.push({nome, preco, qtd: 1});
-            atualizar();
+            if(item) item.qtd++; else carrinho.push({ nome, preco, qtd: 1 });
+            atualizarUI();
         }
 
-        function remove(nome) {
-            const idx = carrinho.findIndex(i => i.nome === nome);
-            if(idx > -1) {
-                carrinho[idx].qtd--;
-                if(carrinho[idx].qtd === 0) carrinho.splice(idx, 1);
+        function remover(nome) {
+            const index = carrinho.findIndex(i => i.nome === nome);
+            if(index > -1) {
+                carrinho[index].qtd--;
+                if(carrinho[index].qtd === 0) carrinho.splice(index, 1);
             }
-            atualizar();
+            atualizarUI();
         }
 
-        function atualizar() {
+        function atualizarUI() {
             const total = carrinho.reduce((acc, i) => acc + (i.preco * i.qtd), 0);
             const qtd = carrinho.reduce((acc, i) => acc + i.qtd, 0);
-
             document.getElementById('cart-count').innerText = qtd;
-            document.getElementById('cart-total-bar').innerText = `R$ ${total.toFixed(2)}`;
+            document.getElementById('cart-total-btn').innerText = `R$ ${total.toFixed(2)}`;
             document.getElementById('cart-total-final').innerText = `R$ ${total.toFixed(2)}`;
-            document.getElementById('bar-sacola').classList.toggle('hidden', carrinho.length === 0);
+            document.getElementById('btn-sacola-flutuante').classList.toggle('hidden', carrinho.length === 0);
 
-            document.getElementById('cart-items-list').innerHTML = carrinho.map(i => `
-                <div class="flex justify-between items-center bg-gray-50 p-4 rounded-[20px]">
+            document.getElementById('cart-items').innerHTML = carrinho.map(i => `
+                <div class="flex justify-between items-center bg-gray-50 p-4 rounded-[1.5rem]">
                     <div>
-                        <p class="font-black italic uppercase text-[11px]">${i.nome}</p>
-                        <p class="text-[#f57c00] font-black text-xs">R$ ${(i.preco * i.qtd).toFixed(2)}</p>
+                        <p class="font-black italic uppercase text-[10px]">${i.nome}</p>
+                        <p class="text-orange-600 font-black text-xs italic">R$ ${(i.preco * i.qtd).toFixed(2)}</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <button onclick="remove('${i.nome}')" class="w-8 h-8 bg-white border rounded-lg font-black">-</button>
-                        <span class="font-black italic text-xs">${i.qtd}</span>
-                        <button onclick="add('${i.nome}', ${i.preco})" class="w-8 h-8 bg-white border rounded-lg font-black text-[#f57c00]">+</button>
+                        <button onclick="remover('${i.nome}')" class="w-8 h-8 rounded-xl bg-white border font-black text-gray-300">-</button>
+                        <span class="font-black text-xs">${i.qtd}</span>
+                        <button onclick="adicionar('${i.nome}', ${i.preco})" class="w-8 h-8 rounded-xl bg-white border font-black text-orange-500">+</button>
                     </div>
-                </div>`).join('');
+                </div>
+            `).join('');
         }
 
         function toggleSacola() {
-            const modal = document.getElementById('modal-sacola');
-            const painel = modal.querySelector('.sacola-painel');
-            if(modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                setTimeout(() => painel.classList.add('sacola-show'), 10);
+            const painel = document.getElementById('sacola-painel');
+            const container = painel.querySelector('.sacola-container');
+            if(painel.classList.contains('hidden')) {
+                painel.classList.remove('hidden');
+                setTimeout(() => container.classList.add('sacola-aberta'), 10);
             } else {
-                painel.classList.remove('sacola-show');
-                setTimeout(() => modal.classList.add('hidden'), 400);
+                container.classList.remove('sacola-aberta');
+                setTimeout(() => painel.classList.add('hidden'), 400);
             }
         }
 
-        function enviarWhatsApp() {
-            const nome = document.getElementById('order-nome').value;
-            const end = document.getElementById('order-end').value;
-            if(!nome || !end) return alert("Preencha seu nome e endereço!");
+        function finalizarPedido() {
+            const nome = document.getElementById('cust-nome').value;
+            const endereco = document.getElementById('cust-endereco').value;
+            if(!nome || !endereco) return alert("Preencha nome e endereço!");
 
-            let msg = `*NOVO PEDIDO - MELO DELIVERY*%0A%0A`;
-            msg += `*Cliente:* ${nome}%0A*Endereço:* ${end}%0A%0A*ITENS:*%0A`;
-            carrinho.forEach(i => msg += `${i.qtd}x ${i.nome} - R$ ${(i.preco * i.qtd).toFixed(2)}%0A`);
+            let msg = `*PEDIDO - MELO DELIVERY*%0A%0A`;
+            msg += `*Cliente:* ${nome}%0A*Endereço:* ${endereco}%0A%0A*ITENS:*%0A`;
+            carrinho.forEach(i => msg += `${i.qtd}x ${i.nome} - R$ ${(i.preco*i.qtd).toFixed(2)}%0A`);
             msg += `%0A*TOTAL: ${document.getElementById('cart-total-final').innerText}*`;
-            window.open(`https://wa.me/${numZap}?text=${msg}`, '_blank');
+            window.open(`https://wa.me/${whatsAppLoja}?text=${msg}`, '_blank');
         }
 
-        carregar();
+        carregarDados();
     </script>
 </body>
 </html>

@@ -5,166 +5,202 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Melo Delivery para Parceiros - Venda Mais!</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         .gradient-text { background-clip: text; -webkit-background-clip: text; color: transparent; background-image: linear-gradient(to right, #ea580c, #c2410c); }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-pop { animation: slideUp 0.5s ease-out; }
-        #slider-wrapper { width: 100%; overflow: hidden; border-radius: 2rem; }
-        /* Garante que o texto digitado seja legível */
-        input, select, textarea { color: #ffffff !important; }
-        ::placeholder { color: #9ca3af !important; }
+        #slider-wrapper { width: 100%; overflow: hidden; border-radius: 2.5rem; }
+        input, select, textarea { color: #ffffff !important; background: rgba(255,255,255,0.05) !important; }
+        ::placeholder { color: #6b7280 !important; }
+        .card-plano { transition: all 0.3s ease; }
+        .card-plano:hover { transform: translateY(-10px); border-color: #f97316; }
+        .fase-emoji { font-size: 3rem; margin-bottom: 1rem; }
     </style>
 </head>
-<body class="bg-gray-900 text-white font-sans antialiased selection:bg-orange-500">
+<body class="bg-gray-950 text-white font-sans antialiased selection:bg-orange-500">
 
     <nav class="w-full py-6 px-6 flex justify-between items-center max-w-6xl mx-auto border-b border-white/5">
-        <div class="font-black text-2xl tracking-tighter italic uppercase">MELO<span class="text-orange-500">.PARCEIROS</span></div>
+        <div class="font-black text-2xl tracking-tighter italic uppercase">MELO<span class="text-orange-500">DELIVERY</span></div>
         <div class="flex gap-4">
-            <a href="index.html" class="hidden md:block text-gray-400 hover:text-white font-bold py-2 transition-colors">Sou Cliente</a>
-            <a href="login.html" class="bg-white text-gray-900 px-6 py-2 rounded-full font-black hover:bg-orange-500 hover:text-white transition-all shadow-lg active:scale-95">LOGIN →</a>
+            <a href="login.html" class="text-[10px] font-black uppercase italic text-gray-400 hover:text-white transition-colors flex items-center">Já sou lojista</a>
+            <button onclick="abrirFormulario()" class="bg-white text-gray-900 px-6 py-2.5 rounded-full font-black italic uppercase text-[10px] shadow-lg active:scale-95 transition-all">Começar Agora</button>
         </div>
     </nav>
 
-    <header class="max-w-6xl mx-auto px-6 py-16 md:py-24 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-        
+    <main class="max-w-6xl mx-auto px-6 py-12 md:py-20 grid grid-cols-1 md:grid-cols-2 gap-12 items-center border-b border-white/5">
         <div class="space-y-8 animate-pop">
-            <div class="inline-block bg-orange-500/10 text-orange-400 px-4 py-1 rounded-full text-xs font-black tracking-widest uppercase border border-orange-500/20">Seja um Parceiro</div>
-            <h1 class="text-5xl md:text-6xl font-black leading-tight italic">
-                Transforme sua loja em uma <span class="gradient-text">Máquina de Vendas</span>
-            </h1>
-            <p class="text-gray-400 text-lg leading-relaxed max-w-lg">
-                Junte-se à maior rede de delivery da cidade. Sem taxas abusivas, faturamento 100% seu e gestão simplificada.
-            </p>
-            
-            <button onclick="abrirFormulario()" class="group relative bg-orange-600 hover:bg-orange-500 text-white px-10 py-6 rounded-[2rem] font-black italic uppercase tracking-widest shadow-2xl shadow-orange-900/40 transition-all active:scale-95 flex items-center gap-4">
-                QUERO SER UM PARCEIRO 🚀
-                <span class="bg-white/20 p-2 rounded-full group-hover:translate-x-2 transition-transform">→</span>
-            </button>
+            <div class="inline-block px-4 py-1.5 bg-orange-500/10 border border-orange-500/20 rounded-full text-orange-500 text-[10px] font-black uppercase tracking-widest italic">Expanda seu negócio local</div>
+            <h1 class="text-5xl md:text-7xl font-black italic uppercase leading-[0.9] tracking-tighter">Transforme seu WhatsApp em uma <span class="gradient-text">máquina de vendas.</span></h1>
+            <p class="text-gray-400 text-lg font-medium leading-relaxed max-w-md">Gerencie pedidos, personalize seu cardápio e venda de forma profissional e automatizada.</p>
+            <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                <button onclick="abrirFormulario()" class="bg-orange-600 hover:bg-orange-500 text-white px-10 py-5 rounded-[2rem] font-black italic uppercase text-xs shadow-2xl shadow-orange-900/20 transition-all">Quero ser parceiro 🚀</button>
+            </div>
         </div>
-        
-        <div class="relative hidden md:block animate-pop" style="animation-delay: 0.2s">
-            <div class="absolute inset-0 bg-orange-500 blur-[100px] opacity-10"></div>
-            <div class="relative bg-gray-800 border border-gray-700 p-2 rounded-[2.5rem] shadow-2xl">
-                <div id="slider-wrapper">
-                    <div id="slider-container" class="flex transition-transform duration-700 ease-in-out" style="width: 300%;">
-                        <div class="w-1/3 flex flex-col items-center justify-center p-10 text-center bg-gray-900 rounded-[2rem]">
-                            <span class="text-5xl mb-4">📈</span>
-                            <h3 class="text-xl font-black italic uppercase tracking-tighter text-orange-500">Painel VIP</h3>
-                            <p class="text-gray-500 text-sm mt-2">Gestão total de produtos e preços em tempo real.</p>
-                        </div>
-                        <div class="w-1/3 flex flex-col items-center justify-center p-10 text-center bg-gray-900 rounded-[2rem]">
-                            <span class="text-5xl mb-4">⚡</span>
-                            <h3 class="text-xl font-black italic uppercase tracking-tighter text-blue-400">Agilidade</h3>
-                            <p class="text-gray-500 text-sm mt-2">Receba pedidos organizados direto no seu WhatsApp.</p>
-                        </div>
-                        <div class="w-1/3 flex flex-col items-center justify-center p-10 text-center bg-gray-900 rounded-[2rem]">
-                            <span class="text-5xl mb-4">💰</span>
-                            <h3 class="text-xl font-black italic uppercase tracking-tighter text-green-500">Lucro Real</h3>
-                            <p class="text-gray-500 text-sm mt-2">Sem comissões por venda. O faturamento é 100% seu.</p>
-                        </div>
-                    </div>
+
+        <div id="slider-wrapper" class="relative shadow-2xl border border-white/5 bg-white/5 p-4 animate-pop">
+            <div id="slider-container" class="flex transition-transform duration-1000 ease-in-out">
+                <div class="w-full shrink-0 text-center p-12 bg-gradient-to-br from-gray-900 to-black rounded-[2rem]">
+                    <div class="fase-emoji">📝</div>
+                    <h4 class="text-2xl font-black uppercase italic mb-2 text-orange-500">1. Cadastro Rápido</h4>
+                    <p class="text-gray-400 font-bold uppercase text-[11px] leading-relaxed">Preencha seus dados e escolha seu plano. Em poucos minutos sua loja ganha vida.</p>
                 </div>
-                <div class="absolute bottom-6 left-0 right-0 flex justify-center gap-2">
-                    <div class="dot w-2 h-2 rounded-full bg-orange-500 transition-all w-6"></div>
-                    <div class="dot w-2 h-2 rounded-full bg-gray-600 transition-all"></div>
-                    <div class="dot w-2 h-2 rounded-full bg-gray-600 transition-all"></div>
+                <div class="w-full shrink-0 text-center p-12 bg-gradient-to-br from-gray-900 to-black rounded-[2rem]">
+                    <div class="fase-emoji">🥘</div>
+                    <h4 class="text-2xl font-black uppercase italic mb-2 text-orange-500">2. Monte seu Cardápio</h4>
+                    <p class="text-gray-400 font-bold uppercase text-[11px] leading-relaxed">Adicione fotos, preços e categorias. Tudo pronto para o cliente babar no seu produto.</p>
+                </div>
+                <div class="w-full shrink-0 text-center p-12 bg-gradient-to-br from-gray-900 to-black rounded-[2rem]">
+                    <div class="fase-emoji">💰</div>
+                    <h4 class="text-2xl font-black uppercase italic mb-2 text-orange-500">3. Venda sem Parar</h4>
+                    <p class="text-gray-400 font-bold uppercase text-[11px] leading-relaxed">Receba pedidos organizados no WhatsApp e foque no que importa: preparar e entregar.</p>
                 </div>
             </div>
         </div>
-    </header>
+    </main>
 
-    <div id="modal-parceiro" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-gray-800 w-full max-w-2xl rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative border border-gray-700 max-h-[90vh] overflow-y-auto">
-            <button onclick="fecharFormulario()" class="absolute top-6 right-8 text-gray-500 hover:text-white text-3xl font-black">&times;</button>
+    <section class="max-w-6xl mx-auto px-6 py-24">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-black italic uppercase tracking-tighter">Planos <span class="text-orange-500">Estratégicos</span></h2>
+            <p class="text-gray-500 text-[10px] font-black uppercase mt-2 italic tracking-widest">Escolha a velocidade do seu crescimento</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-end">
+            <div class="bg-white/5 border border-white/10 p-8 rounded-[3rem] flex flex-col card-plano">
+                <h3 class="text-xl font-black italic uppercase text-orange-500 mb-4">🥉 Bronze</h3>
+                <div class="text-4xl font-black mb-6">R$ 10<span class="text-sm text-gray-500">/mês</span></div>
+                <ul class="text-gray-400 text-[11px] font-bold space-y-4 mb-8 flex-1 uppercase italic">
+                    <li class="text-white">✅ 7 Dias Grátis</li>
+                    <li>✅ Até 10 Produtos</li>
+                    <li>✅ Controle Total do Painel</li>
+                    <li>✅ Assistência na Criação</li>
+                </ul>
+                <button onclick="abrirFormulario()" class="w-full py-4 bg-white/10 rounded-2xl font-black italic uppercase text-[10px]">Escolher Bronze</button>
+            </div>
+            <div class="bg-orange-600 p-10 rounded-[3.5rem] flex flex-col shadow-2xl scale-105 relative card-plano">
+                <div class="absolute top-6 -right-12 bg-white text-orange-600 px-12 py-1 font-black text-[8px] uppercase italic rotate-45">Popular</div>
+                <h3 class="text-2xl font-black italic uppercase text-white mb-4">🥈 Prata</h3>
+                <div class="text-4xl font-black mb-6">R$ 30<span class="text-sm text-white/50">/mês</span></div>
+                <ul class="text-white text-[11px] font-bold space-y-4 mb-8 flex-1 uppercase italic">
+                    <li class="bg-white/20 p-2 rounded-lg">✅ 7 Dias Grátis</li>
+                    <li>✅ Até 30 Produtos</li>
+                    <li>✅ Suporte VIP na Criação</li>
+                    <li>✅ Painel Administrativo Pro</li>
+                </ul>
+                <button onclick="abrirFormulario()" class="w-full py-4 bg-white text-orange-600 rounded-2xl font-black italic uppercase text-[10px]">Escolher Prata</button>
+            </div>
+            <div class="bg-white/5 border border-white/10 p-8 rounded-[3rem] flex flex-col card-plano">
+                <h3 class="text-xl font-black italic uppercase text-yellow-500 mb-4">🥇 Ouro</h3>
+                <div class="text-4xl font-black mb-6">R$ 70<span class="text-sm text-gray-500">/mês</span></div>
+                <ul class="text-gray-400 text-[11px] font-bold space-y-4 mb-8 flex-1 uppercase italic">
+                    <li class="text-yellow-500">✅ 30 Dias Grátis</li>
+                    <li>✅ Produtos Ilimitados</li>
+                    <li>✅ Consultoria Personalizada</li>
+                    <li>✅ Criação Total pela Equipe</li>
+                    <li>✅ 30 Dias de Destaque</li>
+                </ul>
+                <button onclick="abrirFormulario()" class="w-full py-4 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded-2xl font-black italic uppercase text-[10px]">Escolher Ouro</button>
+            </div>
+        </div>
+    </section>
+
+    <div id="modal-parceiro" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-gray-900 w-full max-w-4xl rounded-[3rem] p-8 md:p-12 relative border border-white/10 shadow-2xl overflow-y-auto max-h-[90vh]">
+            <button onclick="fecharFormulario()" class="absolute top-8 right-8 text-gray-500 hover:text-white">✕</button>
             
-            <div class="text-center mb-8">
-                <h2 class="text-3xl font-black italic uppercase tracking-tighter">Ficha de <span class="text-orange-500">Inscrição</span></h2>
-                <p class="text-gray-400 text-sm mt-1">Nossa equipe entrará em contato após a análise.</p>
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-black italic uppercase tracking-tighter">Formulário de <span class="text-orange-500 italic">Parceria</span></h2>
+                <p class="text-gray-500 text-[10px] font-black uppercase italic tracking-widest mt-2">Informe seus dados para começarmos</p>
             </div>
 
-            <form action="https://formspree.io/f/xlgwwzlv" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black uppercase text-orange-500 ml-2 tracking-widest">Nome do Lojista</label>
-                    <input type="text" name="nome_responsavel" required placeholder="Nome completo" class="w-full p-4 bg-gray-900 border border-gray-700 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 font-bold">
+            <form id="form-cadastro" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <input type="text" name="nome_lojista" required placeholder="Nome do Lojista" class="w-full p-5 rounded-2xl border border-white/10 outline-none focus:border-orange-500 font-bold">
+                    <input type="text" name="nome_negocio" id="nome_loja" required placeholder="Nome do Negócio" class="w-full p-5 rounded-2xl border border-white/10 outline-none focus:border-orange-500 font-bold">
+                    <input type="text" name="documento" required placeholder="CNPJ, MEI ou CPF" class="w-full p-5 rounded-2xl border border-white/10 outline-none focus:border-orange-500 font-bold">
                 </div>
-
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black uppercase text-orange-500 ml-2 tracking-widest">Nome do Negócio</label>
-                    <input type="text" name="nome_loja" required placeholder="Ex: Eli Doces" class="w-full p-4 bg-gray-900 border border-gray-700 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 font-bold">
+                <div class="space-y-4">
+                    <input type="email" name="email" id="email" required placeholder="Seu E-mail" class="w-full p-5 rounded-2xl border border-white/10 outline-none focus:border-orange-500 font-bold">
+                    <input type="tel" name="telefone" id="telefone" required placeholder="Celular (WhatsApp)" class="w-full p-5 rounded-2xl border border-white/10 outline-none focus:border-orange-500 font-bold">
+                    <input type="text" name="horario" required placeholder="Horário de Funcionamento (ex: 18h às 23h)" class="w-full p-5 rounded-2xl border border-white/10 outline-none focus:border-orange-500 font-bold">
                 </div>
-
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black uppercase text-orange-500 ml-2 tracking-widest">CNPJ, MEI ou CPF</label>
-                    <input type="text" name="documento" required placeholder="00.000.000/0000-00" class="w-full p-4 bg-gray-900 border border-gray-700 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 font-bold">
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black uppercase text-orange-500 ml-2 tracking-widest">Área de Segmento</label>
-                    <select name="segmento" required class="w-full p-4 bg-gray-900 border border-gray-700 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 font-bold appearance-none">
-                        <option value="">Selecione...</option>
-                        <option value="Restaurante">Restaurante / Lanches</option>
-                        <option value="Doceria">Doceria / Sobremesas</option>
-                        <option value="Bebidas">Adega / Bebidas</option>
-                        <option value="Mercado">Mini Mercado</option>
+                <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <select name="segmento" required class="w-full p-5 rounded-2xl border border-white/10 outline-none bg-transparent font-bold">
+                        <option value="" disabled selected>Área de Segmento</option>
+                        <option value="Restaurante">Restaurante</option>
+                        <option value="Pizzaria">Pizzaria</option>
+                        <option value="Açaiteria">Açaiteria</option>
+                        <option value="Hambúrguer">Hambúrguer</option>
                         <option value="Outros">Outros</option>
+                    </select>
+                    <select name="plano" id="plano_escolhido" required class="w-full p-5 rounded-2xl border border-white/10 outline-none bg-transparent font-bold">
+                        <option value="bronze">🥉 Plano Bronze</option>
+                        <option value="prata">🥈 Plano Prata</option>
+                        <option value="ouro">🥇 Plano Ouro</option>
                     </select>
                 </div>
 
-                <div class="space-y-1 md:col-span-2">
-                    <label class="text-[10px] font-black uppercase text-orange-500 ml-2 tracking-widest">Horário de Funcionamento</label>
-                    <input type="text" name="horario" required placeholder="Ex: Seg a Sab das 18h às 23h" class="w-full p-4 bg-gray-900 border border-gray-700 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 font-bold">
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black uppercase text-orange-500 ml-2 tracking-widest">E-mail</label>
-                    <input type="email" name="email" required placeholder="contato@empresa.com" class="w-full p-4 bg-gray-900 border border-gray-700 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 font-bold">
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black uppercase text-orange-500 ml-2 tracking-widest">WhatsApp / Celular</label>
-                    <input type="tel" name="telefone" required placeholder="(00) 00000-0000" class="w-full p-4 bg-gray-900 border border-gray-700 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 font-bold">
-                </div>
-
                 <div class="md:col-span-2 pt-4">
-                    <button type="submit" class="w-full bg-orange-600 hover:bg-orange-500 text-white py-6 rounded-2xl font-black italic uppercase tracking-widest shadow-xl shadow-orange-900/40 transition-all active:scale-95">
-                        ENVIAR SOLICITAÇÃO AGORA 🚀
-                    </button>
+                    <button type="submit" id="btn-submit" class="w-full bg-orange-600 py-6 rounded-3xl text-white font-black italic uppercase text-xs shadow-xl hover:bg-orange-500 transition-all">FINALIZAR CADASTRO E TESTAR GRÁTIS 🚀</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <footer class="bg-gray-900 border-t border-white/5 py-12 text-center text-gray-500 text-[10px] font-bold uppercase italic tracking-widest">
-        © 2026 Melo Delivery - O sabor bate à sua porta
-    </footer>
-
     <script>
-        // Funções do Modal
-        function abrirFormulario() {
-            const modal = document.getElementById('modal-parceiro');
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // Bloqueia scroll ao fundo
-        }
+        const SUPABASE_URL = 'https://xhfwrbjxitcrktccdrpn.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZndyYmp4aXRjcmt0Y2NkcnBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MjQ5NTksImV4cCI6MjA4NjIwMDk1OX0.nyGJxdNT-qiH-oqJL4KDKA-7bRtlj5UxmXy32RswPUc';
+        const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        function fecharFormulario() {
-            const modal = document.getElementById('modal-parceiro');
-            modal.classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        }
+        function abrirFormulario() { document.getElementById('modal-parceiro').classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+        function fecharFormulario() { document.getElementById('modal-parceiro').classList.add('hidden'); document.body.style.overflow = 'auto'; }
 
-        // Script do Slider Original
-        let current = 0;
-        const dots = document.querySelectorAll('.dot');
-        const container = document.getElementById('slider-container');
-        function move() {
-            current = (current + 1) % 3;
-            container.style.transform = `translateX(-${current * 33.333}%)`;
-            dots.forEach((dot, i) => {
-                if(i === current) { dot.classList.add('w-6', 'bg-orange-500'); dot.classList.remove('bg-gray-600'); }
-                else { dot.classList.remove('w-6', 'bg-orange-500'); dot.classList.add('bg-gray-600'); }
-            });
-        }
-        setInterval(move, 4000);
+        // Slider automático
+        let cur = 0;
+        setInterval(() => {
+            cur = (cur + 1) % 3;
+            document.getElementById('slider-container').style.transform = `translateX(-${cur * 33.333}%)`;
+        }, 5000);
+
+        // Automação de Cadastro
+        document.getElementById('form-cadastro').onsubmit = async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit');
+            btn.innerText = "SINCROZINANDO..."; btn.disabled = true;
+
+            const formData = new FormData(this);
+            const plano = formData.get('plano');
+            const dias = plano === 'ouro' ? 30 : 7;
+            
+            const hoje = new Date();
+            const trialEnd = new Date();
+            trialEnd.setDate(hoje.getDate() + dias);
+
+            const dadosLoja = {
+                store_name: formData.get('nome_negocio'),
+                whatsapp_number: formData.get('telefone'),
+                plan_type: plano,
+                plan_status: true,
+                trial_start: hoje.toISOString().split('T')[0],
+                trial_end: trialEnd.toISOString().split('T')[0]
+            };
+
+            try {
+                // 1. Supabase
+                const { error: sbError } = await sbClient.from('profiles').insert([dadosLoja]);
+                if (sbError) throw sbError;
+
+                // 2. Formspree
+                await fetch("https://formspree.io/f/xlgwwzlv", {
+                    method: "POST", body: formData, headers: { 'Accept': 'application/json' }
+                });
+
+                alert(`🎉 SUCESSO!\nSeu Plano ${plano.toUpperCase()} foi ativado com ${dias} dias grátis.`);
+                window.location.href = 'login.html';
+            } catch (err) {
+                alert("Erro ao cadastrar. Verifique os dados.");
+                btn.disabled = false; btn.innerText = "FINALIZAR CADASTRO 🚀";
+            }
+        };
     </script>
 </body>
 </html>

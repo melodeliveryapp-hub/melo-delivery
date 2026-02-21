@@ -11,30 +11,33 @@
         .animate-fade { animation: fadeIn 0.4s ease-out forwards; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans selection:bg-orange-100">
+<body class="bg-gray-50 text-gray-900 font-sans selection:bg-orange-100 flex flex-col min-h-screen">
 
     <header class="bg-gradient-to-b from-orange-500 to-orange-600 pt-12 pb-24 px-6 rounded-b-[3rem] shadow-xl text-center relative z-10">
         <h1 class="text-white text-4xl font-black italic tracking-tighter uppercase drop-shadow-md">Melo Delivery</h1>
         <p class="text-orange-100 text-sm font-bold mt-2 uppercase tracking-widest italic opacity-90">O sabor bate à sua porta</p>
     </header>
 
-    <div class="max-w-4xl mx-auto -mt-12 px-6 relative z-20">
+    <div class="max-w-4xl mx-auto w-full -mt-12 px-6 relative z-20">
         <div class="bg-white rounded-[2rem] shadow-2xl p-2 flex items-center border border-orange-100">
             <span class="ml-4 text-orange-500">🔍</span>
             <input type="text" id="searchInput" oninput="filtrarLojas()" placeholder="Buscar sua loja favorita..." class="w-full p-4 outline-none font-bold text-gray-600 bg-transparent">
         </div>
     </div>
 
-    <main class="max-w-6xl mx-auto px-6 py-12">
+    <main class="max-w-6xl mx-auto w-full px-6 py-12 flex-1">
         <div id="msg-indicacao" class="hidden mb-8">
             <h2 class="text-xs font-black uppercase italic text-orange-500 tracking-[0.2em] ml-2">Lojas em Destaque</h2>
         </div>
         
-        <div id="lista-lojas" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            </div>
+        <div id="lista-lojas" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
     </main>
 
-    <footer class="py-12 text-center">
+    <footer class="py-12 text-center mt-auto border-t border-gray-200 bg-gray-50">
+        <div class="flex justify-center gap-6 mb-4">
+            <a href="parceiro.html" class="text-[10px] font-black uppercase italic text-gray-500 hover:text-orange-500 transition-all">Seja um Parceiro</a>
+            <a href="login.html" class="text-[10px] font-black uppercase italic text-gray-500 hover:text-orange-500 transition-all">Painel Administrativo</a>
+        </div>
         <button onclick="compartilhar()" class="bg-gray-900 text-white px-8 py-4 rounded-2xl font-black italic uppercase text-[10px] shadow-lg active:scale-95 transition-all tracking-widest">Compartilhar Plataforma 📲</button>
         <p class="text-gray-400 text-[9px] font-black uppercase italic mt-8 tracking-widest">© 2026 Melo Delivery - Todos os direitos reservados</p>
     </footer>
@@ -66,7 +69,11 @@
                     const minAb = parseMin(extra.opening_time);
                     let minFe = parseMin(extra.closing_time);
                     if (minFe < minAb) minFe += 1440;
-                    aberto = minAt >= minAb && minAt < minFe;
+                    
+                    let minAtualComp = minAt;
+                    if (minAt < minAb && minFe > 1440) minAtualComp += 1440;
+
+                    aberto = minAtualComp >= minAb && minAtualComp < minFe;
                 }
 
                 return { 
@@ -106,7 +113,7 @@
 
         function filtrarLojas() {
             const termo = document.getElementById('searchInput').value.toLowerCase().trim();
-            const filtradas = todasAsLojas.filter(loja => loja.store_name.toLowerCase().includes(termo));
+            const filtradas = todasAsLojas.filter(loja => (loja.store_name || "").toLowerCase().includes(termo));
             exibirLojas(filtradas);
         }
 

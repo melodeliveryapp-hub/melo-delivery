@@ -18,7 +18,7 @@
 </head>
 <body class="bg-orange-50 text-gray-800 pb-32 font-sans">
 
-    <div id="suspenso-overlay" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center p-8 text-center">
+    <div id="suspenso-overlay" class="fixed inset-0 bg-white z-[100] hidden flex flex-col items-center justify-center p-8 text-center">
         <div class="w-24 h-24 bg-orange-100 rounded-full flex items-center justify-center text-4xl mb-6">🔒</div>
         <h1 class="text-2xl font-black italic uppercase text-gray-800 tracking-tighter">Loja Indisponível</h1>
         <p class="text-gray-500 mt-4 text-sm font-bold max-w-xs leading-relaxed">Assinatura expirada. Entre em contato com o suporte.</p>
@@ -51,7 +51,7 @@
     
     <main class="max-w-2xl mx-auto p-4 space-y-6">
         <div id="container-seletor-fracao" class="hidden px-2 pb-4">
-            <button id="btn-modo-fracao" onclick="alternarModoFracao()" class="w-full py-4 rounded-2xl border-2 border-orange-500 text-orange-600 font-black uppercase italic text-xs flex items-center justify-center gap-2 bg-white shadow-sm">
+            <button id="btn-modo-fracao" onclick="alternarModoFracao()" class="w-full py-4 rounded-2xl border-2 border-orange-500 text-orange-600 font-black uppercase italic text-xs flex items-center justify-center gap-2 bg-white shadow-sm transition-all">
                 <span id="txt-modo">Quero montar Meio à Meio</span>
             </button>
         </div>
@@ -138,14 +138,20 @@
                 nav.innerHTML += `<a href="#cat-${idx}" class="px-5 py-2.5 bg-gray-100 rounded-full text-sm font-bold text-gray-500 shrink-0">${cat}</a>`;
                 let h = `<section id="cat-${idx}" class="scroll-mt-40"><h2 class="text-xl font-black italic uppercase mb-4 ml-2"><span class="w-1.5 h-6 bg-orange-500 rounded-full inline-block mr-2"></span>${cat}</h2><div class="space-y-3">`;
                 produtos.filter(p => (p.categoria_produtos || 'Geral') === cat).forEach(p => {
-                    h += `<div id="card-${p.id}" class="bg-white p-4 rounded-[2rem] shadow-sm border flex gap-4 items-center" onclick="gerenciarClique('${p.id}', '${p.name}', ${p.price}, ${p.permite_fracao})">
+                    
+                    // Estrutura Restaurada com os botões + e - e a proteção de cliques (stopPropagation)
+                    h += `<div id="card-${p.id}" class="bg-white p-4 rounded-[2rem] shadow-sm border flex gap-4 items-center cursor-pointer transition-all active:scale-[0.98]" onclick="gerenciarClique('${p.id}', '${p.name}', ${p.price}, ${p.permite_fracao})">
                         <img src="${p.image_url}" onerror="this.src='https://via.placeholder.com/150'" class="w-24 h-24 object-cover rounded-2xl shrink-0">
                         <div class="flex-1 min-w-0">
                             <h3 class="font-black text-sm uppercase truncate">${p.name}</h3>
-                            <p class="text-[10px] text-gray-400 font-bold">${p.description || ''}</p>
+                            <p class="text-[10px] text-gray-400 font-bold line-clamp-2">${p.description || ''}</p>
                             <p class="text-green-600 font-black italic mt-1">R$ ${p.price.toFixed(2)} ${p.unidade ? `<small class='text-gray-400 font-bold'>/ ${p.unidade}</small>` : ''}</p>
                         </div>
-                        <button class="w-10 h-10 rounded-2xl bg-orange-500 text-white font-black">+</button>
+                        <div class="flex flex-col items-center gap-1">
+                            <button class="w-10 h-10 rounded-2xl bg-orange-500 text-white font-black hover:scale-105 transition-all">+</button>
+                            <span id="qtd-${p.name}" class="text-xs font-black text-gray-600 hidden">0</span>
+                            <button onclick="event.stopPropagation(); rem('${p.name}')" id="btn-rem-${p.name}" class="w-10 h-10 rounded-2xl bg-gray-100 text-gray-400 font-black hidden hover:bg-gray-200 transition-all">-</button>
+                        </div>
                     </div>`;
                 });
                 container.innerHTML += h + `</div></section>`;
@@ -156,11 +162,11 @@
             modoMeioAMeioAtivo = !modoMeioAMeioAtivo;
             const btn = document.getElementById('btn-modo-fracao'), instr = document.getElementById('instrucao-fracao');
             if (modoMeioAMeioAtivo) {
-                btn.className = "w-full py-4 rounded-2xl bg-orange-500 text-white font-black uppercase italic text-xs";
+                btn.className = "w-full py-4 rounded-2xl bg-orange-500 text-white font-black uppercase italic text-xs shadow-sm transition-all";
                 instr.classList.remove('hidden');
-                document.getElementById('txt-modo').innerText = "Modo Meio à Meio Ativo";
+                document.getElementById('txt-modo').innerText = "Modo Meio à Meio Ativo (Cancelar)";
             } else {
-                btn.className = "w-full py-4 rounded-2xl border-2 border-orange-500 text-orange-600 font-black uppercase italic text-xs bg-white";
+                btn.className = "w-full py-4 rounded-2xl border-2 border-orange-500 text-orange-600 font-black uppercase italic text-xs bg-white shadow-sm transition-all";
                 instr.classList.add('hidden');
                 document.getElementById('txt-modo').innerText = "Quero montar Meio à Meio";
                 if(sabor1) document.getElementById(`card-${sabor1.id}`).classList.remove('selecionado-fracao');
@@ -174,19 +180,41 @@
                     sabor1 = { n: nome, p: preco, id: id };
                     document.getElementById(`card-${id}`).classList.add('selecionado-fracao');
                 } else {
-                    carrinho.push({ n: `1/2 ${sabor1.n} + 1/2 ${nome}`, p: (sabor1.p + preco) / 2 });
+                    const nomeFinal = `1/2 ${sabor1.n} + 1/2 ${nome}`;
+                    carrinho.push({ n: nomeFinal, p: (sabor1.p + preco) / 2 });
                     document.getElementById(`card-${sabor1.id}`).classList.remove('selecionado-fracao');
-                    sabor1 = null; alternarModoFracao(); updateUI();
+                    sabor1 = null; alternarModoFracao(); updateUI(nomeFinal);
                 }
             } else {
-                carrinho.push({ n: nome, p: preco }); updateUI();
+                carrinho.push({ n: nome, p: preco }); updateUI(nome);
             }
         }
 
-        function updateUI() {
+        function rem(n) {
+            const idx = carrinho.map(i => i.n).lastIndexOf(n);
+            if(idx > -1) carrinho.splice(idx, 1);
+            updateUI(n);
+        }
+
+        function updateUI(n) {
+            if(n) {
+                const q = carrinho.filter(i => i.n === n).length;
+                const eq = document.getElementById(`qtd-${n}`);
+                const er = document.getElementById(`btn-rem-${n}`);
+                if(eq) { 
+                    eq.innerText = q; 
+                    if(q > 0) { eq.classList.remove('hidden'); if(er) er.classList.remove('hidden'); } 
+                    else { eq.classList.add('hidden'); if(er) er.classList.add('hidden'); } 
+                }
+            }
             const total = carrinho.reduce((s,i)=>s+i.p,0), barra = document.getElementById('barra-carrinho');
-            if(carrinho.length>0) { barra.classList.replace('hidden', 'flex'); document.getElementById('carrinho-qtd').innerText = carrinho.length; document.getElementById('carrinho-total').innerText = `R$ ${total.toFixed(2)}`; }
-            else barra.classList.replace('flex', 'hidden');
+            if(carrinho.length > 0) { 
+                barra.classList.replace('hidden', 'flex'); 
+                document.getElementById('carrinho-qtd').innerText = carrinho.length; 
+                document.getElementById('carrinho-total').innerText = `R$ ${total.toFixed(2)}`; 
+            } else { 
+                barra.classList.replace('flex', 'hidden'); 
+            }
         }
 
         function verificarStatusLoja(abre, fecha) {

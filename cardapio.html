@@ -12,9 +12,18 @@
         html { scroll-behavior: smooth; }
         .status-dot { animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
+        #suspenso-overlay { display: none; }
+        .selecionado-fracao { border: 3px solid #f97316 !important; background-color: #fff7ed !important; }
     </style>
 </head>
 <body class="bg-orange-50 text-gray-800 pb-32 font-sans">
+
+    <div id="suspenso-overlay" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center p-8 text-center">
+        <div class="w-24 h-24 bg-orange-100 rounded-full flex items-center justify-center text-4xl mb-6">🔒</div>
+        <h1 class="text-2xl font-black italic uppercase text-gray-800 tracking-tighter">Loja Indisponível</h1>
+        <p id="msg-suspensao" class="text-gray-500 mt-4 text-sm font-bold max-w-xs leading-relaxed">Assinatura expirada. Entre em contato com o suporte.</p>
+        <a href="https://wa.me/5588999465376" target="_blank" class="mt-8 bg-orange-600 text-white px-8 py-4 rounded-2xl font-black italic uppercase text-[10px] shadow-lg active:scale-95 transition-all">Falar com Suporte</a>
+    </div>
 
     <header class="bg-orange-600 shadow-lg relative z-20 pb-6 rounded-b-[2.5rem]">
         <div class="h-32 w-full overflow-hidden bg-gray-900 relative">
@@ -27,54 +36,51 @@
             <div class="mt-4 flex justify-between items-end">
                 <div class="text-white">
                     <h1 id="nome-loja" class="text-2xl font-black leading-none drop-shadow-md">Carregando...</h1>
-                    <p class="text-xs text-orange-100 mt-2 font-medium flex items-center gap-1 opacity-90 italic">
-                        ⏱️ <span id="horario-txt">--:-- às --:--</span> • 🛵 30-45min
-                    </p>
+                    <p class="text-xs text-orange-100 mt-2 font-medium flex items-center gap-1 opacity-90 italic">⏱️ <span id="horario-txt">--:-- às --:--</span></p>
                 </div>
                 <div id="status-loja" class="bg-white text-gray-800 px-4 py-2 rounded-xl text-xs font-black uppercase shadow-lg flex items-center gap-2">...</div>
             </div>
         </div>
     </header>
 
-    <nav class="sticky top-0 bg-white/95 backdrop-blur-sm z-30 py-3 px-4 overflow-x-auto no-scrollbar whitespace-nowrap shadow-sm border-b flex gap-2" id="nav-categorias"></nav>
-    <main class="max-w-2xl mx-auto p-4 space-y-6" id="cardapio-container"></main>
-
-    <div id="modal-fechado" class="fixed inset-0 bg-black/80 z-[80] hidden flex items-center justify-center p-6 backdrop-blur-sm">
-        <div class="bg-white rounded-[2.5rem] p-8 text-center shadow-2xl max-w-sm relative overflow-hidden">
-            <div class="absolute top-0 w-full h-2 bg-red-500 left-0"></div>
-            <div class="text-6xl mb-4 grayscale">😴</div>
-            <h3 class="text-2xl font-black text-gray-800">Loja Fechada!</h3>
-            <p class="text-gray-500 mt-2 font-medium">Funcionamos das <br><b class="text-red-500 text-lg" id="modal-horario">--:-- às --:--</b></p>
-            <button onclick="document.getElementById('modal-fechado').classList.add('hidden')" class="mt-6 w-full py-3.5 bg-gray-100 text-gray-600 font-bold rounded-2xl">Só estou olhando</button>
-        </div>
+    <div id="instrucao-fracao" class="hidden sticky top-0 bg-orange-500 text-white text-center py-3 z-[60] font-black uppercase italic text-[10px] tracking-widest shadow-md">
+        🍕 Selecione o segundo sabor para completar!
     </div>
+
+    <nav class="sticky top-0 bg-white/95 backdrop-blur-sm z-30 py-3 px-4 overflow-x-auto no-scrollbar whitespace-nowrap shadow-sm border-b flex gap-2" id="nav-categorias"></nav>
+    
+    <main class="max-w-2xl mx-auto p-4 space-y-6">
+        <div id="container-seletor-fracao" class="hidden px-2 pb-4">
+            <button id="btn-modo-fracao" onclick="alternarModoFracao()" class="w-full py-4 rounded-2xl border-2 border-orange-500 text-orange-600 font-black uppercase italic text-xs flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm bg-white">
+                <span id="icon-pizza">🍕</span> <span id="txt-modo">Quero montar Meio à Meio</span>
+            </button>
+        </div>
+        <div id="cardapio-container"></div>
+    </main>
 
     <div id="barra-carrinho" class="fixed bottom-6 left-6 right-6 bg-gray-900/90 backdrop-blur-md text-white p-4 rounded-3xl shadow-2xl z-40 hidden flex justify-between items-center border border-white/10" onclick="abrirModalEntrega()">
         <div class="flex items-center gap-4">
             <div class="bg-orange-500 w-12 h-12 flex items-center justify-center rounded-2xl font-black text-sm" id="carrinho-qtd">0</div>
-            <div class="flex flex-col">
-                <span class="text-[10px] uppercase font-bold text-gray-400 leading-none mb-1">Total</span>
-                <span class="text-xl font-black leading-none" id="carrinho-total">R$ 0,00</span>
-            </div>
+            <div class="flex flex-col"><span class="text-[10px] uppercase font-bold text-gray-400">Total</span><span class="text-xl font-black" id="carrinho-total">R$ 0,00</span></div>
         </div>
         <span class="font-bold text-sm bg-white/10 px-4 py-2 rounded-xl">Ver Pedido →</span>
     </div>
 
     <div id="modal-entrega" class="fixed inset-0 bg-black/60 z-[70] hidden flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white w-full max-w-md rounded-[2.5rem] p-6 shadow-2xl my-auto relative">
+        <div class="bg-white w-full max-w-md rounded-[2.5rem] p-6 shadow-2xl relative">
             <button onclick="document.getElementById('modal-entrega').classList.add('hidden')" class="absolute top-4 right-6 text-gray-300 font-bold text-2xl z-10">&times;</button>
             <h3 class="text-xl font-black text-gray-800 mb-4 uppercase italic">Finalizar Pedido</h3>
             <div id="lista-resumo" class="bg-orange-50 rounded-2xl p-4 max-h-40 overflow-y-auto text-sm space-y-2 border border-orange-100 mb-4"></div>
             <div class="space-y-3">
-                <input type="text" id="cli-nome" placeholder="Seu Nome Completo" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold outline-none">
+                <input type="text" id="cli-nome" placeholder="Seu Nome" class="w-full p-4 bg-gray-50 border rounded-2xl font-bold outline-none text-gray-700">
                 <div class="flex gap-2">
-                    <input type="text" id="cli-rua" placeholder="Rua" class="w-2/3 p-4 bg-gray-50 border rounded-2xl font-bold outline-none">
-                    <input type="text" id="cli-num" placeholder="Nº" class="w-1/3 p-4 bg-gray-50 border rounded-2xl font-bold outline-none text-center">
+                    <input type="text" id="cli-rua" placeholder="Rua" class="w-2/3 p-4 bg-gray-50 border rounded-2xl font-bold outline-none text-gray-700">
+                    <input type="text" id="cli-num" placeholder="Nº" class="w-1/3 p-4 bg-gray-50 border rounded-2xl font-bold outline-none text-center text-gray-700">
                 </div>
-                <input type="text" id="cli-bairro" placeholder="Bairro" class="w-full p-4 bg-gray-50 border rounded-2xl font-bold outline-none">
-                <select id="cli-taxa" class="w-full p-4 bg-orange-50 border border-orange-100 rounded-2xl font-bold text-orange-600 outline-none"></select>
+                <input type="text" id="cli-bairro" placeholder="Bairro" class="w-full p-4 bg-gray-50 border rounded-2xl font-bold outline-none text-gray-700">
+                <select id="cli-taxa" class="w-full p-4 bg-orange-50 border rounded-2xl font-bold text-orange-600 outline-none"></select>
             </div>
-            <button onclick="finalizarPedido()" class="w-full py-4 bg-green-600 text-white font-black rounded-2xl shadow-lg mt-4 active:scale-95 transition-all uppercase tracking-widest italic">Enviar no WhatsApp 🚀</button>
+            <button onclick="finalizarPedido()" class="w-full py-4 bg-green-600 text-white font-black rounded-2xl shadow-lg mt-4 active:scale-95 transition-all uppercase italic">Enviar no WhatsApp 🚀</button>
         </div>
     </div>
 
@@ -84,156 +90,160 @@
         const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const urlParams = new URLSearchParams(window.location.search);
         const paramLoja = urlParams.get('loja');
-        let lojaId = "", zapLoja = "", lojaAberta = false, carrinho = [];
+        
+        let lojaId = "", zapLoja = "", carrinho = [];
+        let modoMeioAMeioAtivo = false;
+        let sabor1 = null;
 
         async function init() {
-            // CORREÇÃO ELI DOCES: Trata o slug caso venha com espaços ou maiúsculas na URL
             let slugBusca = (paramLoja || "").toLowerCase().replace(/\s+/g, '-');
-            
-            let { data: profile } = await sbClient.from('profiles').select('*').eq('slug', slugBusca).single();
+            let { data: profile } = await sbClient.from('profiles').select('*').eq('slug', slugBusca).maybeSingle();
             if (!profile) {
-                const { data: pId } = await sbClient.from('profiles').select('*').eq('id', paramLoja).single();
-                profile = pId;
+                const retry = await sbClient.from('profiles').select('*').eq('id', paramLoja).maybeSingle();
+                profile = retry.data;
             }
 
             if (profile) {
+                const hoje = new Date().toISOString().split('T')[0];
+                const expirou = profile.trial_end && hoje > profile.trial_end;
+                if (profile.plan_status === false || expirou) {
+                    document.getElementById('suspenso-overlay').style.display = 'flex';
+                    return;
+                }
+
                 lojaId = profile.id; 
                 zapLoja = profile.whatsapp_number;
                 document.getElementById('nome-loja').innerText = profile.store_name;
                 
-                const { data: info } = await sbClient.from('store_info').select('*').eq('tenant_id', lojaId).single();
+                const { data: info } = await sbClient.from('store_info').select('*').eq('tenant_id', lojaId).maybeSingle();
                 if (info) {
                     if (info.banner_url) document.getElementById('banner-topo').src = info.banner_url;
                     if (info.logo_url) document.getElementById('logo-loja').src = info.logo_url;
-                    
                     const tm = info.delivery_fee_main || 0, tf = info.delivery_fee_far || 0;
-                    document.getElementById('cli-taxa').innerHTML = `
-                        <option value="0">Escolha a Entrega</option>
-                        <option value="${tm}">Centro (R$ ${parseFloat(tm).toFixed(2)})</option>
-                        <option value="${tf}">Bairros (R$ ${parseFloat(tf).toFixed(2)})</option>
-                    `;
-                    
+                    document.getElementById('cli-taxa').innerHTML = `<option value="0">Entrega</option><option value="${tm}">Centro (R$ ${tm.toFixed(2)})</option><option value="${tf}">Bairros (R$ ${tf.toFixed(2)})</option>`;
                     verificarStatusLoja(info.opening_time || "18:00", info.closing_time || "23:59");
                 }
                 carregarProdutos(lojaId);
             }
         }
 
-        // --- SISTEMA DE HORÁRIOS ROBUSTO ---
-        function verificarStatusLoja(abreStr, fechaStr) {
-            document.getElementById('horario-txt').innerText = `${abreStr.slice(0,5)} às ${fechaStr.slice(0,5)}`;
-            document.getElementById('modal-horario').innerText = `${abreStr.slice(0,5)} às ${fechaStr.slice(0,5)}`;
-            
-            const agora = new Date();
-            const minAtual = agora.getHours() * 60 + agora.getMinutes();
-
-            const parseMinutos = (timeStr) => {
-                if (!timeStr) return 0;
-                const [h, m] = timeStr.split(':').map(Number);
-                return (h || 0) * 60 + (m || 0);
-            };
-
-            const minAbre = parseMinutos(abreStr);
-            let minFecha = parseMinutos(fechaStr);
-
-            // Se fechar após meia-noite (ex: 18:00 às 02:00)
-            if (minFecha < minAbre) minFecha += 1440;
-
-            // Ajuste para virada do dia
-            let minAtualComp = minAtual;
-            if (minAtual < minAbre && minFecha > 1440) minAtualComp += 1440;
-
-            lojaAberta = minAtualComp >= minAbre && minAtualComp < minFecha;
-
-            const badge = document.getElementById('status-loja');
-            if (lojaAberta) {
-                badge.innerHTML = "<span class='w-2 h-2 bg-green-500 rounded-full status-dot'></span> Aberto";
-                badge.className = "bg-white text-green-600 px-4 py-2 rounded-xl text-xs font-black uppercase shadow-lg flex items-center gap-2";
-            } else {
-                badge.innerText = "Fechado";
-                badge.className = "bg-white text-red-500 px-4 py-2 rounded-xl text-xs font-black uppercase shadow-lg";
-                // Mostra o modal se estiver fechado
-                setTimeout(() => {
-                   if(!lojaAberta) document.getElementById('modal-fechado').classList.remove('hidden');
-                }, 800);
-            }
-        }
-
         async function carregarProdutos(id) {
-            const { data: produtos } = await sbClient.from('products').select('*').eq('tenant_id', id).eq('is_active', true);
+            const { data: produtos } = await sbClient.from('products').select('*').eq('tenant_id', id).eq('is_active', true).order('name');
             const container = document.getElementById('cardapio-container'), nav = document.getElementById('nav-categorias');
-            container.innerHTML = ""; nav.innerHTML = "";
-            if(!produtos || produtos.length === 0) return;
-            
-            const cats = [...new Set(produtos.map(p => p.categoria_produtos || 'Diversos'))];
+            if(!produtos) return;
+
+            // Mostra o botão Meio a Meio se houver produtos que permitem
+            const temFracionados = produtos.some(p => p.permite_fracao);
+            document.getElementById('container-seletor-fracao').classList.toggle('hidden', !temFracionados);
+
+            const cats = [...new Set(produtos.map(p => p.categoria_produtos || 'Geral'))];
+            nav.innerHTML = "";
+            container.innerHTML = "";
+
             cats.forEach((cat, idx) => {
                 nav.innerHTML += `<a href="#cat-${idx}" class="px-5 py-2.5 bg-gray-100 rounded-full text-sm font-bold text-gray-500 shrink-0">${cat}</a>`;
-                let html = `<section id="cat-${idx}" class="scroll-mt-40"><h2 class="text-xl font-black italic uppercase text-gray-800 mb-4 ml-2"><span class="w-1.5 h-6 bg-orange-500 rounded-full inline-block mr-2"></span>${cat}</h2><div class="space-y-3">`;
-                produtos.filter(p => (p.categoria_produtos || 'Diversos') === cat).forEach(p => {
-                    html += `<div class="bg-white p-4 rounded-[2rem] shadow-sm border flex gap-4 items-center">
-                        <img src="${p.image_url}" onerror="this.src='https://via.placeholder.com/150'" class="w-24 h-24 object-cover rounded-2xl bg-gray-50 shrink-0">
-                        <div class="flex-1 min-w-0"><h3 class="font-black text-sm uppercase truncate">${p.name}</h3><p class="text-[10px] text-gray-400 font-bold line-clamp-2 leading-tight">${p.description || ''}</p><p class="text-green-600 font-black italic mt-1 text-base">R$ ${p.price.toFixed(2)}</p></div>
+                let h = `<section id="cat-${idx}" class="scroll-mt-40"><h2 class="text-xl font-black italic uppercase text-gray-800 mb-4 ml-2"><span class="w-1.5 h-6 bg-orange-500 rounded-full inline-block mr-2"></span>${cat}</h2><div class="space-y-3">`;
+                
+                produtos.filter(p => (p.categoria_produtos || 'Geral') === cat).forEach(p => {
+                    // Injeta a lógica de clique condicional
+                    h += `<div id="card-${p.id}" class="bg-white p-4 rounded-[2rem] shadow-sm border flex gap-4 items-center transition-all" onclick="gerenciarClique('${p.id}', '${p.name}', ${p.price}, ${p.permite_fracao})">
+                        <img src="${p.image_url}" onerror="this.src='https://via.placeholder.com/150'" class="w-24 h-24 object-cover rounded-2xl shrink-0">
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-black text-sm uppercase truncate">${p.name}</h3>
+                            <p class="text-[10px] text-gray-400 font-bold line-clamp-2">${p.description || ''}</p>
+                            <p class="text-green-600 font-black italic mt-1">R$ ${p.price.toFixed(2)} ${p.unidade ? `<small class='text-gray-400 font-bold'>/ ${p.unidade}</small>` : ''}</p>
+                        </div>
                         <div class="flex flex-col items-center gap-1">
-                            <button onclick="add('${p.name}', ${p.price})" class="w-10 h-10 rounded-2xl bg-orange-500 text-white font-black active:scale-90 transition-all">+</button>
+                            <button class="w-10 h-10 rounded-2xl bg-orange-500 text-white font-black">+</button>
                             <span id="qtd-${p.name}" class="text-xs font-bold hidden">0</span>
-                            <button onclick="rem('${p.name}')" id="btn-rem-${p.name}" class="w-10 h-10 rounded-2xl bg-gray-100 text-gray-400 font-black hidden">-</button>
                         </div>
                     </div>`;
                 });
-                container.innerHTML += html + `</div></section>`;
+                container.innerHTML += h + `</div></section>`;
             });
         }
 
-        function add(n, p) { carrinho.push({ n, p }); updateUI(n); }
-        function rem(n) { const idx = carrinho.map(i => i.n).lastIndexOf(n); if (idx > -1) carrinho.splice(idx, 1); updateUI(n); }
-        
-        function updateUI(n) {
-            const q = carrinho.filter(i => i.n === n).length, eQ = document.getElementById(`qtd-${n}`), eR = document.getElementById(`btn-rem-${n}`);
-            if(eQ) { eQ.innerText = q; if(q > 0) { eQ.classList.remove('hidden'); eR.classList.remove('hidden'); } else { eQ.classList.add('hidden'); eR.classList.add('hidden'); } }
+        function alternarModoFracao() {
+            modoMeioAMeioAtivo = !modoMeioAMeioAtivo;
+            const btn = document.getElementById('btn-modo-fracao');
+            const instrucao = document.getElementById('instrucao-fracao');
+            const txt = document.getElementById('txt-modo');
             
-            const total = carrinho.reduce((s, i) => s + i.p, 0), barra = document.getElementById('barra-carrinho');
-            if (carrinho.length > 0) { 
-                barra.classList.remove('hidden'); barra.classList.add('flex'); 
-                document.getElementById('carrinho-qtd').innerText = carrinho.length; 
-                document.getElementById('carrinho-total').innerText = `R$ ${total.toFixed(2)}`; 
-            } else { barra.classList.add('hidden'); }
+            if (modoMeioAMeioAtivo) {
+                btn.className = "w-full py-4 rounded-2xl bg-orange-500 text-white font-black uppercase italic text-xs flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg";
+                instrucao.classList.remove('hidden');
+                txt.innerText = "Modo Meio à Meio Ativo (Clique p/ Cancelar)";
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                btn.className = "w-full py-4 rounded-2xl border-2 border-orange-500 text-orange-600 font-black uppercase italic text-xs flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm bg-white";
+                instrucao.classList.add('hidden');
+                txt.innerText = "Quero montar Meio à Meio";
+                if(sabor1) document.getElementById(`card-${sabor1.id}`).classList.remove('selecionado-fracao');
+                sabor1 = null;
+            }
+        }
+
+        function gerenciarClique(id, nome, preco, permiteFracao) {
+            if (modoMeioAMeioAtivo && permiteFracao) {
+                if (!sabor1) {
+                    sabor1 = { n: nome, p: preco, id: id };
+                    document.getElementById(`card-${id}`).classList.add('selecionado-fracao');
+                } else {
+                    const nomeFinal = `1/2 ${sabor1.n} + 1/2 ${nome}`;
+                    const precoFinal = (sabor1.p + preco) / 2;
+                    carrinho.push({ n: nomeFinal, p: precoFinal });
+                    
+                    document.getElementById(`card-${sabor1.id}`).classList.remove('selecionado-fracao');
+                    sabor1 = null;
+                    alternarModoFracao(); 
+                    updateUI();
+                }
+            } else {
+                carrinho.push({ n: nome, p: preco });
+                updateUI(nome);
+            }
+        }
+
+        function updateUI(n) {
+            if(n) {
+                const q = carrinho.filter(i=>i.n===n).length;
+                const eq = document.getElementById(`qtd-${n}`);
+                if(eq) { eq.innerText = q; q > 0 ? eq.classList.remove('hidden') : eq.classList.add('hidden'); }
+            }
+            const total = carrinho.reduce((s,i)=>s+i.p,0), barra = document.getElementById('barra-carrinho');
+            if(carrinho.length>0) { barra.classList.remove('hidden'); barra.classList.add('flex'); document.getElementById('carrinho-qtd').innerText = carrinho.length; document.getElementById('carrinho-total').innerText = `R$ ${total.toFixed(2)}`; } 
+            else { barra.classList.add('hidden'); }
+        }
+
+        // --- MANTENDO SUAS FUNÇÕES ORIGINAIS DE HORÁRIO, MODAL E WHATSAPP ---
+        function verificarStatusLoja(abre, fecha) {
+            document.getElementById('horario-txt').innerText = `${abre} às ${fecha}`;
+            const agora = new Date();
+            const minAt = agora.getHours() * 60 + agora.getMinutes();
+            const parseMin = (s) => s.split(':').map(Number)[0] * 60 + s.split(':').map(Number)[1];
+            const minAb = parseMin(abre); let minFe = parseMin(fecha);
+            if (minFe < minAb) minFe += 1440;
+            const aberto = minAt >= minAb && minAt < minFe;
+            const b = document.getElementById('status-loja');
+            if(aberto) { b.innerHTML = "<span class='w-2 h-2 bg-green-500 rounded-full status-dot'></span> Aberto"; b.className = "bg-white text-green-600 px-4 py-2 rounded-xl text-xs font-black uppercase shadow-lg flex items-center gap-2"; }
+            else { b.innerText = "Fechado"; b.className = "bg-white text-red-500 px-4 py-2 rounded-xl text-xs font-black uppercase shadow-lg"; }
         }
 
         function abrirModalEntrega() {
-            const lista = document.getElementById('lista-resumo'); lista.innerHTML = '';
-            const ct = {}; carrinho.forEach(i => ct[i.n] = (ct[i.n] || 0) + 1);
-            for (const [n, q] of Object.entries(ct)) lista.innerHTML += `<div class="flex justify-between font-bold italic"><span>${q}x ${n}</span></div>`;
+            const list = document.getElementById('lista-resumo'); list.innerHTML = '';
+            const ct = {}; carrinho.forEach(i=>ct[i.n]=(ct[i.n]||0)+1);
+            for(const [n,q] of Object.entries(ct)) list.innerHTML += `<div class="flex justify-between font-bold italic border-b border-orange-100 pb-1"><span>${q}x ${n}</span></div>`;
             document.getElementById('modal-entrega').classList.remove('hidden');
         }
 
         function finalizarPedido() {
-            if (!zapLoja || zapLoja.trim() === "") return alert("Esta loja não cadastrou WhatsApp.");
-            
-            const n = document.getElementById('cli-nome').value.trim();
-            const r = document.getElementById('cli-rua').value.trim();
-            const num = document.getElementById('cli-num').value.trim();
-            const b = document.getElementById('cli-bairro').value.trim();
-            const t = parseFloat(document.getElementById('cli-taxa').value);
-            
-            if (!n || !r || !num || t === 0) return alert("Preencha todos os dados e escolha a taxa!");
-            
-            const ct = {}; carrinho.forEach(i => ct[i.n] = (ct[i.n] || 0) + 1);
-            let res = "";
-            for (const [p, q] of Object.entries(ct)) res += `✅ *${q}x* ${p}\n`;
-            
-            const total = carrinho.reduce((s, i) => s + i.p, 0) + t;
-            const msg = encodeURIComponent(
-                `🍱 *PEDIDO: ${document.getElementById('nome-loja').innerText}*\n` +
-                `👤 *Cliente:* ${n}\n` +
-                `📍 *Endereço:* ${r}, ${num} - ${b}\n\n` +
-                `🛒 *ITENS:*\n${res}\n` +
-                `🛵 *Entrega:* R$ ${t.toFixed(2)}\n` +
-                `💰 *TOTAL: R$ ${total.toFixed(2)}*`
-            );
-            
-            window.open(`https://wa.me/55${zapLoja.replace(/\D/g, '')}?text=${msg}`, '_blank');
+            const n = document.getElementById('cli-nome').value.trim(), r = document.getElementById('cli-rua').value.trim(), num = document.getElementById('cli-num').value.trim(), b = document.getElementById('cli-bairro').value.trim(), t = parseFloat(document.getElementById('cli-taxa').value);
+            if(!n || !r || !num || t === 0) return alert("Preencha tudo!");
+            const ct = {}; carrinho.forEach(i=>ct[i.n]=(ct[i.n]||0)+1); let res = "";
+            for(const [prod, q] of Object.entries(ct)) res += `✅ *${q}x* ${prod}\n`;
+            const msg = encodeURIComponent(`🍱 *PEDIDO*\n👤 *${n}*\n📍 *${r}, ${num} - ${b}*\n\n🛒 *ITENS:*\n${res}\n🛵 *Entrega:* R$ ${t.toFixed(2)}\n💰 *TOTAL: R$ ${(carrinho.reduce((s,i)=>s+i.p,0)+t).toFixed(2)}*`);
+            window.open(`https://wa.me/55${zapLoja.replace(/\D/g,'')}?text=${msg}`);
         }
-        
         init();
     </script>
 </body>

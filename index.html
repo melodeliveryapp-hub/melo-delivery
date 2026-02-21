@@ -60,10 +60,18 @@
         let todasAsLojas = [];
 
         async function carregarLojas() {
-            const { data: profiles } = await sbClient.from('profiles').select('*');
+            // Upgrade: Ordenar por plano (Ouro aparece primeiro)
+            const { data: profiles } = await sbClient.from('profiles').select('*').order('plan_type', { ascending: false });
             const { data: info } = await sbClient.from('store_info').select('*');
             if (!profiles) return;
-            todasAsLojas = profiles.map(p => {
+
+            const hoje = new Date().toISOString().split('T')[0];
+
+            todasAsLojas = profiles.filter(p => {
+                // Upgrade: Trava por data e status na vitrine
+                const expirou = p.trial_end && hoje > p.trial_end;
+                return p.plan_status !== false && !expirou;
+            }).map(p => {
                 const extra = info?.find(i => i.tenant_id === p.id || i.name === p.store_name);
                 return { ...p, logo: extra?.logo_url || 'https://via.placeholder.com/200' };
             });
@@ -75,7 +83,7 @@
             const msgIndicacao = document.getElementById('msg-indicacao');
             container.innerHTML = '';
             if (lista.length === 0) {
-                container.innerHTML = `<div class="col-span-full py-12 text-center animate-fade"><div class="text-6xl mb-4">🔎</div><h3 class="text-gray-500 font-bold uppercase italic">Nenhuma loja encontrada.</h3></div>`;
+                container.innerHTML = `<div class="col-span-full py-12 text-center animate-fade"><div class="text-6xl mb-4">🔎</div><h3 class="text-gray-500 font-bold uppercase italic">Nenhuma loja ativa no momento.</h3></div>`;
                 msgIndicacao.classList.add('hidden');
                 return;
             }
@@ -83,7 +91,11 @@
             lista.forEach(p => {
                 const link = `cardapio.html?loja=${p.slug || p.id}`;
                 container.innerHTML += `
-                    <div class="bg-white p-6 rounded-[2.5rem] shadow-lg border border-gray-50 flex flex-col items-center text-center transition-all hover:-translate-y-1 hover:shadow-xl cursor-pointer group animate-fade" onclick="window.location.href='${link}'">
+                    <div class="bg-white p-6 rounded-[2.5rem] shadow-lg border border-gray-50 flex flex-col items-center text-center transition-all hover:-translate-y-1 hover:shadow-xl cursor-pointer group animate-fade relative" onclick="window.location.href='${link}'">
+                        ${p.plan_type === 'ouro' ? `
+                            <span class="absolute top-4 right-4 bg-yellow-400 text-yellow-900 text-[8px] font-black px-2 py-1 rounded-lg uppercase italic shadow-sm flex items-center gap-1">
+                                ⭐ DESTAQUE
+                            </span>` : ''}
                         <div class="w-24 h-24 bg-gray-50 rounded-full mb-4 overflow-hidden border-4 border-white shadow-md group-hover:border-orange-100">
                             <img src="${p.logo}" class="w-full h-full object-cover">
                         </div>

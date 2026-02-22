@@ -43,8 +43,8 @@
         </div>
     </header>
 
-    <div id="instrucao-fracao" class="hidden sticky top-0 bg-orange-500 text-white text-center py-3 z-[60] font-black uppercase italic text-[10px] tracking-widest shadow-md">
-        🍕 Escolha o 2º sabor para completar!
+    <div id="instrucao-fracao" class="hidden sticky top-0 bg-orange-500 text-white text-center py-3 z-[60] font-black uppercase italic text-[10px] tracking-widest shadow-md transition-colors duration-300">
+        🍕 Escolha o 1º sabor da sua Pizza!
     </div>
 
     <nav class="sticky top-0 bg-white/95 backdrop-blur-sm z-30 py-3 px-4 overflow-x-auto no-scrollbar whitespace-nowrap shadow-sm border-b flex gap-2" id="nav-categorias"></nav>
@@ -136,11 +136,13 @@
 
             cats.forEach((cat, idx) => {
                 nav.innerHTML += `<a href="#cat-${idx}" class="px-5 py-2.5 bg-gray-100 rounded-full text-sm font-bold text-gray-500 shrink-0">${cat}</a>`;
-                let h = `<section id="cat-${idx}" class="scroll-mt-40"><h2 class="text-xl font-black italic uppercase mb-4 ml-2"><span class="w-1.5 h-6 bg-orange-500 rounded-full inline-block mr-2"></span>${cat}</h2><div class="space-y-3">`;
+                
+                // Adicionada a classe categoria-section para manipulação visual no filtro
+                let h = `<section id="cat-${idx}" class="categoria-section scroll-mt-40"><h2 class="text-xl font-black italic uppercase mb-4 ml-2"><span class="w-1.5 h-6 bg-orange-500 rounded-full inline-block mr-2"></span>${cat}</h2><div class="space-y-3">`;
+                
                 produtos.filter(p => (p.categoria_produtos || 'Geral') === cat).forEach(p => {
-                    
-                    // Estrutura Restaurada com os botões + e - e a proteção de cliques (stopPropagation)
-                    h += `<div id="card-${p.id}" class="bg-white p-4 rounded-[2rem] shadow-sm border flex gap-4 items-center cursor-pointer transition-all active:scale-[0.98]" onclick="gerenciarClique('${p.id}', '${p.name}', ${p.price}, ${p.permite_fracao})">
+                    // Adicionada a classe produto-card e data-fracao para o filtro
+                    h += `<div id="card-${p.id}" class="produto-card bg-white p-4 rounded-[2rem] shadow-sm border flex gap-4 items-center cursor-pointer transition-all active:scale-[0.98]" data-fracao="${p.permite_fracao}" onclick="gerenciarClique('${p.id}', '${p.name}', ${p.price}, ${p.permite_fracao})">
                         <img src="${p.image_url}" onerror="this.src='https://via.placeholder.com/150'" class="w-24 h-24 object-cover rounded-2xl shrink-0">
                         <div class="flex-1 min-w-0">
                             <h3 class="font-black text-sm uppercase truncate">${p.name}</h3>
@@ -158,32 +160,77 @@
             });
         }
 
+        // LÓGICA ATUALIZADA: FILTRO VISUAL AO ATIVAR O MEIO A MEIO
         function alternarModoFracao() {
             modoMeioAMeioAtivo = !modoMeioAMeioAtivo;
-            const btn = document.getElementById('btn-modo-fracao'), instr = document.getElementById('instrucao-fracao');
+            const btn = document.getElementById('btn-modo-fracao');
+            const instr = document.getElementById('instrucao-fracao');
+            const cards = document.querySelectorAll('.produto-card');
+            const sections = document.querySelectorAll('.categoria-section');
+
             if (modoMeioAMeioAtivo) {
+                // Ativando Modo
                 btn.className = "w-full py-4 rounded-2xl bg-orange-500 text-white font-black uppercase italic text-xs shadow-sm transition-all";
                 instr.classList.remove('hidden');
-                document.getElementById('txt-modo').innerText = "Modo Meio à Meio Ativo (Cancelar)";
+                instr.innerHTML = "🍕 Escolha o 1º sabor da sua Pizza!";
+                document.getElementById('txt-modo').innerText = "Cancelar Modo Meio à Meio";
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                // Filtra os cards (Oculta quem não permite fração)
+                cards.forEach(c => {
+                    if (c.getAttribute('data-fracao') !== 'true') c.classList.add('hidden');
+                });
+                
+                // Oculta categorias que ficaram vazias após o filtro
+                sections.forEach(s => {
+                    const visiveis = s.querySelectorAll('.produto-card:not(.hidden)').length;
+                    if (visiveis === 0) s.classList.add('hidden');
+                });
+
             } else {
+                // Desativando Modo
                 btn.className = "w-full py-4 rounded-2xl border-2 border-orange-500 text-orange-600 font-black uppercase italic text-xs bg-white shadow-sm transition-all";
                 instr.classList.add('hidden');
                 document.getElementById('txt-modo').innerText = "Quero montar Meio à Meio";
-                if(sabor1) document.getElementById(`card-${sabor1.id}`).classList.remove('selecionado-fracao');
+
+                // Mostra todos os produtos e categorias novamente
+                cards.forEach(c => c.classList.remove('hidden'));
+                sections.forEach(s => s.classList.remove('hidden'));
+
+                if (sabor1) document.getElementById(`card-${sabor1.id}`).classList.remove('selecionado-fracao');
                 sabor1 = null;
             }
         }
 
+        // LÓGICA ATUALIZADA: FEEDBACK VISUAL NO CLIQUE
         function gerenciarClique(id, nome, preco, permiteFracao) {
             if (modoMeioAMeioAtivo && permiteFracao) {
+                const instr = document.getElementById('instrucao-fracao');
+                
                 if (!sabor1) {
                     sabor1 = { n: nome, p: preco, id: id };
                     document.getElementById(`card-${id}`).classList.add('selecionado-fracao');
+                    // Atualiza a barra avisando qual foi o 1º sabor
+                    instr.innerHTML = `🍕 1º Sabor: <b>${nome}</b>. Escolha o 2º!`;
                 } else {
                     const nomeFinal = `1/2 ${sabor1.n} + 1/2 ${nome}`;
                     carrinho.push({ n: nomeFinal, p: (sabor1.p + preco) / 2 });
+                    
                     document.getElementById(`card-${sabor1.id}`).classList.remove('selecionado-fracao');
-                    sabor1 = null; alternarModoFracao(); updateUI(nomeFinal);
+                    
+                    // Feedback visual de sucesso antes de fechar o modo
+                    instr.innerHTML = `✅ Adicionado: 1/2 ${sabor1.n} + 1/2 ${nome}`;
+                    instr.classList.replace('bg-orange-500', 'bg-green-500');
+                    
+                    sabor1 = null; 
+                    updateUI(nomeFinal);
+                    
+                    // Aguarda 1.5s para o cliente ler a mensagem verde e reseta
+                    setTimeout(() => {
+                        modoMeioAMeioAtivo = true; // Força true para que a função entenda e desative corretamente
+                        alternarModoFracao();
+                        instr.classList.replace('bg-green-500', 'bg-orange-500'); // Reseta a cor para a próxima
+                    }, 1500);
                 }
             } else {
                 carrinho.push({ n: nome, p: preco }); updateUI(nome);

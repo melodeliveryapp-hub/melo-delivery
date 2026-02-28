@@ -63,7 +63,9 @@
             }).map(p => {
                 const extra = info?.find(i => i.tenant_id === p.id);
                 
-                let aberto = false;
+                // Lojas recém-criadas aparecem abertas por padrão até o lojista configurar
+                let aberto = true; 
+                
                 if (extra?.opening_time && extra?.closing_time) {
                     const parseMin = (s) => s.split(':').map(Number)[0] * 60 + s.split(':').map(Number)[1];
                     const minAb = parseMin(extra.opening_time);
@@ -90,25 +92,34 @@
             const msg = document.getElementById('msg-indicacao');
             container.innerHTML = '';
             
-            if (lista.length > 0) msg.classList.remove('hidden');
+            if (lista.length > 0) {
+                msg.classList.remove('hidden');
+                lista.forEach(p => {
+                    const link = `cardapio.html?loja=${p.slug || p.id}`;
+                    container.innerHTML += `
+                        <div class="bg-white p-6 rounded-[2.5rem] shadow-lg border border-gray-50 flex flex-col items-center text-center transition-all hover:-translate-y-1 hover:shadow-xl cursor-pointer group animate-fade relative" onclick="window.location.href='${link}'">
+                            ${p.plan_type === 'ouro' ? `<span class="absolute top-4 right-4 bg-yellow-400 text-yellow-900 text-[8px] font-black px-2 py-1 rounded-lg uppercase italic shadow-sm">⭐ DESTAQUE</span>` : ''}
+                            
+                            <div class="absolute top-4 left-4 flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full ${p.aberto ? 'bg-green-500 animate-pulse' : 'bg-red-500'}"></span>
+                                <span class="text-[8px] font-black uppercase italic ${p.aberto ? 'text-green-600' : 'text-red-600'}">${p.aberto ? 'Aberto' : 'Fechado'}</span>
+                            </div>
 
-            lista.forEach(p => {
-                const link = `cardapio.html?loja=${p.slug || p.id}`;
-                container.innerHTML += `
-                    <div class="bg-white p-6 rounded-[2.5rem] shadow-lg border border-gray-50 flex flex-col items-center text-center transition-all hover:-translate-y-1 hover:shadow-xl cursor-pointer group animate-fade relative" onclick="window.location.href='${link}'">
-                        ${p.plan_type === 'ouro' ? `<span class="absolute top-4 right-4 bg-yellow-400 text-yellow-900 text-[8px] font-black px-2 py-1 rounded-lg uppercase italic shadow-sm">⭐ DESTAQUE</span>` : ''}
-                        
-                        <div class="absolute top-4 left-4 flex items-center gap-1">
-                            <span class="w-2 h-2 rounded-full ${p.aberto ? 'bg-green-500 animate-pulse' : 'bg-red-500'}"></span>
-                            <span class="text-[8px] font-black uppercase italic ${p.aberto ? 'text-green-600' : 'text-red-600'}">${p.aberto ? 'Aberto' : 'Fechado'}</span>
-                        </div>
-
-                        <div class="w-24 h-24 bg-gray-50 rounded-full mb-4 overflow-hidden border-4 border-white shadow-md group-hover:border-orange-100">
-                            <img src="${p.logo}" class="w-full h-full object-cover">
-                        </div>
-                        <h3 class="text-lg font-black italic text-gray-800 uppercase tracking-tighter">${p.store_name}</h3>
+                            <div class="w-24 h-24 bg-gray-50 rounded-full mb-4 overflow-hidden border-4 border-white shadow-md group-hover:border-orange-100">
+                                <img src="${p.logo}" class="w-full h-full object-cover">
+                            </div>
+                            <h3 class="text-lg font-black italic text-gray-800 uppercase tracking-tighter">${p.store_name}</h3>
+                        </div>`;
+                });
+            } else {
+                // Correção Visual: Se a busca não encontrar nada, oculta o título e mostra uma mensagem amigável
+                msg.classList.add('hidden');
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12 animate-fade">
+                        <div class="text-4xl mb-4 grayscale opacity-50">🏪</div>
+                        <p class="text-gray-400 font-black uppercase italic tracking-widest text-xs">Nenhuma loja encontrada.</p>
                     </div>`;
-            });
+            }
         }
 
         function filtrarLojas() {

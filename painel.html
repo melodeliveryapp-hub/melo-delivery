@@ -54,67 +54,117 @@
                 </div>
                 <button id="btn-novo-item" onclick="abrirModalCriacao()" class="bg-orange-500 text-white px-6 py-3 rounded-xl font-black italic uppercase text-xs shadow-lg active:scale-95 tracking-widest">+ NOVO</button>
             </section>
-            
             <div id="lista-produtos" class="space-y-8"></div>
         </div>
 
         <div id="conteudo-loja" class="hidden animate-fade space-y-6">
             <section id="status-assinatura-container" class="animate-fade"></section>
+            
             <section class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm space-y-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="space-y-3">
-                        <label class="text-[10px] font-black uppercase text-orange-500 tracking-widest">Banner</label>
-                        <div id="box-banner" class="relative h-32 bg-gray-100 rounded-2xl overflow-hidden border-2 border-dashed border-gray-200 group">
-                            <img id="preview-banner" class="w-full h-full object-cover opacity-50"><input type="file" id="file-banner" onchange="uploadMidia('banner')" class="absolute inset-0 opacity-0 cursor-pointer">
-                        </div>
+                <div>
+                    <h2 class="text-xs font-black uppercase text-gray-400 mb-4 italic tracking-widest">Dados do Negócio</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" id="inp-nome-loja" placeholder="Nome da Loja" class="bg-gray-50 p-4 rounded-xl font-bold border text-gray-600 outline-none w-full">
+                        <input type="text" id="inp-zap-loja" placeholder="WhatsApp (Ex: 88999999999)" class="bg-gray-50 p-4 rounded-xl font-bold border text-gray-600 outline-none w-full">
                     </div>
-                    <div class="space-y-3">
-                        <label class="text-[10px] font-black uppercase text-orange-500 tracking-widest">Logo</label>
-                        <div id="box-logo" class="relative w-32 h-32 mx-auto bg-gray-100 rounded-2xl overflow-hidden border-2 border-dashed border-gray-200 group">
-                            <img id="preview-logo" class="w-full h-full object-cover"><input type="file" id="file-logo" onchange="uploadMidia('logo')" class="absolute inset-0 opacity-0 cursor-pointer">
+                    <button id="btn-salvar-dados" onclick="salvarDadosBasicos()" class="w-full mt-4 bg-gray-900 text-white py-3 rounded-xl font-black italic uppercase text-xs">ATUALIZAR NOME/ZAP</button>
+                </div>
+
+                <div class="border-t border-gray-50 pt-6">
+                    <h2 class="text-xs font-black uppercase text-gray-400 mb-4 italic tracking-widest">Identidade Visual</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-black uppercase text-orange-500 tracking-widest">Banner</label>
+                            <div id="box-banner" class="relative h-32 bg-gray-100 rounded-2xl overflow-hidden border-2 border-dashed border-gray-200 group">
+                                <img id="preview-banner" class="w-full h-full object-cover opacity-50"><input type="file" id="file-banner" onchange="uploadMidia('banner')" class="absolute inset-0 opacity-0 cursor-pointer">
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-black uppercase text-orange-500 tracking-widest">Logo</label>
+                            <div id="box-logo" class="relative w-32 h-32 mx-auto bg-gray-100 rounded-2xl overflow-hidden border-2 border-dashed border-gray-200 group">
+                                <img id="preview-logo" class="w-full h-full object-cover"><input type="file" id="file-logo" onchange="uploadMidia('logo')" class="absolute inset-0 opacity-0 cursor-pointer">
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="pt-6 border-t border-gray-50">
-                    <h2 class="text-xs font-black uppercase text-gray-400 mb-6 italic tracking-widest">Taxas</h2>
+
+                <div class="border-t border-gray-50 pt-6">
+                    <h2 class="text-xs font-black uppercase text-gray-400 mb-4 italic tracking-widest">Taxas de Entrega</h2>
                     <div class="grid grid-cols-2 gap-4">
-                        <input type="number" id="fee-main" placeholder="Centro" class="bg-gray-50 p-4 rounded-xl font-bold border text-gray-600 outline-none">
-                        <input type="number" id="fee-far" placeholder="Bairros" class="bg-gray-50 p-4 rounded-xl font-bold border text-gray-600 outline-none">
+                        <input type="number" step="0.01" id="fee-main" placeholder="Centro" class="bg-gray-50 p-4 rounded-xl font-bold border text-gray-600 outline-none">
+                        <input type="number" step="0.01" id="fee-far" placeholder="Bairros" class="bg-gray-50 p-4 rounded-xl font-bold border text-gray-600 outline-none">
                     </div>
-                    <button id="btn-salvar-taxas" onclick="salvarConfigLoja()" class="w-full mt-6 bg-gray-900 text-white py-4 rounded-xl font-black italic uppercase text-xs">ATUALIZAR</button>
+                    <button id="btn-salvar-taxas" onclick="salvarTaxas()" class="w-full mt-4 bg-gray-900 text-white py-3 rounded-xl font-black italic uppercase text-xs">ATUALIZAR TAXAS</button>
                 </div>
             </section>
         </div>
     </main>
 
     <div id="modal-produto" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-lg rounded-3xl p-8 shadow-2xl relative border border-gray-100 overflow-y-auto max-h-screen">
+        <div class="bg-white w-full max-w-lg rounded-3xl p-8 shadow-2xl relative border border-gray-100 overflow-y-auto max-h-screen no-scrollbar">
             <h3 class="text-2xl font-black italic text-gray-800 mb-6 uppercase tracking-tighter">Gerir Item</h3>
-            <form onsubmit="salvarProduto(event)" class="space-y-4">
+            
+            <form id="form-cadastro" onsubmit="salvarProduto(event)" class="space-y-4">
                 <input type="hidden" id="prod-id-edit">
+                
                 <div class="w-full h-32 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden group">
                     <input type="file" id="prod-img" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="previewImg(this)">
                     <img id="img-preview" src="" class="hidden w-full h-full object-cover">
                     <div id="upload-txt" class="text-center text-gray-400"><span class="text-2xl">📸</span><p class="text-[9px] font-black uppercase">Foto do Produto</p></div>
                 </div>
+                
                 <input type="text" id="prod-nome" placeholder="Nome do Produto" required class="w-full p-4 bg-gray-50 rounded-xl font-bold border text-gray-600 outline-none">
                 
                 <div class="grid grid-cols-2 gap-4">
                     <input type="number" id="prod-preco" step="0.01" placeholder="Preço" required class="p-4 bg-gray-50 rounded-xl font-bold border text-gray-600 outline-none">
-                    <input type="text" id="prod-unidade" placeholder="Unidade (ml, kg, un)" class="p-4 bg-gray-50 rounded-xl font-bold border text-gray-600 outline-none">
+                    <input type="text" id="prod-unidade" placeholder="Unid (ml, kg, un)" class="p-4 bg-gray-50 rounded-xl font-bold border text-gray-600 outline-none">
                 </div>
 
-                <input list="categorias-existentes" id="prod-cat" placeholder="Categoria" class="w-full p-4 bg-gray-50 rounded-xl font-bold border text-gray-600 outline-none">
+                <input list="categorias-existentes" id="prod-cat" placeholder="Categoria" required class="w-full p-4 bg-gray-50 rounded-xl font-bold border text-gray-600 outline-none">
                 <datalist id="categorias-existentes"></datalist>
 
                 <textarea id="prod-desc" rows="2" placeholder="Descrição" class="w-full p-4 bg-gray-50 rounded-xl font-bold border text-gray-600 outline-none resize-none"></textarea>
                 
                 <div class="flex items-center gap-2 p-3 bg-orange-50 rounded-xl border border-orange-100">
                     <input type="checkbox" id="prod-fracao" class="w-5 h-5 accent-orange-500">
-                    <label for="prod-fracao" class="text-[10px] font-black uppercase italic text-orange-600 cursor-pointer">Ativar "Meio à Meio" para este item</label>
+                    <label for="prod-fracao" class="text-[10px] font-black uppercase italic text-orange-600 cursor-pointer">Ativar "Meio a Meio" para este item</label>
                 </div>
 
-                <div class="flex gap-2 pt-2">
+                <button type="button" onclick="document.getElementById('config-avancadas').classList.toggle('hidden')" class="w-full py-4 bg-gray-100 text-gray-600 rounded-xl font-black italic uppercase text-[10px] mt-2 border border-gray-200 hover:bg-gray-200 transition-all">
+                    ⚙️ Configurações Avançadas (Opcional)
+                </button>
+
+                <div id="config-avancadas" class="hidden space-y-6 pt-4 border-t border-gray-100 mt-4 bg-gray-50 p-4 rounded-xl">
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-orange-500 tracking-widest block mb-2">Características Especiais</label>
+                        <div class="flex flex-wrap gap-2">
+                            <label class="text-xs bg-white border border-gray-200 p-2 rounded-lg cursor-pointer flex items-center gap-1"><input type="checkbox" class="tag-checkbox accent-orange-500" value="Vegetariano"> 🍃 Vegetariano</label>
+                            <label class="text-xs bg-white border border-gray-200 p-2 rounded-lg cursor-pointer flex items-center gap-1"><input type="checkbox" class="tag-checkbox accent-orange-500" value="Zero Lactose"> 🚫 Zero Lactose</label>
+                            <label class="text-xs bg-white border border-gray-200 p-2 rounded-lg cursor-pointer flex items-center gap-1"><input type="checkbox" class="tag-checkbox accent-orange-500" value="Sem Açúcar"> 🍬 Sem Açúcar</label>
+                            <label class="text-xs bg-white border border-gray-200 p-2 rounded-lg cursor-pointer flex items-center gap-1"><input type="checkbox" class="tag-checkbox accent-orange-500" value="Orgânico"> 🌾 Orgânico</label>
+                        </div>
+                    </div>
+
+                    <div>
+                         <label class="text-[10px] font-black uppercase text-orange-500 tracking-widest block mb-2">Disponibilidade</label>
+                         <select id="prod-disp" class="w-full p-3 bg-white rounded-xl font-bold border border-gray-200 text-gray-600 outline-none text-xs">
+                             <option value="sempre">Sempre Disponível</option>
+                             <option value="fds">Apenas Finais de Semana</option>
+                             <option value="esgotado">Esgotado (Ocultar do Cliente)</option>
+                         </select>
+                    </div>
+
+                    <div>
+                         <label class="text-[10px] font-black uppercase text-orange-500 tracking-widest block mb-2 flex justify-between items-center">
+                             Grupos de Complementos
+                             <span class="text-gray-400 normal-case font-medium text-[8px]">Ex: Escolha o Ponto...</span>
+                         </label>
+                         <div id="container-grupos" class="space-y-4 mb-3"></div>
+                         <button type="button" onclick="addGrupo()" class="w-full py-3 border-2 border-dashed border-orange-300 bg-orange-50 text-orange-500 rounded-xl font-black text-[10px] uppercase italic active:scale-95 transition-all">+ Novo Grupo de Complementos</button>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 pt-4">
                     <button type="submit" id="btn-salvar-produto" class="flex-1 py-4 bg-orange-500 text-white font-black italic uppercase text-xs rounded-xl shadow-lg">SALVAR</button>
                     <button type="button" onclick="fecharModalProduto()" class="flex-1 py-4 bg-gray-100 text-gray-400 font-black italic uppercase text-xs rounded-xl">CANCELAR</button>
                 </div>
@@ -127,6 +177,7 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZndyYmp4aXRjcmt0Y2NkcnBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MjQ5NTksImV4cCI6MjA4NjIwMDk1OX0.nyGJxdNT-qiH-oqJL4KDKA-7bRtlj5UxmXy32RswPUc';
         const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let user = null, produtosCache = [], statusAtivo = true, limiteProdutos = 10, planoLojista = 'bronze';
+        let gruposAdicionais = []; 
 
         async function checkAuth() {
             const { data: { session } } = await sbClient.auth.getSession();
@@ -135,11 +186,15 @@
         }
 
         async function carregarDadosLoja() {
-            const { data: profile } = await sbClient.from('profiles').select('*').eq('id', user.id).single();
+            const { data: profArr } = await sbClient.from('profiles').select('*').eq('id', user.id).limit(1);
+            const profile = profArr && profArr.length > 0 ? profArr[0] : null;
+            
             if(profile) {
                 document.getElementById('nome-loja-nav').innerText = profile.store_name;
                 document.getElementById('btn-ver-loja').onclick = () => window.open(`cardapio.html?loja=${profile.slug || profile.id}`, '_blank');
-                
+                document.getElementById('inp-nome-loja').value = profile.store_name || "";
+                document.getElementById('inp-zap-loja').value = profile.whatsapp_number || "";
+
                 const hoje = new Date().toISOString().split('T')[0];
                 const trialVencido = profile.trial_end && hoje > profile.trial_end;
                 statusAtivo = profile.plan_status !== false && !trialVencido;
@@ -147,14 +202,16 @@
                 if(!statusAtivo) {
                     const b = document.getElementById('plan-alert'); b.classList.remove('hidden');
                     if(trialVencido) b.innerHTML = `⚠️ SEU ACESSO EXPIROU EM ${profile.trial_end}. CARDÁPIO OFFLINE. <a href="https://wa.me/5588999465376" class="underline ml-1">Falar com Suporte ➔</a>`;
-                    ['btn-salvar-horario','btn-novo-item','btn-salvar-taxas','box-banner','box-logo'].forEach(id => document.getElementById(id).classList.add('plan-blocked'));
+                    ['btn-salvar-horario','btn-novo-item','btn-salvar-taxas','btn-salvar-dados','box-banner','box-logo'].forEach(id => document.getElementById(id).classList.add('plan-blocked'));
                 }
 
                 planoLojista = profile.plan_type || 'bronze';
                 limiteProdutos = planoLojista === 'bronze' ? 10 : (planoLojista === 'prata' ? 30 : 9999);
                 renderizarCardPlano(profile.trial_end);
                 
-                const { data: info } = await sbClient.from('store_info').select('*').eq('tenant_id', user.id).maybeSingle();
+                const { data: infoArr } = await sbClient.from('store_info').select('*').eq('tenant_id', user.id).limit(1);
+                const info = infoArr && infoArr.length > 0 ? infoArr[0] : null;
+                
                 if (info) {
                     document.getElementById('inp-abre').value = info.opening_time || "";
                     document.getElementById('inp-fecha').value = info.closing_time || "";
@@ -162,24 +219,69 @@
                     document.getElementById('fee-far').value = info.delivery_fee_far || 0;
                     if(info.banner_url) document.getElementById('preview-banner').src = info.banner_url;
                     if(info.logo_url) document.getElementById('preview-logo').src = info.logo_url;
+                } else {
+                    await sbClient.from('store_info').insert({ tenant_id: user.id, opening_time: '00:00', closing_time: '23:59', delivery_fee_main: 0, delivery_fee_far: 0 });
+                    document.getElementById('inp-abre').value = "00:00"; document.getElementById('inp-fecha').value = "23:59";
                 }
             }
             carregarProdutos();
         }
 
+        async function salvarDadosBasicos() {
+            if(!statusAtivo) return; 
+            const nome = document.getElementById('inp-nome-loja').value.trim();
+            const zap = document.getElementById('inp-zap-loja').value.trim();
+            
+            if(!nome) return alert("O Nome da Loja não pode ficar vazio!");
+            
+            const btn = document.getElementById('btn-salvar-dados'); 
+            btn.classList.add('btn-loading');
+            
+            await sbClient.from('profiles').update({ store_name: nome, whatsapp_number: zap }).eq('id', user.id);
+            document.getElementById('nome-loja-nav').innerText = nome;
+            btn.classList.remove('btn-loading'); 
+            alert("Dados da Loja atualizados com sucesso!");
+        }
+
+        async function salvarHorario() { 
+            if(!statusAtivo) return; 
+            const abre = document.getElementById('inp-abre').value || "00:00";
+            const fecha = document.getElementById('inp-fecha').value || "23:59";
+            
+            const btn = document.getElementById('btn-salvar-horario'); 
+            btn.classList.add('btn-loading'); 
+            
+            await sbClient.from('store_info').update({ opening_time: abre, closing_time: fecha }).eq('tenant_id', user.id); 
+            btn.classList.remove('btn-loading'); 
+            alert("Horário de Funcionamento salvo!"); 
+        }
+        
+        async function salvarTaxas() { 
+            if(!statusAtivo) return; 
+            const btn = document.getElementById('btn-salvar-taxas'); 
+            btn.classList.add('btn-loading'); 
+            
+            await sbClient.from('store_info').update({ 
+                delivery_fee_main: parseFloat(document.getElementById('fee-main').value) || 0, 
+                delivery_fee_far: parseFloat(document.getElementById('fee-far').value) || 0 
+            }).eq('tenant_id', user.id); 
+            
+            btn.classList.remove('btn-loading'); 
+            alert("Taxas salvas!"); 
+        }
+
+        async function uploadMidia(tipo) {
+            if(!statusAtivo) return; const box = document.getElementById(`box-${tipo}`); const f = document.getElementById(`file-${tipo}`).files[0]; if(!f) return;
+            box.classList.add('btn-loading'); const fn = `lojas/${user.id}/${tipo}_${Date.now()}`;
+            await sbClient.storage.from('product-images').upload(fn, f);
+            const url = sbClient.storage.from('product-images').getPublicUrl(fn).data.publicUrl;
+            await sbClient.from('store_info').update(tipo==='banner'?{banner_url:url}:{logo_url:url}).eq('tenant_id', user.id);
+            document.getElementById(`preview-${tipo}`).src = url; box.classList.remove('btn-loading');
+        }
+
         function renderizarCardPlano(trial) {
             const container = document.getElementById('status-assinatura-container');
-            container.innerHTML = `
-                <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div class="flex-1 w-full">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="text-[10px] font-black uppercase text-orange-500 tracking-widest">Plano: ${planoLojista}</span>
-                            <span class="px-2 py-0.5 bg-orange-50 text-orange-600 text-[8px] font-black rounded-full uppercase italic">Vencimento: ${trial || '--'}</span>
-                        </div>
-                        <div class="w-full bg-gray-100 h-2 rounded-full mt-2 overflow-hidden"><div id="barra-progresso" class="bg-orange-500 h-full transition-all duration-700" style="width: 0%"></div></div>
-                        <p id="txt-progresso" class="text-[9px] text-gray-400 mt-2 font-bold uppercase italic tracking-tighter">Sincronizando...</p>
-                    </div>
-                </div>`;
+            container.innerHTML = `<div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4"><div class="flex-1 w-full"><div class="flex items-center gap-2 mb-1"><span class="text-[10px] font-black uppercase text-orange-500 tracking-widest">Plano: ${planoLojista}</span><span class="px-2 py-0.5 bg-orange-50 text-orange-600 text-[8px] font-black rounded-full uppercase italic">Vencimento: ${trial || '--'}</span></div><div class="w-full bg-gray-100 h-2 rounded-full mt-2 overflow-hidden"><div id="barra-progresso" class="bg-orange-500 h-full transition-all duration-700" style="width: 0%"></div></div><p id="txt-progresso" class="text-[9px] text-gray-400 mt-2 font-bold uppercase italic tracking-tighter">Sincronizando...</p></div></div>`;
         }
 
         async function carregarProdutos() {
@@ -193,108 +295,85 @@
                 document.getElementById('txt-progresso').innerText = `${qtd} de ${limiteProdutos === 9999 ? '∞' : limiteProdutos} produtos cadastrados`;
             }
 
-            const lista = document.getElementById('lista-produtos');
-            lista.innerHTML = '';
+            const lista = document.getElementById('lista-produtos'); lista.innerHTML = '';
+            const dataList = document.getElementById('categorias-existentes'); dataList.innerHTML = '';
             const categorias = [...new Set(produtosCache.map(p => p.categoria_produtos || 'Geral'))];
             
             categorias.forEach(cat => {
+                dataList.innerHTML += `<option value="${cat}">`;
                 let catHtml = `<div class="space-y-3"><h2 class="text-xs font-black uppercase italic text-orange-500 tracking-widest flex items-center gap-2"><span class="w-4 h-[2px] bg-orange-200"></span> ${cat}</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
                 produtosCache.filter(p => (p.categoria_produtos || 'Geral') === cat).forEach(p => {
-                    const ativo = p.is_active !== false;
-                    catHtml += `<div class="bg-white p-4 rounded-2xl border flex items-center justify-between shadow-sm transition-all hover:border-orange-200 ${ativo ? '' : 'opacity-40 grayscale'}">
-                        <div class="flex items-center gap-3 min-w-0 flex-1">
-                            <img src="${p.image_url}" onerror="this.src='https://via.placeholder.com/100'" class="w-12 h-12 rounded-lg object-cover bg-gray-50">
-                            <div class="truncate">
-                                <h3 class="font-bold text-gray-800 text-[11px] uppercase italic truncate">${p.name}</h3>
-                                <p class="text-green-600 font-black text-xs italic">R$ ${parseFloat(p.price).toFixed(2)} ${p.unidade ? `<small class='text-gray-400 font-bold ml-1'>/ ${p.unidade}</small>` : ''}</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="abrirModalEdicao('${p.id}')" class="p-2 hover:scale-110 ${!statusAtivo ? 'plan-blocked' : ''}">✏️</button>
-                            <button onclick="deleteProduto('${p.id}')" class="p-2 hover:scale-110 ${!statusAtivo ? 'plan-blocked' : ''}">🗑️</button>
-                            <button onclick="toggleStatus('${p.id}', ${ativo})" class="text-[9px] font-black uppercase px-3 py-1.5 rounded-lg border ${ativo ? 'bg-orange-50 text-orange-500' : 'bg-green-50 text-green-600'} ${!statusAtivo ? 'plan-blocked' : ''}">${ativo?'PAUSAR':'ATIVAR'}</button>
-                        </div>
-                    </div>`;
+                    const ativo = p.is_active !== false; let tagsBadge = '';
+                    if (p.opcoes_avancadas && p.opcoes_avancadas.caracteristicas && p.opcoes_avancadas.caracteristicas.length > 0) {
+                        tagsBadge = `<span class="ml-2 text-[8px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded uppercase font-bold tracking-widest">${p.opcoes_avancadas.caracteristicas.length} TAGS</span>`;
+                    }
+                    catHtml += `<div class="bg-white p-4 rounded-2xl border flex items-center justify-between shadow-sm transition-all hover:border-orange-200 ${ativo ? '' : 'opacity-40 grayscale'}"><div class="flex items-center gap-3 min-w-0 flex-1"><img src="${p.image_url}" onerror="this.src='https://via.placeholder.com/100'" class="w-12 h-12 rounded-lg object-cover bg-gray-50"><div class="truncate"><h3 class="font-bold text-gray-800 text-[11px] uppercase italic truncate">${p.name} ${tagsBadge}</h3><p class="text-green-600 font-black text-xs italic">R$ ${parseFloat(p.price).toFixed(2)} ${p.unidade ? `<small class='text-gray-400 font-bold ml-1'>/ ${p.unidade}</small>` : ''}</p></div></div><div class="flex gap-2"><button onclick="abrirModalEdicao('${p.id}')" class="p-2 hover:scale-110 ${!statusAtivo ? 'plan-blocked' : ''}">✏️</button><button onclick="deleteProduto('${p.id}')" class="p-2 hover:scale-110 ${!statusAtivo ? 'plan-blocked' : ''}">🗑️</button><button onclick="toggleStatus('${p.id}', ${ativo})" class="text-[9px] font-black uppercase px-3 py-1.5 rounded-lg border ${ativo ? 'bg-orange-50 text-orange-500' : 'bg-green-50 text-green-600'} ${!statusAtivo ? 'plan-blocked' : ''}">${ativo?'PAUSAR':'ATIVAR'}</button></div></div>`;
                 });
-                catHtml += `</div></div>`;
-                lista.innerHTML += catHtml;
+                catHtml += `</div></div>`; lista.innerHTML += catHtml;
             });
         }
 
         async function deleteProduto(id) { if(!statusAtivo) return; if(confirm("Excluir?")) { await sbClient.from('products').delete().eq('id', id); carregarProdutos(); } }
-        
-        async function salvarProduto(e) {
-            e.preventDefault(); if(!statusAtivo) return;
-            const btn = document.getElementById('btn-salvar-produto');
-            const id = document.getElementById('prod-id-edit').value;
-            if(!id && produtosCache.length >= limiteProdutos) return alert("Limite do plano!");
-            
-            btn.classList.add('btn-loading');
-            let url = document.getElementById('img-preview').src;
-            const file = document.getElementById('prod-img').files[0];
-            
-            if (file) {
-                const fn = `produtos/${user.id}/${Date.now()}`;
-                await sbClient.storage.from('product-images').upload(fn, file);
-                url = sbClient.storage.from('product-images').getPublicUrl(fn).data.publicUrl;
-            }
+        async function toggleStatus(id, a) { if(!statusAtivo) return; await sbClient.from('products').update({ is_active: !a }).eq('id', id); carregarProdutos(); }
 
-            // Tenta salvar com as novas colunas. Se falhar, tenta salvar sem elas.
-            const dadosCompletos = { 
-                name: document.getElementById('prod-nome').value, 
-                price: parseFloat(document.getElementById('prod-preco').value), 
-                unidade: document.getElementById('prod-unidade').value,
-                categoria_produtos: document.getElementById('prod-cat').value, 
-                description: document.getElementById('prod-desc').value, 
-                image_url: url.includes('data:') ? '' : url, 
-                permite_fracao: document.getElementById('prod-fracao').checked,
-                tenant_id: user.id 
-            };
-
-            let { error } = id ? 
-                await sbClient.from('products').update(dadosCompletos).eq('id', id) : 
-                await sbClient.from('products').insert(dadosCompletos);
-
-            if(error) {
-                console.warn("Falha ao salvar colunas extras. Tentando salvamento básico...");
-                const dadosBasicos = { 
-                    name: dadosCompletos.name, price: dadosCompletos.price, 
-                    categoria_produtos: dadosCompletos.categoria_produtos, 
-                    description: dadosCompletos.description, 
-                    image_url: dadosCompletos.image_url, tenant_id: user.id 
-                };
-                await (id ? sbClient.from('products').update(dadosBasicos).eq('id', id) : sbClient.from('products').insert(dadosBasicos));
-                alert("Salvo com sucesso! Nota: Unidade e Meio à Meio não salvos (colunas ausentes no Supabase).");
-            }
-            
-            btn.classList.remove('btn-loading');
-            fecharModalProduto(); carregarProdutos();
-        }
-
-        async function uploadMidia(tipo) {
-            if(!statusAtivo) return; const box = document.getElementById(`box-${tipo}`); const f = document.getElementById(`file-${tipo}`).files[0]; if(!f) return;
-            box.classList.add('btn-loading'); const fn = `lojas/${user.id}/${tipo}_${Date.now()}`;
-            await sbClient.storage.from('product-images').upload(fn, f);
-            const url = sbClient.storage.from('product-images').getPublicUrl(fn).data.publicUrl;
-            await sbClient.from('store_info').update(tipo==='banner'?{banner_url:url}:{logo_url:url}).eq('tenant_id', user.id);
-            document.getElementById(`preview-${tipo}`).src = url; box.classList.remove('btn-loading');
-        }
-
-        async function salvarHorario() { if(!statusAtivo) return; const btn = document.getElementById('btn-salvar-horario'); btn.classList.add('btn-loading'); await sbClient.from('store_info').update({ opening_time: document.getElementById('inp-abre').value, closing_time: document.getElementById('inp-fecha').value }).eq('tenant_id', user.id); btn.classList.remove('btn-loading'); alert("Salvo!"); }
-        async function salvarConfigLoja() { if(!statusAtivo) return; const btn = document.getElementById('btn-salvar-taxas'); btn.classList.add('btn-loading'); await sbClient.from('store_info').update({ delivery_fee_main: parseFloat(document.getElementById('fee-main').value) || 0, delivery_fee_far: parseFloat(document.getElementById('fee-far').value) || 0 }).eq('tenant_id', user.id); btn.classList.remove('btn-loading'); alert("Taxas salvas!"); }
-        function previewImg(i) { if (i.files && i.files[0]) { const r = new FileReader(); r.onload = e => { document.getElementById('img-preview').src = e.target.result; document.getElementById('img-preview').classList.remove('hidden'); document.getElementById('upload-txt').classList.add('hidden'); }; r.readAsDataURL(i.files[0]); } }
-        function abrirModalCriacao() { if(!statusAtivo) return; document.getElementById('prod-id-edit').value = ""; document.getElementById('img-preview').classList.add('hidden'); document.getElementById('upload-txt').classList.remove('hidden'); document.getElementById('modal-produto').classList.remove('hidden'); }
-        function fecharModalProduto() { document.getElementById('modal-produto').classList.add('hidden'); }
-        function abrirModalEdicao(id) { 
-            if(!statusAtivo) return; const p = produtosCache.find(x => x.id === id); 
-            document.getElementById('prod-id-edit').value = p.id; document.getElementById('prod-nome').value = p.name; 
-            document.getElementById('prod-preco').value = p.price; document.getElementById('prod-unidade').value = p.unidade || "";
-            document.getElementById('prod-cat').value = p.categoria_produtos; document.getElementById('prod-desc').value = p.description || ""; 
-            document.getElementById('prod-fracao').checked = p.permite_fracao || false;
-            if(p.image_url) { document.getElementById('img-preview').src = p.image_url; document.getElementById('img-preview').classList.remove('hidden'); document.getElementById('upload-txt').classList.add('hidden'); } 
+        function abrirModalCriacao() { 
+            if(!statusAtivo) return; document.getElementById('form-cadastro').reset();
+            document.getElementById('prod-id-edit').value = ""; document.getElementById('img-preview').classList.add('hidden'); document.getElementById('upload-txt').classList.remove('hidden'); document.getElementById('config-avancadas').classList.add('hidden'); 
+            document.querySelectorAll('.tag-checkbox').forEach(cb => cb.checked = false); document.getElementById('prod-disp').value = 'sempre'; gruposAdicionais = []; renderGrupos();
             document.getElementById('modal-produto').classList.remove('hidden'); 
         }
-        async function toggleStatus(id, a) { if(!statusAtivo) return; await sbClient.from('products').update({ is_active: !a }).eq('id', id); carregarProdutos(); }
+
+        function abrirModalEdicao(id) { 
+            if(!statusAtivo) return; const p = produtosCache.find(x => x.id === id); 
+            document.getElementById('prod-id-edit').value = p.id; document.getElementById('prod-nome').value = p.name; document.getElementById('prod-preco').value = p.price; document.getElementById('prod-unidade').value = p.unidade || ""; document.getElementById('prod-cat').value = p.categoria_produtos; document.getElementById('prod-desc').value = p.description || ""; document.getElementById('prod-fracao').checked = p.permite_fracao || false;
+            if(p.image_url) { document.getElementById('img-preview').src = p.image_url; document.getElementById('img-preview').classList.remove('hidden'); document.getElementById('upload-txt').classList.add('hidden'); } 
+            
+            document.querySelectorAll('.tag-checkbox').forEach(cb => cb.checked = false); document.getElementById('prod-disp').value = 'sempre'; gruposAdicionais = [];
+            if(p.opcoes_avancadas) {
+                if(p.opcoes_avancadas.caracteristicas) p.opcoes_avancadas.caracteristicas.forEach(tag => { const cb = document.querySelector(`.tag-checkbox[value="${tag}"]`); if(cb) cb.checked = true; });
+                if(p.opcoes_avancadas.disponibilidade) document.getElementById('prod-disp').value = p.opcoes_avancadas.disponibilidade;
+                if(p.opcoes_avancadas.complementos) gruposAdicionais = p.opcoes_avancadas.complementos;
+            }
+            renderGrupos(); document.getElementById('config-avancadas').classList.add('hidden'); document.getElementById('modal-produto').classList.remove('hidden'); 
+        }
+
+        async function salvarProduto(e) {
+            e.preventDefault(); if(!statusAtivo) return;
+            const btn = document.getElementById('btn-salvar-produto'), id = document.getElementById('prod-id-edit').value;
+            if(!id && produtosCache.length >= limiteProdutos) return alert("Limite do plano atingido!");
+            
+            btn.classList.add('btn-loading'); let url = document.getElementById('img-preview').src; const file = document.getElementById('prod-img').files[0];
+            if (file) { const fn = `produtos/${user.id}/${Date.now()}`; await sbClient.storage.from('product-images').upload(fn, file); url = sbClient.storage.from('product-images').getPublicUrl(fn).data.publicUrl; }
+
+            const opcoes_avancadas_json = { caracteristicas: Array.from(document.querySelectorAll('.tag-checkbox:checked')).map(cb => cb.value), disponibilidade: document.getElementById('prod-disp').value, complementos: gruposAdicionais };
+            const dadosCompletos = { name: document.getElementById('prod-nome').value, price: parseFloat(document.getElementById('prod-preco').value), unidade: document.getElementById('prod-unidade').value, categoria_produtos: document.getElementById('prod-cat').value, description: document.getElementById('prod-desc').value, image_url: url.includes('data:') ? '' : url, permite_fracao: document.getElementById('prod-fracao').checked, opcoes_avancadas: opcoes_avancadas_json, tenant_id: user.id };
+
+            let { error } = id ? await sbClient.from('products').update(dadosCompletos).eq('id', id) : await sbClient.from('products').insert(dadosCompletos);
+            if(error) alert("Erro ao salvar o item."); else { fecharModalProduto(); carregarProdutos(); }
+            btn.classList.remove('btn-loading');
+        }
+
+        function fecharModalProduto() { document.getElementById('modal-produto').classList.add('hidden'); }
+        function previewImg(i) { if (i.files && i.files[0]) { const r = new FileReader(); r.onload = e => { document.getElementById('img-preview').src = e.target.result; document.getElementById('img-preview').classList.remove('hidden'); document.getElementById('upload-txt').classList.add('hidden'); }; r.readAsDataURL(i.files[0]); } }
+
+        function addGrupo() { gruposAdicionais.push({ nome: '', obrigatorio: false, maximo: 1, itens: [] }); renderGrupos(); }
+        function updateGrupo(i, field, val) { gruposAdicionais[i][field] = val; }
+        function updateItem(i, j, field, val) { gruposAdicionais[i].itens[j][field] = field === 'preco' ? parseFloat(val)||0 : val; }
+        function addItem(i) { gruposAdicionais[i].itens.push({ nome: '', preco: 0 }); renderGrupos(); }
+        function remItem(i, j) { gruposAdicionais[i].itens.splice(j, 1); renderGrupos(); }
+        function remGrupo(i) { gruposAdicionais.splice(i, 1); renderGrupos(); }
+        
+        function renderGrupos() {
+            const container = document.getElementById('container-grupos'); container.innerHTML = '';
+            gruposAdicionais.forEach((g, i) => {
+                let itensHtml = '';
+                g.itens.forEach((item, j) => {
+                    itensHtml += `<div class="flex gap-2 mt-2 items-center bg-gray-50 border border-gray-100 p-2 rounded-lg"><input type="text" placeholder="Item (Ex: Bacon)" value="${item.nome}" oninput="updateItem(${i}, ${j}, 'nome', this.value)" class="flex-1 p-2 bg-white border border-gray-200 rounded text-xs font-bold outline-none text-gray-600"><span class="text-gray-400 text-xs font-bold">R$</span><input type="number" step="0.01" placeholder="0.00" value="${item.preco}" oninput="updateItem(${i}, ${j}, 'preco', this.value)" class="w-16 p-2 bg-white border border-gray-200 rounded text-xs font-bold outline-none text-gray-600"><button type="button" onclick="remItem(${i}, ${j})" class="text-red-400 bg-red-50 hover:bg-red-100 font-bold w-8 h-8 rounded-lg flex items-center justify-center transition-all">✕</button></div>`;
+                });
+                container.innerHTML += `<div class="bg-white border border-gray-200 p-4 rounded-2xl relative shadow-sm"><button type="button" onclick="remGrupo(${i})" class="absolute top-4 right-4 text-red-400 text-[10px] font-black uppercase italic bg-red-50 px-2 py-1 rounded">Excluir Grupo</button><input type="text" placeholder="Nome do Grupo" value="${g.nome}" oninput="updateGrupo(${i}, 'nome', this.value)" class="w-10/12 p-3 mb-3 font-black text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-xl outline-none"><div class="flex gap-4 mb-4 bg-gray-50 p-3 rounded-xl border border-gray-100"><label class="text-[11px] font-bold text-gray-600 flex items-center gap-2 cursor-pointer"><input type="checkbox" ${g.obrigatorio ? 'checked' : ''} onchange="updateGrupo(${i}, 'obrigatorio', this.checked)" class="w-4 h-4 accent-orange-500"> Obrigatório</label><label class="text-[11px] font-bold text-gray-600 flex items-center gap-2">Máximo: <input type="number" value="${g.maximo}" oninput="updateGrupo(${i}, 'maximo', this.value)" class="w-12 p-1 bg-white border border-gray-200 rounded text-center outline-none"></label></div><div class="border-t border-gray-100 pt-3"><p class="text-[10px] font-black text-orange-500 uppercase tracking-widest italic mb-2">Opções deste grupo</p>${itensHtml}<button type="button" onclick="addItem(${i})" class="mt-3 text-[10px] bg-white border border-gray-200 px-4 py-2 rounded-xl text-gray-600 font-black uppercase italic hover:bg-gray-50 transition-all">+ Adicionar Nova Opção</button></div></div>`;
+            });
+        }
+
         function mudarAba(a) { const tP = document.getElementById('tab-produtos'), tL = document.getElementById('tab-loja'), cP = document.getElementById('conteudo-produtos'), cL = document.getElementById('conteudo-loja'); if(a === 'produtos') { tP.className = "flex-1 py-4 font-black italic uppercase text-xs aba-ativa transition-all"; tL.className = "flex-1 py-4 font-black italic uppercase text-xs text-gray-400 transition-all"; cP.classList.remove('hidden'); cL.classList.add('hidden'); } else { tL.className = "flex-1 py-4 font-black italic uppercase text-xs aba-ativa transition-all"; tP.className = "flex-1 py-4 font-black italic uppercase text-xs text-gray-400 transition-all"; cL.classList.remove('hidden'); cP.classList.add('hidden'); } }
         async function logout() { await sbClient.auth.signOut(); window.location.href = 'login.html'; }
         checkAuth();

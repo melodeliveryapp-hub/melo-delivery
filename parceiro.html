@@ -53,7 +53,7 @@
                 <div class="w-full shrink-0 text-center p-12 bg-gradient-to-br from-gray-900 to-black rounded-[2rem]">
                     <div class="fase-emoji">💰</div>
                     <h4 class="text-2xl font-black uppercase italic mb-2 text-orange-500">3. Venda sem Parar</h4>
-                    <p class="text-gray-400 font-bold uppercase text-[11px] leading-relaxed">Receba pedidos organizados no WhatsApp e foque no que importa: preparar e entregar.</p>
+                    <p class="text-gray-400 font-bold uppercase text-[11px] leading-relaxed">Receba pedidos organizados no WhatsApp e foque no que importa.</p>
                 </div>
             </div>
         </div>
@@ -67,36 +67,37 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-end">
             <div class="bg-white/5 border border-white/10 p-8 rounded-[3rem] flex flex-col card-plano">
                 <h3 class="text-xl font-black italic uppercase text-orange-500 mb-4">🥉 Bronze</h3>
-                <div class="text-4xl font-black mb-6">R$ 10<span class="text-sm text-gray-500">/mês</span></div>
+                <div class="text-4xl font-black mb-6">R$ 10,00<span class="text-sm text-gray-500">/mês</span></div>
                 <ul class="text-gray-400 text-[11px] font-bold space-y-4 mb-8 flex-1 uppercase italic">
-                    <li class="text-white">✅ 7 Dias Grátis</li>
-                    <li>✅ Até 10 Produtos</li>
-                    <li>✅ Controle Total do Painel</li>
-                    <li>✅ Assistência na Criação</li>
+                    <li class="text-white">✅ 7 Dias de Teste Grátis</li>
+                    <li>✅ Painel de Controle</li>
+                    <li>✅ Cadastro de até 10 itens</li>
                 </ul>
                 <button onclick="abrirFormulario()" class="w-full py-4 bg-white/10 rounded-2xl font-black italic uppercase text-[10px]">Escolher Bronze</button>
             </div>
+            
             <div class="bg-orange-600 p-10 rounded-[3.5rem] flex flex-col shadow-2xl scale-105 relative card-plano">
                 <div class="absolute top-6 -right-12 bg-white text-orange-600 px-12 py-1 font-black text-[8px] uppercase italic rotate-45">Popular</div>
                 <h3 class="text-2xl font-black italic uppercase text-white mb-4">🥈 Prata</h3>
-                <div class="text-4xl font-black mb-6">R$ 30<span class="text-sm text-white/50">/mês</span></div>
+                <div class="text-4xl font-black mb-6">R$ 30,00<span class="text-sm text-white/50">/mês</span></div>
                 <ul class="text-white text-[11px] font-bold space-y-4 mb-8 flex-1 uppercase italic">
-                    <li class="bg-white/20 p-2 rounded-lg">✅ 7 Dias Grátis</li>
-                    <li>✅ Até 30 Produtos</li>
-                    <li>✅ Suporte VIP na Criação</li>
-                    <li>✅ Painel Administrativo Pro</li>
+                    <li class="bg-white/20 p-2 rounded-lg">✅ 7 Dias de Teste Grátis</li>
+                    <li>✅ Painel de Controle</li>
+                    <li>✅ Cadastro de até 30 itens</li>
+                    <li>✅ Suporte Personalizado</li>
                 </ul>
                 <button onclick="abrirFormulario()" class="w-full py-4 bg-white text-orange-600 rounded-2xl font-black italic uppercase text-[10px]">Escolher Prata</button>
             </div>
+            
             <div class="bg-white/5 border border-white/10 p-8 rounded-[3rem] flex flex-col card-plano">
                 <h3 class="text-xl font-black italic uppercase text-yellow-500 mb-4">🥇 Ouro</h3>
-                <div class="text-4xl font-black mb-6">R$ 70<span class="text-sm text-gray-500">/mês</span></div>
+                <div class="text-4xl font-black mb-6">R$ 75,00<span class="text-sm text-gray-500">/mês</span></div>
                 <ul class="text-gray-400 text-[11px] font-bold space-y-4 mb-8 flex-1 uppercase italic">
-                    <li class="text-yellow-500">✅ 30 Dias Grátis</li>
+                    <li class="text-yellow-500">✅ 15 Dias de Teste Grátis</li>
+                    <li>✅ Painel de Controle</li>
                     <li>✅ Produtos Ilimitados</li>
-                    <li>✅ Consultoria Personalizada</li>
-                    <li>✅ Criação Total pela Equipe</li>
-                    <li>✅ 30 Dias de Destaque</li>
+                    <li>✅ Suporte Personalizado</li>
+                    <li>✅ Vantagens Exclusivas Ouro</li>
                 </ul>
                 <button onclick="abrirFormulario()" class="w-full py-4 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded-2xl font-black italic uppercase text-[10px]">Escolher Ouro</button>
             </div>
@@ -109,20 +110,22 @@
             
             <div class="text-center mb-10">
                 <h2 class="text-3xl font-black italic uppercase tracking-tighter">Formulário de <span class="text-orange-500 italic">Parceria</span></h2>
-                <p class="text-gray-500 text-[10px] font-black uppercase italic tracking-widest mt-2">Informe seus dados para começarmos</p>
+                <p class="text-gray-500 text-[10px] font-black uppercase italic tracking-widest mt-2">Crie sua conta para acessar o painel</p>
             </div>
 
             <form id="form-cadastro" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-4">
-                    <input type="text" name="nome_lojista" required placeholder="Nome do Lojista" class="w-full p-5 rounded-2xl border border-white/10 outline-none focus:border-orange-500 font-bold">
                     <input type="text" name="nome_negocio" id="nome_loja" required placeholder="Nome do Negócio" class="w-full p-5 rounded-2xl border border-white/10 outline-none focus:border-orange-500 font-bold">
                     <input type="text" name="documento" required placeholder="CNPJ, MEI ou CPF" class="w-full p-5 rounded-2xl border border-white/10 outline-none focus:border-orange-500 font-bold">
-                </div>
-                <div class="space-y-4">
-                    <input type="email" name="email" id="email" required placeholder="Seu E-mail" class="w-full p-5 rounded-2xl border border-white/10 outline-none focus:border-orange-500 font-bold">
                     <input type="tel" name="telefone" id="telefone" required placeholder="Celular (WhatsApp)" class="w-full p-5 rounded-2xl border border-white/10 outline-none focus:border-orange-500 font-bold">
-                    <input type="text" name="horario" required placeholder="Horário de Funcionamento (ex: 18h às 23h)" class="w-full p-5 rounded-2xl border border-white/10 outline-none focus:border-orange-500 font-bold">
                 </div>
+                
+                <div class="space-y-4 bg-white/5 p-4 rounded-3xl border border-white/10">
+                    <p class="text-[10px] font-black uppercase text-orange-500 tracking-widest ml-2">Dados de Login</p>
+                    <input type="email" name="email" id="email" required placeholder="Seu E-mail" class="w-full p-5 rounded-2xl border border-white/10 outline-none focus:border-orange-500 font-bold">
+                    <input type="password" name="senha" id="senha" required minlength="6" placeholder="Crie uma Senha (mín. 6 caracteres)" class="w-full p-5 rounded-2xl border border-white/10 outline-none focus:border-orange-500 font-bold">
+                </div>
+
                 <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <select name="segmento" required class="w-full p-5 rounded-2xl border border-white/10 outline-none bg-transparent font-bold">
                         <option value="" disabled selected>Área de Segmento</option>
@@ -140,7 +143,7 @@
                 </div>
 
                 <div class="md:col-span-2 pt-4">
-                    <button type="submit" id="btn-submit" class="w-full bg-orange-600 py-6 rounded-3xl text-white font-black italic uppercase text-xs shadow-xl hover:bg-orange-500 transition-all">FINALIZAR CADASTRO E TESTAR GRÁTIS 🚀</button>
+                    <button type="submit" id="btn-submit" class="w-full bg-orange-600 py-6 rounded-3xl text-white font-black italic uppercase text-xs shadow-xl hover:bg-orange-500 transition-all">FINALIZAR CADASTRO E INICIAR TESTE 🚀</button>
                 </div>
             </form>
         </div>
@@ -154,51 +157,77 @@
         function abrirFormulario() { document.getElementById('modal-parceiro').classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
         function fecharFormulario() { document.getElementById('modal-parceiro').classList.add('hidden'); document.body.style.overflow = 'auto'; }
 
-        // Slider automático
         let cur = 0;
         setInterval(() => {
             cur = (cur + 1) % 3;
             document.getElementById('slider-container').style.transform = `translateX(-${cur * 33.333}%)`;
         }, 5000);
 
-        // Automação de Cadastro
+        // NÚCLEO DA AUTOMAÇÃO MESTRA (Com nova regra de dias)
         document.getElementById('form-cadastro').onsubmit = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-submit');
-            btn.innerText = "SINCROZINANDO..."; btn.disabled = true;
+            btn.innerText = "CRIANDO SUA CONTA..."; 
+            btn.disabled = true;
 
             const formData = new FormData(this);
+            const email = formData.get('email');
+            const senha = formData.get('senha');
             const plano = formData.get('plano');
-            const dias = plano === 'ouro' ? 30 : 7;
             
+            // Regra Atualizada: 15 dias para Ouro, 7 para os restantes
+            const dias = plano === 'ouro' ? 15 : 7;
             const hoje = new Date();
             const trialEnd = new Date();
             trialEnd.setDate(hoje.getDate() + dias);
 
-            const dadosLoja = {
-                store_name: formData.get('nome_negocio'),
-                whatsapp_number: formData.get('telefone'),
-                plan_type: plano,
-                plan_status: true,
-                trial_start: hoje.toISOString().split('T')[0],
-                trial_end: trialEnd.toISOString().split('T')[0]
-            };
-
             try {
-                // 1. Supabase
-                const { error: sbError } = await sbClient.from('profiles').insert([dadosLoja]);
-                if (sbError) throw sbError;
+                // PASSO 1: Cria o usuário real de acesso (Auth)
+                const { data: authData, error: authError } = await sbClient.auth.signUp({
+                    email: email,
+                    password: senha
+                });
+                
+                if (authError) throw new Error("Erro ao criar conta de acesso: " + authError.message);
+                
+                const userId = authData.user.id; 
 
-                // 2. Formspree
+                // PASSO 2: Cria o perfil da Loja atrelado ao ID do usuário
+                const dadosLoja = {
+                    id: userId, 
+                    store_name: formData.get('nome_negocio'),
+                    whatsapp_number: formData.get('telefone'),
+                    plan_type: plano,
+                    plan_status: true,
+                    trial_start: hoje.toISOString().split('T')[0],
+                    trial_end: trialEnd.toISOString().split('T')[0]
+                };
+
+                const { error: profileError } = await sbClient.from('profiles').insert([dadosLoja]);
+                if (profileError) throw new Error("Erro ao gravar perfil: " + profileError.message);
+
+                // PASSO 3: A Mágica do Zero-Touch (Inicializa a loja)
+                await sbClient.from('store_info').insert([{
+                    tenant_id: userId,
+                    opening_time: '00:00',
+                    closing_time: '23:59',
+                    delivery_fee_main: 0,
+                    delivery_fee_far: 0
+                }]);
+
+                // PASSO 4: Manda aviso pro seu email via Formspree
                 await fetch("https://formspree.io/f/xlgwwzlv", {
                     method: "POST", body: formData, headers: { 'Accept': 'application/json' }
                 });
 
-                alert(`🎉 SUCESSO!\nSeu Plano ${plano.toUpperCase()} foi ativado com ${dias} dias grátis.`);
-                window.location.href = 'login.html';
+                alert(`🎉 SUCESSO!\nSua conta foi criada. Use o email e a senha que cadastrou para entrar.`);
+                window.location.href = 'login.html'; 
+                
             } catch (err) {
-                alert("Erro ao cadastrar. Verifique os dados.");
-                btn.disabled = false; btn.innerText = "FINALIZAR CADASTRO 🚀";
+                console.error(err);
+                alert(err.message || "Erro ao cadastrar. Tente usar outro e-mail.");
+                btn.disabled = false; 
+                btn.innerText = "FINALIZAR CADASTRO E INICIAR TESTE 🚀";
             }
         };
     </script>

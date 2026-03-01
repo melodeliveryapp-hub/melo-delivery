@@ -184,17 +184,20 @@
         }
         function fecharModalErro() { document.getElementById('modal-feedback-erro').classList.add('hidden'); }
 
+        // Slider automático das fases
         let cur = 0;
         setInterval(() => {
             cur = (cur + 1) % 3;
-            document.getElementById('slider-container').style.transform = `translateX(-${cur * 33.333}%)`;
+            if(document.getElementById('slider-container')) {
+                document.getElementById('slider-container').style.transform = `translateX(-${cur * 33.333}%)`;
+            }
         }, 5000);
 
-        // MOTOR DE CURADORIA E SEGURANÇA (Aprovação Manual + Validação de E-mail)
+        // MOTOR DE CADASTRO PARA LOJISTAS
         document.getElementById('form-cadastro').onsubmit = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-submit');
-            btn.innerText = "VERIFICANDO DADOS..."; 
+            btn.innerText = "PROCESSANDO..."; 
             btn.disabled = true;
 
             const formData = new FormData(this);
@@ -202,51 +205,54 @@
             const senha = formData.get('senha');
 
             try {
-                // PASSO 1: Tenta registrar o usuário no Supabase (Criptografia forte)
+                // 1. Tenta criar o login no Supabase
                 const { data, error } = await sbClient.auth.signUp({
                     email: email,
                     password: senha
                 });
 
+                // Se o Supabase der erro real (como e-mail já existente)
                 if (error) {
-                    throw new Error("Erro de validação: " + error.message);
+                    if (error.message.includes("already registered")) {
+                        throw new Error("Este e-mail já está sendo usado por outra loja.");
+                    } else if (error.status === 429) {
+                        throw new Error("Limite de tentativas excedido pelo servidor. Tente novamente em alguns minutos.");
+                    } else {
+                        throw new Error(error.message);
+                    }
                 }
 
-                // Verifica o "falso sucesso" do Supabase (E-mail duplicado)
+                // 2. Se as identidades vierem vazias, o Supabase "fingiu" sucesso mas o e-mail já existe
                 if (data.user && data.user.identities && data.user.identities.length === 0) {
-                    throw new Error("Este e-mail já está sendo utilizado por outra loja. Por favor, insira um e-mail diferente.");
+                    throw new Error("Este e-mail já possui uma conta ativa.");
                 }
 
-                // PASSO 2: Desloga imediatamente 
+                // 3. Desloga para o lojista não entrar no painel sem a sua aprovação manual
                 await sbClient.auth.signOut();
 
-                // PASSO 3: Prepara os dados para o seu e-mail (Formspree)
-                btn.innerText = "ENVIANDO SOLICITAÇÃO..."; 
-                
-                if (data.user) { formData.append("id_do_usuario", data.user.id); }
+                // 4. Envia os dados para o seu Formspree (Analisar a abertura)
+                btn.innerText = "ENVIANDO SOLICITAÇÃO...";
+                if (data.user) { formData.append("id_supabase_gerada", data.user.id); }
+                formData.delete('senha'); // Segurança: não manda a senha por e-mail
 
-                // 🚨 TRAVA DE SEGURANÇA CRÍTICA: Remove a senha do pacote que vai para o seu e-mail.
-                // A senha já está segura no Supabase. Você não deve recebê-la.
-                formData.delete('senha');
-
-                // Envia o e-mail apenas com os dados públicos e a ID do usuário
-                const response = await fetch("https://formspree.io/f/xlgwwzlv", {
-                    method: "POST", 
-                    body: formData, 
+                const resp = await fetch("https://formspree.io/f/xlgwwzlv", {
+                    method: "POST",
+                    body: formData,
                     headers: { 'Accept': 'application/json' }
                 });
 
-                if (response.ok) {
+                if (resp.ok) {
+                    // SUCESSO TOTAL: Fecha formulário e mostra o pop-up profissional
                     document.getElementById('modal-parceiro').classList.add('hidden');
                     document.getElementById('modal-feedback-sucesso').classList.remove('hidden');
                 } else {
-                    throw new Error("Falha de comunicação com o servidor de e-mail. Tente novamente mais tarde.");
+                    throw new Error("Erro ao enviar dados para análise. Tente novamente.");
                 }
-                
+
             } catch (err) {
-                console.error(err);
-                mostrarErro("E-mail Indisponível", err.message);
-                btn.disabled = false; 
+                console.error("Erro no cadastro:", err);
+                mostrarErro("Atenção", err.message);
+                btn.disabled = false;
                 btn.innerText = "ENVIAR SOLICITAÇÃO DE LOJA 🚀";
             }
         };

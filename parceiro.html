@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Melo Delivery para Parceiros - Venda Mais!</title>
+    <link rel="icon" type="image/png" href="fiveicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -104,13 +105,13 @@
         </div>
     </section>
 
-    <div id="modal-parceiro" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[100] hidden flex items-center justify-center p-4">
+    <div id="modal-parceiro" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[100] hidden flex items-center justify-center p-4 transition-opacity">
         <div class="bg-gray-900 w-full max-w-4xl rounded-[3rem] p-8 md:p-12 relative border border-white/10 shadow-2xl overflow-y-auto max-h-[90vh]">
-            <button onclick="fecharFormulario()" class="absolute top-8 right-8 text-gray-500 hover:text-white">✕</button>
+            <button onclick="fecharFormulario()" class="absolute top-8 right-8 text-gray-500 hover:text-white text-xl">✕</button>
             
             <div class="text-center mb-10">
                 <h2 class="text-3xl font-black italic uppercase tracking-tighter">Formulário de <span class="text-orange-500 italic">Parceria</span></h2>
-                <p class="text-gray-500 text-[10px] font-black uppercase italic tracking-widest mt-2">Crie sua conta para acessar o painel</p>
+                <p class="text-gray-500 text-[10px] font-black uppercase italic tracking-widest mt-2">Envie seus dados para analisarmos sua loja</p>
             </div>
 
             <form id="form-cadastro" class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -121,31 +122,50 @@
                 </div>
                 
                 <div class="space-y-4 bg-white/5 p-4 rounded-3xl border border-white/10">
-                    <p class="text-[10px] font-black uppercase text-orange-500 tracking-widest ml-2">Dados de Login</p>
-                    <input type="email" name="email" id="email" required placeholder="Seu E-mail" class="w-full p-5 rounded-2xl border border-white/10 outline-none focus:border-orange-500 font-bold">
+                    <p class="text-[10px] font-black uppercase text-orange-500 tracking-widest ml-2">Dados de Acesso (Para o Painel)</p>
+                    <input type="email" name="email" id="email" required placeholder="Seu melhor E-mail" class="w-full p-5 rounded-2xl border border-white/10 outline-none focus:border-orange-500 font-bold">
                     <input type="password" name="senha" id="senha" required minlength="6" placeholder="Crie uma Senha (mín. 6 caracteres)" class="w-full p-5 rounded-2xl border border-white/10 outline-none focus:border-orange-500 font-bold">
                 </div>
 
                 <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <select name="segmento" required class="w-full p-5 rounded-2xl border border-white/10 outline-none bg-transparent font-bold">
+                    <select name="segmento" required class="w-full p-5 rounded-2xl border border-white/10 outline-none bg-transparent font-bold text-gray-400">
                         <option value="" disabled selected>Área de Segmento</option>
-                        <option value="Restaurante">Restaurante</option>
-                        <option value="Pizzaria">Pizzaria</option>
-                        <option value="Açaiteria">Açaiteria</option>
-                        <option value="Hambúrguer">Hambúrguer</option>
-                        <option value="Outros">Outros</option>
+                        <option value="Restaurante" class="text-gray-900">Restaurante</option>
+                        <option value="Pizzaria" class="text-gray-900">Pizzaria</option>
+                        <option value="Açaiteria" class="text-gray-900">Açaiteria</option>
+                        <option value="Hambúrguer" class="text-gray-900">Hambúrguer</option>
+                        <option value="Serviços" class="text-gray-900">Serviços / Consertos</option>
+                        <option value="Outros" class="text-gray-900">Outros</option>
                     </select>
-                    <select name="plano" id="plano_escolhido" required class="w-full p-5 rounded-2xl border border-white/10 outline-none bg-transparent font-bold">
-                        <option value="bronze">🥉 Plano Bronze</option>
-                        <option value="prata">🥈 Plano Prata</option>
-                        <option value="ouro">🥇 Plano Ouro</option>
+                    <select name="plano" id="plano_escolhido" required class="w-full p-5 rounded-2xl border border-white/10 outline-none bg-transparent font-bold text-gray-400">
+                        <option value="bronze" class="text-gray-900">🥉 Plano Bronze</option>
+                        <option value="prata" class="text-gray-900">🥈 Plano Prata</option>
+                        <option value="ouro" class="text-gray-900">🥇 Plano Ouro</option>
                     </select>
                 </div>
 
                 <div class="md:col-span-2 pt-4">
-                    <button type="submit" id="btn-submit" class="w-full bg-orange-600 py-6 rounded-3xl text-white font-black italic uppercase text-xs shadow-xl hover:bg-orange-500 transition-all">FINALIZAR CADASTRO E INICIAR TESTE 🚀</button>
+                    <button type="submit" id="btn-submit" class="w-full bg-orange-600 py-6 rounded-3xl text-white font-black italic uppercase text-xs shadow-xl hover:bg-orange-500 transition-all">ENVIAR SOLICITAÇÃO DE LOJA 🚀</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div id="modal-feedback-sucesso" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[200] hidden flex items-center justify-center p-4">
+        <div class="bg-gray-900 border border-white/10 p-10 rounded-[3rem] shadow-2xl max-w-md w-full text-center animate-pop">
+            <div class="w-24 h-24 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto text-5xl mb-6 shadow-inner">✅</div>
+            <h3 class="text-3xl font-black italic uppercase text-white mb-3 tracking-tighter">Tudo Certo!</h3>
+            <p class="text-gray-400 text-sm font-bold leading-relaxed mb-8">Suas informações foram enviadas.<br>Seu pedido de abertura será analisado e responderemos em até <strong>2 dias úteis</strong>.</p>
+            <button onclick="window.location.href='index.html'" class="w-full py-5 bg-green-500 hover:bg-green-600 text-white font-black italic uppercase text-xs rounded-2xl transition-all shadow-lg active:scale-95">Entendido, Voltar para o início</button>
+        </div>
+    </div>
+
+    <div id="modal-feedback-erro" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[200] hidden flex items-center justify-center p-4">
+        <div class="bg-gray-900 border border-white/10 p-10 rounded-[3rem] shadow-2xl max-w-md w-full text-center animate-pop">
+            <div class="w-24 h-24 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center mx-auto text-5xl mb-6 shadow-inner">⚠️</div>
+            <h3 class="text-3xl font-black italic uppercase text-white mb-3 tracking-tighter" id="erro-titulo">Atenção!</h3>
+            <p class="text-gray-400 text-sm font-bold leading-relaxed mb-8" id="erro-msg">Ocorreu um erro ao processar sua solicitação.</p>
+            <button onclick="fecharModalErro()" class="w-full py-5 bg-white/10 hover:bg-white/20 text-white font-black italic uppercase text-xs rounded-2xl transition-all active:scale-95">Tentar Novamente</button>
         </div>
     </div>
 
@@ -156,6 +176,13 @@
 
         function abrirFormulario() { document.getElementById('modal-parceiro').classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
         function fecharFormulario() { document.getElementById('modal-parceiro').classList.add('hidden'); document.body.style.overflow = 'auto'; }
+        
+        function mostrarErro(titulo, msg) {
+            document.getElementById('erro-titulo').innerText = titulo;
+            document.getElementById('erro-msg').innerText = msg;
+            document.getElementById('modal-feedback-erro').classList.remove('hidden');
+        }
+        function fecharModalErro() { document.getElementById('modal-feedback-erro').classList.add('hidden'); }
 
         let cur = 0;
         setInterval(() => {
@@ -163,71 +190,64 @@
             document.getElementById('slider-container').style.transform = `translateX(-${cur * 33.333}%)`;
         }, 5000);
 
-        // NÚCLEO DA AUTOMAÇÃO MESTRA (Com nova regra de dias)
+        // MOTOR DE CURADORIA E SEGURANÇA (Aprovação Manual + Validação de E-mail)
         document.getElementById('form-cadastro').onsubmit = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-submit');
-            btn.innerText = "CRIANDO SUA CONTA..."; 
+            btn.innerText = "VERIFICANDO DADOS..."; 
             btn.disabled = true;
 
             const formData = new FormData(this);
             const email = formData.get('email');
             const senha = formData.get('senha');
-            const plano = formData.get('plano');
-            
-            // Regra Atualizada: 15 dias para Ouro, 7 para os restantes
-            const dias = plano === 'ouro' ? 15 : 7;
-            const hoje = new Date();
-            const trialEnd = new Date();
-            trialEnd.setDate(hoje.getDate() + dias);
 
             try {
-                // PASSO 1: Cria o usuário real de acesso (Auth)
-                const { data: authData, error: authError } = await sbClient.auth.signUp({
+                // PASSO 1: Tenta registrar o usuário no Supabase (Criptografia forte)
+                const { data, error } = await sbClient.auth.signUp({
                     email: email,
                     password: senha
                 });
+
+                if (error) {
+                    throw new Error("Erro de validação: " + error.message);
+                }
+
+                // Verifica o "falso sucesso" do Supabase (E-mail duplicado)
+                if (data.user && data.user.identities && data.user.identities.length === 0) {
+                    throw new Error("Este e-mail já está sendo utilizado por outra loja. Por favor, insira um e-mail diferente.");
+                }
+
+                // PASSO 2: Desloga imediatamente 
+                await sbClient.auth.signOut();
+
+                // PASSO 3: Prepara os dados para o seu e-mail (Formspree)
+                btn.innerText = "ENVIANDO SOLICITAÇÃO..."; 
                 
-                if (authError) throw new Error("Erro ao criar conta de acesso: " + authError.message);
-                
-                const userId = authData.user.id; 
+                if (data.user) { formData.append("id_do_usuario", data.user.id); }
 
-                // PASSO 2: Cria o perfil da Loja atrelado ao ID do usuário
-                const dadosLoja = {
-                    id: userId, 
-                    store_name: formData.get('nome_negocio'),
-                    whatsapp_number: formData.get('telefone'),
-                    plan_type: plano,
-                    plan_status: true,
-                    trial_start: hoje.toISOString().split('T')[0],
-                    trial_end: trialEnd.toISOString().split('T')[0]
-                };
+                // 🚨 TRAVA DE SEGURANÇA CRÍTICA: Remove a senha do pacote que vai para o seu e-mail.
+                // A senha já está segura no Supabase. Você não deve recebê-la.
+                formData.delete('senha');
 
-                const { error: profileError } = await sbClient.from('profiles').insert([dadosLoja]);
-                if (profileError) throw new Error("Erro ao gravar perfil: " + profileError.message);
-
-                // PASSO 3: A Mágica do Zero-Touch (Inicializa a loja)
-                await sbClient.from('store_info').insert([{
-                    tenant_id: userId,
-                    opening_time: '00:00',
-                    closing_time: '23:59',
-                    delivery_fee_main: 0,
-                    delivery_fee_far: 0
-                }]);
-
-                // PASSO 4: Manda aviso pro seu email via Formspree
-                await fetch("https://formspree.io/f/xlgwwzlv", {
-                    method: "POST", body: formData, headers: { 'Accept': 'application/json' }
+                // Envia o e-mail apenas com os dados públicos e a ID do usuário
+                const response = await fetch("https://formspree.io/f/xlgwwzlv", {
+                    method: "POST", 
+                    body: formData, 
+                    headers: { 'Accept': 'application/json' }
                 });
 
-                alert(`🎉 SUCESSO!\nSua conta foi criada. Use o email e a senha que cadastrou para entrar.`);
-                window.location.href = 'login.html'; 
+                if (response.ok) {
+                    document.getElementById('modal-parceiro').classList.add('hidden');
+                    document.getElementById('modal-feedback-sucesso').classList.remove('hidden');
+                } else {
+                    throw new Error("Falha de comunicação com o servidor de e-mail. Tente novamente mais tarde.");
+                }
                 
             } catch (err) {
                 console.error(err);
-                alert(err.message || "Erro ao cadastrar. Tente usar outro e-mail.");
+                mostrarErro("E-mail Indisponível", err.message);
                 btn.disabled = false; 
-                btn.innerText = "FINALIZAR CADASTRO E INICIAR TESTE 🚀";
+                btn.innerText = "ENVIAR SOLICITAÇÃO DE LOJA 🚀";
             }
         };
     </script>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acesso do Lojista - Melo Delivery</title>
-    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/png" href="fiveicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
@@ -19,7 +19,7 @@
         
         <div id="loading" class="absolute inset-0 bg-gray-900 z-50 flex flex-col items-center justify-center">
             <div class="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-            <p class="text-gray-400 text-xs font-black uppercase tracking-widest mt-4">Verificando sessão...</p>
+            <p class="text-gray-400 text-xs font-black uppercase tracking-widest mt-4">Verificando sistema...</p>
         </div>
 
         <div id="sessao-detectada" class="hidden text-center space-y-6">
@@ -48,8 +48,23 @@
                     <input type="password" id="password" required placeholder="Sua Senha" class="w-full p-5 bg-white/5 rounded-2xl border border-white/10 outline-none focus:border-orange-500 font-bold text-white placeholder-gray-600 transition-colors">
                 </div>
                 
+                <div class="text-right">
+                    <button type="button" onclick="abrirRecuperacao()" class="text-gray-500 hover:text-orange-500 text-[10px] font-black uppercase italic tracking-widest transition-colors">Esqueceu sua senha?</button>
+                </div>
+
                 <button type="submit" id="btn-login" class="w-full mt-2 py-5 bg-orange-600 hover:bg-orange-500 text-white rounded-2xl font-black italic uppercase text-xs shadow-lg transition-all">ENTRAR NO PAINEL ➔</button>
             </form>
+
+            <div class="relative flex items-center py-6">
+                <div class="flex-grow border-t border-white/10"></div>
+                <span class="flex-shrink-0 mx-4 text-white/30 text-[10px] font-black uppercase italic tracking-widest">OU ACESSE COM</span>
+                <div class="flex-grow border-t border-white/10"></div>
+            </div>
+
+            <button onclick="loginComGoogle()" class="w-full py-4 bg-white hover:bg-gray-100 text-gray-900 rounded-2xl font-black italic uppercase text-xs shadow-lg transition-all flex items-center justify-center gap-3 active:scale-95">
+                <svg viewBox="0 0 24 24" class="w-5 h-5"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/><path fill="none" d="M1 1h22v22H1z"/></svg>
+                Entrar com o Google
+            </button>
 
             <div class="mt-8 text-center border-t border-white/5 pt-6">
                 <p class="text-gray-500 text-xs font-bold">Ainda não é parceiro?</p>
@@ -58,12 +73,35 @@
         </div>
     </div>
 
+    <div id="modal-recuperacao" class="fixed inset-0 bg-black/95 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-gray-900 border border-white/10 p-8 rounded-[3rem] shadow-2xl max-w-sm w-full animate-pop relative">
+            <button onclick="fecharRecuperacao()" class="absolute top-6 right-6 text-gray-500 hover:text-white text-xl">✕</button>
+            <div class="w-16 h-16 bg-orange-500/20 text-orange-500 rounded-full flex items-center justify-center mb-6 text-3xl shadow-inner">🔑</div>
+            <h3 class="text-2xl font-black italic uppercase text-white mb-2 tracking-tighter">Recuperar Senha</h3>
+            <p class="text-gray-400 text-xs font-bold leading-relaxed mb-6">Digite seu e-mail abaixo. Enviaremos um link seguro para você criar uma nova senha.</p>
+            
+            <input type="email" id="email-recuperacao" placeholder="Seu E-mail" class="w-full p-4 mb-4 bg-white/5 rounded-2xl border border-white/10 outline-none focus:border-orange-500 font-bold text-white">
+            <button onclick="enviarLinkRecuperacao()" id="btn-enviar-rec" class="w-full py-4 bg-orange-600 hover:bg-orange-500 text-white font-black italic uppercase text-xs rounded-2xl transition-all shadow-lg active:scale-95">Enviar Link Seguro</button>
+        </div>
+    </div>
+
+    <div id="modal-nova-senha" class="fixed inset-0 bg-black/95 backdrop-blur-md z-[110] hidden flex items-center justify-center p-4">
+        <div class="bg-gray-900 border border-white/10 p-8 rounded-[3rem] shadow-2xl max-w-sm w-full animate-pop">
+            <div class="w-16 h-16 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mb-6 text-3xl shadow-inner">🛡️</div>
+            <h3 class="text-2xl font-black italic uppercase text-white mb-2 tracking-tighter">Criar Nova Senha</h3>
+            <p class="text-gray-400 text-xs font-bold leading-relaxed mb-6">Sua identidade foi confirmada. Digite sua nova senha de acesso.</p>
+            
+            <input type="password" id="input-nova-senha" placeholder="Nova Senha (mín. 6 caracteres)" class="w-full p-4 mb-4 bg-white/5 rounded-2xl border border-white/10 outline-none focus:border-orange-500 font-bold text-white">
+            <button onclick="salvarNovaSenha()" id="btn-salvar-senha" class="w-full py-4 bg-green-600 hover:bg-green-500 text-white font-black italic uppercase text-xs rounded-2xl transition-all shadow-lg active:scale-95">Salvar e Acessar Painel</button>
+        </div>
+    </div>
+
     <script>
         const SUPABASE_URL = 'https://xhfwrbjxitcrktccdrpn.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZndyYmp4aXRjcmt0Y2NkcnBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MjQ5NTksImV4cCI6MjA4NjIwMDk1OX0.nyGJxdNT-qiH-oqJL4KDKA-7bRtlj5UxmXy32RswPUc';
         const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Verifica imediatamente se o utilizador já está logado no navegador
+        // Verifica Sessão
         async function checkSession() {
             const { data: { session } } = await sbClient.auth.getSession();
             document.getElementById('loading').classList.add('hidden');
@@ -76,7 +114,7 @@
             }
         }
 
-        // Função de Login Seguro
+        // Login Padrão
         async function handleLogin(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-login');
@@ -94,14 +132,74 @@
                 btn.innerText = originalText;
                 btn.classList.remove('btn-loading');
             } else {
-                // Sucesso absoluto, redireciona para a central de comando
                 window.location.href = 'painel.html';
             }
         }
 
-        async function fazerLogout() {
-            await sbClient.auth.signOut();
-            window.location.reload();
+        // Login Google
+        async function loginComGoogle() {
+            const urlOrigem = window.location.origin + '/painel.html';
+            const { error } = await sbClient.auth.signInWithOAuth({
+                provider: 'google', options: { redirectTo: urlOrigem }
+            });
+            if (error) alert("Ocorreu um erro ao tentar conectar com o Google.");
+        }
+
+        async function fazerLogout() { await sbClient.auth.signOut(); window.location.reload(); }
+
+        // --- SISTEMA DE RECUPERAÇÃO DE SENHA ---
+
+        function abrirRecuperacao() { document.getElementById('modal-recuperacao').classList.remove('hidden'); }
+        function fecharRecuperacao() { document.getElementById('modal-recuperacao').classList.add('hidden'); }
+
+        async function enviarLinkRecuperacao() {
+            const email = document.getElementById('email-recuperacao').value;
+            if(!email) return alert("Digite seu e-mail primeiro.");
+
+            const btn = document.getElementById('btn-enviar-rec');
+            btn.innerText = "ENVIANDO..."; btn.classList.add('btn-loading');
+
+            // Envia o e-mail e diz ao Supabase para devolver o usuário para o login.html
+            const { error } = await sbClient.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + '/login.html'
+            });
+
+            if (error) {
+                alert("Erro ao enviar o link. Verifique se o e-mail está correto.");
+            } else {
+                alert("✅ Link enviado! Verifique sua caixa de entrada (e a pasta de Spam) para criar sua nova senha.");
+                fecharRecuperacao();
+            }
+            btn.innerText = "Enviar Link Seguro"; btn.classList.remove('btn-loading');
+        }
+
+        // Ouve ativamente se o usuário acabou de clicar no link de recuperação de senha no e-mail
+        sbClient.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'PASSWORD_RECOVERY') {
+                // Esconde as telas de login normais e mostra o modal de nova senha
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('sessao-detectada').classList.add('hidden');
+                document.getElementById('form-login-container').classList.add('hidden');
+                document.getElementById('modal-nova-senha').classList.remove('hidden');
+            }
+        });
+
+        async function salvarNovaSenha() {
+            const novaSenha = document.getElementById('input-nova-senha').value;
+            if(novaSenha.length < 6) return alert("A senha deve ter pelo menos 6 caracteres.");
+
+            const btn = document.getElementById('btn-salvar-senha');
+            btn.innerText = "SALVANDO..."; btn.classList.add('btn-loading');
+
+            const { error } = await sbClient.auth.updateUser({ password: novaSenha });
+
+            if (error) {
+                alert("Erro ao atualizar senha. Tente solicitar um novo link.");
+                btn.innerText = "Salvar e Acessar Painel"; btn.classList.remove('btn-loading');
+            } else {
+                alert("🎉 Senha atualizada com sucesso!");
+                window.location.href = 'painel.html'; // Redireciona logado
+            }
         }
 
         checkSession();
